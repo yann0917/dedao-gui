@@ -73,7 +73,7 @@
 </template>
   
 <script lang="ts" setup>
-import { ref, reactive, onMounted, watch, nextTick } from 'vue'
+import { ref, reactive, onMounted, onUnmounted,watch, nextTick } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
 import { ArticleList, CourseDownload } from '../../wailsjs/go/backend/App'
@@ -131,12 +131,17 @@ onMounted(() => {
 
 })
 
+onUnmounted(() => {
+  if (audioPlayer.value) {
+    audioPlayer.value.dispose()
+  }
+})
 
 const closeAudio = () => {
-  if (audioPlayer.value) {
-    audioPlayer.value.dispose();
-    audiohtml.value = '';
-  }
+  // if (audioPlayer.value) {
+  //   audioPlayer.value.dispose();
+  //   audiohtml.value = '';
+  // }
   audioVisible.value = false;
   media.value = ''
 }
@@ -162,7 +167,7 @@ const handlePlay = (row: any) => {
 }
 
 const open = () => {
-  audiohtml.value = '<audio id="auPlayer" controls class="video-js vjs-big-play-centered  vjs-default-skin " style="width:100%;height:100px"></audio>';
+  audiohtml.value = '<audio id='+media.value.log_type+media.value.enid+' controls class="video-js vjs-big-play-centered  vjs-default-skin " style="width:100%;height:100px"></audio>';
 }
 
 const openVideo = async (row: any) => {
@@ -176,7 +181,7 @@ const openVideo = async (row: any) => {
     // console.log(soc)
     setTimeout(() => {
       nextTick(() => {
-        audioPlayer.value = videojs("auPlayer", {
+        audioPlayer.value = videojs(row.log_type+row.enid, {
           language: 'zh-Hans',
           poster: poster,
           controls: true,
@@ -189,7 +194,7 @@ const openVideo = async (row: any) => {
             },
             fullscreenToggle: false
           },
-          playbackRates: [0.5, 1, 1.5, 2],
+          playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
           audioOnlyMode: true,
           audioPosterMode: true,
           volume: 0.5,

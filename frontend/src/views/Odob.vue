@@ -170,7 +170,7 @@ const openVideo = async (row: any) => {
           },
           fullscreenToggle: false
         },
-        playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
+        playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
         // aspectRatio:'1:1',
         // audioOnlyMode:true,
         audioPosterMode:true,

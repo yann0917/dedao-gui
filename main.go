@@ -1,8 +1,9 @@
 package main
 
 import (
-	"changeme/backend"
 	"embed"
+
+	"github.com/yann0917/dedao-gui/backend"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"

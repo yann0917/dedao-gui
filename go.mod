@@ -1,4 +1,4 @@
-module changeme
+module github.com/yann0917/dedao-gui
 
 go 1.18
 
@@ -59,5 +59,3 @@ require (
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 )
-
-replace github.com/yann0917/dedao v0.0.4 => /Users/yabo/wwwroot/dedao
