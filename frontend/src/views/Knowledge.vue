@@ -5,7 +5,7 @@
     <el-col :span="16" class="notes">
       <ul v-infinite-scroll="loadNotes" 
       class="infinite-note-list" 
-      style="overflow-y: auto; max-height: 800px;"  
+      style="overflow-y: auto; max-height: 900px;"  
       :infinite-scroll-disabled="infLoadingNote"
       infinite-scroll-distance="10"	>
       <li class="infinite-note-list-item">
@@ -20,7 +20,7 @@
                 <span style="font-size: small;" v-if="item.comb.length<=2">  
                     {{ ' '+item.comb.map((v,i)=>{
                   return v.name
-                }).join("、")+" 转发了" }}</span>
+                }).join("、")+"转发了" }}</span>
                  <span style="font-size: small;" v-else="item.comb.length>2">  
                     {{ ' '+item.comb.map((v,i)=>{
                       if(i<2) {
@@ -30,7 +30,7 @@
               </el-col>
             </el-row>
 
-            <el-row :gutter="20" align="top">
+            <el-row :gutter="20">
               <el-col :span="4">
                 
                 <el-avatar :size="72" :src="item.f_part.avatar" fit="fill" />
@@ -54,7 +54,7 @@
             <div class="imageBox">
               <el-image v-for="i in item.f_part.images" :src="i" :preview-src-list="item.f_part.images.map((v,i)=>{
                 return v
-              })" :initial-index="0"  fit="cover" style="width: 32%;"/>
+              })" :initial-index="0"  fit="cover" :style="item.f_part.images?.length>1?'height:245px;width: 32%;':'width: 32%;'" />
             </div>
           </div>
 
@@ -82,7 +82,6 @@
 
           <div class="s-part" v-if="item.s_part">
             <el-divider />
-
             <el-row :gutter="5" align="top">
               <el-col :span="3">
                 <el-avatar :size="48" :src="item.s_part.avatar" fit="fill" />
@@ -93,29 +92,32 @@
                 <h4>{{ item.s_part.nick_name }}</h4>
               </el-col>
             </el-row>
-            <el-row :gutter="5" align="top">
-              <el-col :span="24">
-                <span style="white-space: pre-wrap;">{{item.s_part.note }}</span>
-                <div class="note-line" v-if="item.s_part.base_source.title !=''">
-                  <div v-if="item.notes_type == 4">
-                    {{item.s_part.note_line }}
-                  <el-divider />
-                  </div>
-                <div class="base-source">
-                  <el-row :gutter="2" align="top">
-                  <el-col :span="2" style="padding-left: 1%;">
-                    <el-image :src="item.s_part.base_source.img" fit="cover" style="width:90%;"/>
-                  </el-col>
-                  <el-col :span="16" style="text-align: left;line-height: 2.2em;">
-                    <div style="font-weight: bold;">{{ item.s_part.base_source.title }}</div>
-                    <div style="font-size: small;">{{ item.s_part.base_source.sub_title }}</div>
-                  </el-col>
-                </el-row>
-                </div>
-                </div>
-              </el-col>
-             
-            </el-row>
+
+            <span style="white-space: pre-wrap;">{{item.s_part.note }}</span>
+            <div class="box" v-if="item.s_part.images?.length>0">
+              <div class="imageBox">
+                <el-image v-for="i in item.s_part.images" :src="i" :preview-src-list="item.s_part.images.map((v,i)=>{
+                  return v
+                })" :initial-index="0"  fit="cover"  :style="item.f_part.images?.length>1?'height:245px;width: 32%;':'width: 32%;'"/>
+              </div>
+            </div>
+            <div class="note-line" v-if="item.s_part.base_source.title !=''">
+              <div v-if="item.notes_type == 4">
+                {{item.s_part.note_line }}
+              <el-divider />
+              </div>
+            <div class="base-source">
+              <el-row :gutter="2" align="top">
+                <el-col :span="2" style="padding-left: 1%;">
+                  <el-image :src="item.s_part.base_source.img" fit="cover" style="width:90%;"/>
+                </el-col>
+                <el-col :span="16" style="text-align: left;line-height: 2.2em;">
+                  <div style="font-weight: bold;">{{ item.s_part.base_source.title }}</div>
+                  <div style="font-size: small;">{{ item.s_part.base_source.sub_title }}</div>
+                </el-col>
+              </el-row>
+            </div>
+            </div>
           </div>
 
           <div class="topic-name" style="padding-top: 1em;">
@@ -240,13 +242,19 @@ import { it } from 'element-plus/es/locale'
   
   const getTableData = async () => {
     await NotesTimeline(maxId.value).then((table) => {
-      // console.log(table)
+      console.log(table)
       Object.assign(tableData, table)
       isMore.value = tableData.is_more
       maxId.value = tableData.max_id
       tableData.notes.forEach((item,index,array)=>{
         if(item.f_part.images?.length>0) {
           item.f_part.images.forEach((item1, index1, array1) => {
+            let imgs = JSON.parse(item1)
+            array1[index1]=imgs.url
+        })
+        }
+        if(item.s_part?.images.length) {
+          item.s_part.images.forEach((item1, index1, array1) => {
             let imgs = JSON.parse(item1)
             array1[index1]=imgs.url
         })
@@ -328,7 +336,6 @@ ul {
   margin: 0;
   text-align: left;
   list-style: none;
-
 }
 .infinite-list .infinite-list-item {
   margin: 1%;
@@ -363,7 +370,6 @@ ul {
     position: relative;
     overflow: hidden;
     margin: 0.5%;
-    width: 245px;
 }
 .imageBox .el-image img:nth-child(2):nth-last-child(1),
 .imageBox .el-image img:nth-child(1):nth-last-child(2) {
@@ -387,7 +393,7 @@ ul {
 /*  5张以上图片  */
 .imageBox .el-image img:nth-child(1):nth-last-child(n + 5),
 .imageBox .el-image img:nth-child(1):nth-last-child(n + 5)~img {
-    width: 32%;
+  width: 32%;
 }
 
 </style>
