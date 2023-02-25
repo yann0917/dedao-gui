@@ -68,6 +68,7 @@ import { services } from '../../wailsjs/go/models'
 import { useRouter } from 'vue-router'
 import { userStore } from '../stores/user';
 import Pagination from '../components/Pagination.vue'
+import { Local } from '../utils/storage';
 
 const store = userStore()
 const router = useRouter()
@@ -100,6 +101,8 @@ onMounted(() => {
             store.user = null
             router.push("/user/login")
         }
+        Local.remove("cookies")
+        Local.remove("userStore")
     })
 })
 

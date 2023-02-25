@@ -31,8 +31,16 @@ export function GetVolcPlayAuthToken(arg1:string,arg2:string):Promise<services.M
 
 export function GetVolcPlayInfo(arg1:string):Promise<services.VodPlayInfoResp>;
 
+export function NotesTimeline(arg1:string):Promise<services.NotesTimeline>;
+
 export function OdobDownload(arg1:number,arg2:number):Promise<void>;
 
 export function OdobUserInfo():Promise<services.OdobVip>;
+
+export function TopicAll(arg1:number,arg2:number):Promise<services.TopicAll>;
+
+export function TopicNoteDetail(arg1:string):Promise<services.TopicDetail>;
+
+export function TopicNotesList(arg1:string):Promise<services.NotesList>;
 
 export function UserInfo():Promise<services.User>;

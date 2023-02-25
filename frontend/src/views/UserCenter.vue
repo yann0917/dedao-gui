@@ -8,7 +8,7 @@
                             <el-avatar :size="72" :src="user.avatar" fit="fill" />
                             <el-button text>{{ user.nickname }}</el-button>
                         </el-col>
-                        <el-col :span="18">
+                        <el-col :span="18" style="text-align: left; line-height: 10px;">
                             <p>{{ ebookUser.slogan }}</p>
                             <el-tag class="ml-2" type="warning" v-if="odobUser.user?.is_vip" round>
                                 <el-icon>

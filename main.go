@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 
+	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/yann0917/dedao-gui/backend"
 
 	"github.com/wailsapp/wails/v2"
@@ -26,17 +27,19 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:            "dedao-gui",
-		Width:            1280,
-		Height:           1000,
-		MinWidth:         1024,
-		MinHeight:        768,
-		MaxWidth:         2560,
-		MaxHeight:        1440,
-		Assets:           assets,
+		Title:     "dedao-gui",
+		Width:     1280,
+		Height:    1000,
+		MinWidth:  1024,
+		MinHeight: 768,
+		MaxWidth:  2560,
+		MaxHeight: 1440,
+		AssetServer: &assetserver.Options{
+			Assets:  assets,
+			Handler: backend.NewFileLoader(),
+		},
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		OnStartup:        app.Startup,
-		AssetsHandler:    backend.NewFileLoader(),
 		LogLevel:         logger.DEBUG,
 		WindowStartState: options.Normal,
 		Bind: []interface{}{

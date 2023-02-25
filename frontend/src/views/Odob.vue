@@ -103,6 +103,7 @@ import { services } from '../../wailsjs/go/models'
 import Pagination from '../components/Pagination.vue'
 import { useRouter } from 'vue-router'
 import { userStore } from '../stores/user';
+import { Local } from '../utils/storage';
 
 import { secondToHour } from '../utils/utils'
 import videojs from 'video.js'
@@ -193,7 +194,6 @@ const openVideo = async (row: any) => {
       }
     )
   }, 300)
-
 }
 
 let tableData = reactive(new services.CourseList)
@@ -212,6 +212,8 @@ onMounted(() => {
             store.user = null
             router.push("/user/login")
         }
+        Local.remove("cookies")
+        Local.remove("userStore")
     })
 
 })

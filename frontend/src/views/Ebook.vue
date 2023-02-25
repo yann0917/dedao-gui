@@ -124,6 +124,7 @@ import { repeat } from 'lodash'
 import { secondToHour } from '../utils/utils'
 import { useRouter } from 'vue-router'
 import { userStore } from '../stores/user';
+import { Local } from '../utils/storage';
 
 
 const store = userStore()
@@ -161,6 +162,8 @@ onMounted(() => {
             store.user = null
             router.push("/user/login")
         }
+        Local.remove("cookies")
+        Local.remove("userStore")
     })
 })
 

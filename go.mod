@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/json-iterator/go v1.1.12
 	github.com/wailsapp/wails/v2 v2.3.1
-	github.com/yann0917/dedao v0.0.4
+	github.com/yann0917/dedao v0.0.6
 )
 
 require (
@@ -59,3 +59,5 @@ require (
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 )
+
+//replace github.com/yann0917/dedao v0.0.6 => /Users/yabo/wwwroot/dedao

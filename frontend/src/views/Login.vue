@@ -65,10 +65,16 @@ onMounted(() => {
           
             console.log(store)
             router.push("/user/profile")
+          }).catch((error)=>{
+            console.log(error)
+            Local.remove("cookies")
+            Local.remove("userStore")
           })
-        }
-        if (loginResult.status == 2) {
+        }else if (loginResult.status == 2) {
           router.push("/user/login")
+        } else {
+          Local.remove("cookies")
+          Local.remove("userStore")
         }
       }
 

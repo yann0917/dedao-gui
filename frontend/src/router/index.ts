@@ -103,6 +103,22 @@ const router = createRouter({
         },
         {
             path: "/",
+            // name: "knowledge",
+            meta: { name: "知识城邦", icon:"Notebook", menuType: 2 },
+            redirect: "/knowledge",
+            children: [
+                {
+                    path: 'knowledge',
+                    name: "knowledge",
+                    component: () => import("../views/Knowledge.vue"),
+                    meta: {
+                        name: "知识城邦", requiresAuth:false
+                    },
+                }
+            ]
+        },
+        {
+            path: "/",
             // name: "ebook",
             meta: { name: "锦囊", icon:"Compass", menuType: 2 },
             redirect: "/compass",

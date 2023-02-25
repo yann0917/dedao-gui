@@ -58,12 +58,28 @@ export function GetVolcPlayInfo(arg1) {
   return window['go']['backend']['App']['GetVolcPlayInfo'](arg1);
 }
 
+export function NotesTimeline(arg1) {
+  return window['go']['backend']['App']['NotesTimeline'](arg1);
+}
+
 export function OdobDownload(arg1, arg2) {
   return window['go']['backend']['App']['OdobDownload'](arg1, arg2);
 }
 
 export function OdobUserInfo() {
   return window['go']['backend']['App']['OdobUserInfo']();
+}
+
+export function TopicAll(arg1, arg2) {
+  return window['go']['backend']['App']['TopicAll'](arg1, arg2);
+}
+
+export function TopicNoteDetail(arg1) {
+  return window['go']['backend']['App']['TopicNoteDetail'](arg1);
+}
+
+export function TopicNotesList(arg1) {
+  return window['go']['backend']['App']['TopicNotesList'](arg1);
 }
 
 export function UserInfo() {

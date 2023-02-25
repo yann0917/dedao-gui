@@ -486,6 +486,20 @@ export namespace services {
 	        this.book_type = source["book_type"];
 	    }
 	}
+	export class CampHazy {
+	    SourceIdHazy: string;
+	    OriginIdHazy: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new CampHazy(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.SourceIdHazy = source["SourceIdHazy"];
+	        this.OriginIdHazy = source["OriginIdHazy"];
+	    }
+	}
 	export class Catalog {
 	    level: number;
 	    text: string;
@@ -1913,8 +1927,324 @@ export namespace services {
 		    return a;
 		}
 	}
+	export class NoteBaseSource {
+	    title: string;
+	    sub_title: string;
+	    img: string;
+	    p_type: number;
+	    pid_str: string;
+	    note_ptype: number;
+	    is_pop_login_view: boolean;
+	    need_check_buy: boolean;
+	    url1: string;
+	    url2: string;
+	    camp_hazy: CampHazy;
+	
+	    static createFrom(source: any = {}) {
+	        return new NoteBaseSource(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.title = source["title"];
+	        this.sub_title = source["sub_title"];
+	        this.img = source["img"];
+	        this.p_type = source["p_type"];
+	        this.pid_str = source["pid_str"];
+	        this.note_ptype = source["note_ptype"];
+	        this.is_pop_login_view = source["is_pop_login_view"];
+	        this.need_check_buy = source["need_check_buy"];
+	        this.url1 = source["url1"];
+	        this.url2 = source["url2"];
+	        this.camp_hazy = this.convertValues(source["camp_hazy"], CampHazy);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class NoteCount {
+	    repost_count: number;
+	    comment_count: number;
+	    like_count: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new NoteCount(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.repost_count = source["repost_count"];
+	        this.comment_count = source["comment_count"];
+	        this.like_count = source["like_count"];
+	    }
+	}
+	export class NoteFPart {
+	    uid: number;
+	    uid_hazy: string;
+	    nick_name: string;
+	    avatar: string;
+	    follow: number;
+	    is_v: number;
+	    slogan: string;
+	    v_info: string;
+	    student_id: number;
+	    student_id_hazy: string;
+	    is_poster: boolean;
+	    qr_code: string;
+	    note: string;
+	    time_desc: string;
+	    note_title: string;
+	    note_score: string;
+	    note_line: string;
+	    note_id: string;
+	    note_id_hazy: string;
+	    tip: string;
+	    images: string[];
+	    base_source: NoteBaseSource;
+	    style_note_line: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new NoteFPart(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.uid = source["uid"];
+	        this.uid_hazy = source["uid_hazy"];
+	        this.nick_name = source["nick_name"];
+	        this.avatar = source["avatar"];
+	        this.follow = source["follow"];
+	        this.is_v = source["is_v"];
+	        this.slogan = source["slogan"];
+	        this.v_info = source["v_info"];
+	        this.student_id = source["student_id"];
+	        this.student_id_hazy = source["student_id_hazy"];
+	        this.is_poster = source["is_poster"];
+	        this.qr_code = source["qr_code"];
+	        this.note = source["note"];
+	        this.time_desc = source["time_desc"];
+	        this.note_title = source["note_title"];
+	        this.note_score = source["note_score"];
+	        this.note_line = source["note_line"];
+	        this.note_id = source["note_id"];
+	        this.note_id_hazy = source["note_id_hazy"];
+	        this.tip = source["tip"];
+	        this.images = source["images"];
+	        this.base_source = this.convertValues(source["base_source"], NoteBaseSource);
+	        this.style_note_line = source["style_note_line"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class NoteTopic {
+	    topic_id: number;
+	    topic_id_hazy: string;
+	    is_elected: boolean;
+	    is_topmost: boolean;
+	    topic_name: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new NoteTopic(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.topic_id = source["topic_id"];
+	        this.topic_id_hazy = source["topic_id_hazy"];
+	        this.is_elected = source["is_elected"];
+	        this.is_topmost = source["is_topmost"];
+	        this.topic_name = source["topic_name"];
+	    }
+	}
+	export class Comb {
+	    uid: number;
+	    uid_hazy: string;
+	    name: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Comb(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.uid = source["uid"];
+	        this.uid_hazy = source["uid_hazy"];
+	        this.name = source["name"];
+	    }
+	}
+	export class NoteDetail {
+	    detail_title: string;
+	    comb?: Comb[];
+	    state: number;
+	    is_mine: boolean;
+	    is_reposted: boolean;
+	    is_like: boolean;
+	    own_uid_hazy: string;
+	    topic: NoteTopic;
+	    tags: any[];
+	    folders: any;
+	    note_count: NoteCount;
+	    f_part: NoteFPart;
+	    s_part?: NoteFPart;
+	    share_url: string;
+	    class: number;
+	    level: number;
+	    level_type: number;
+	    level_permission: boolean;
+	    notes_type: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new NoteDetail(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.detail_title = source["detail_title"];
+	        this.comb = this.convertValues(source["comb"], Comb);
+	        this.state = source["state"];
+	        this.is_mine = source["is_mine"];
+	        this.is_reposted = source["is_reposted"];
+	        this.is_like = source["is_like"];
+	        this.own_uid_hazy = source["own_uid_hazy"];
+	        this.topic = this.convertValues(source["topic"], NoteTopic);
+	        this.tags = source["tags"];
+	        this.folders = source["folders"];
+	        this.note_count = this.convertValues(source["note_count"], NoteCount);
+	        this.f_part = this.convertValues(source["f_part"], NoteFPart);
+	        this.s_part = this.convertValues(source["s_part"], NoteFPart);
+	        this.share_url = source["share_url"];
+	        this.class = source["class"];
+	        this.level = source["level"];
+	        this.level_type = source["level_type"];
+	        this.level_permission = source["level_permission"];
+	        this.notes_type = source["notes_type"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	
 	
+	
+	
+	export class NotesList {
+	    has_more: boolean;
+	    list: any[];
+	    note_detail_list: NoteDetail[];
+	    presenter_uid: any[];
+	    presenter_uid_hazy: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new NotesList(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.has_more = source["has_more"];
+	        this.list = source["list"];
+	        this.note_detail_list = this.convertValues(source["note_detail_list"], NoteDetail);
+	        this.presenter_uid = source["presenter_uid"];
+	        this.presenter_uid_hazy = source["presenter_uid_hazy"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class NotesTimeline {
+	    is_more: boolean;
+	    max_id: string;
+	    notes: NoteDetail[];
+	
+	    static createFrom(source: any = {}) {
+	        return new NotesTimeline(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.is_more = source["is_more"];
+	        this.max_id = source["max_id"];
+	        this.notes = this.convertValues(source["notes"], NoteDetail);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	
 	
 	export class OdobRight {
@@ -2117,6 +2447,213 @@ export namespace services {
 		}
 	}
 	
+	
+	
+	
+	export class TopicIntro {
+	    notes_topic_id: string;
+	    topic_id_hazy: string;
+	    name: string;
+	    img: string;
+	    topmost: boolean;
+	    tag: number;
+	    intro: string;
+	    view_count: number;
+	    notes_count: number;
+	    has_new_notes: boolean;
+	    user_state: number;
+	    log_id: string;
+	    log_type: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TopicIntro(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.notes_topic_id = source["notes_topic_id"];
+	        this.topic_id_hazy = source["topic_id_hazy"];
+	        this.name = source["name"];
+	        this.img = source["img"];
+	        this.topmost = source["topmost"];
+	        this.tag = source["tag"];
+	        this.intro = source["intro"];
+	        this.view_count = source["view_count"];
+	        this.notes_count = source["notes_count"];
+	        this.has_new_notes = source["has_new_notes"];
+	        this.user_state = source["user_state"];
+	        this.log_id = source["log_id"];
+	        this.log_type = source["log_type"];
+	    }
+	}
+	export class TopicAll {
+	    has_more: boolean;
+	    list: TopicIntro[];
+	
+	    static createFrom(source: any = {}) {
+	        return new TopicAll(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.has_more = source["has_more"];
+	        this.list = this.convertValues(source["list"], TopicIntro);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class TopicTopArea {
+	    id: number;
+	    id_hazy: string;
+	    icon: string;
+	    title: string;
+	    url: string;
+	    state: number;
+	    index_num: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new TopicTopArea(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.id_hazy = source["id_hazy"];
+	        this.icon = source["icon"];
+	        this.title = source["title"];
+	        this.url = source["url"];
+	        this.state = source["state"];
+	        this.index_num = source["index_num"];
+	    }
+	}
+	export class TopicPresenter {
+	    id: number;
+	    id_hazy: string;
+	    uid: number;
+	    uid_hazy: string;
+	    isV: number;
+	    name: string;
+	    avatar: string;
+	    topic_count: number;
+	    icon: string;
+	    relation: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new TopicPresenter(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.id_hazy = source["id_hazy"];
+	        this.uid = source["uid"];
+	        this.uid_hazy = source["uid_hazy"];
+	        this.isV = source["isV"];
+	        this.name = source["name"];
+	        this.avatar = source["avatar"];
+	        this.topic_count = source["topic_count"];
+	        this.icon = source["icon"];
+	        this.relation = source["relation"];
+	    }
+	}
+	export class TopicDetail {
+	    notes_topic_id: string;
+	    topic_id_hazy: string;
+	    name: string;
+	    img: string;
+	    topmost: boolean;
+	    tag: number;
+	    intro: string;
+	    view_count: number;
+	    notes_count: number;
+	    has_new_notes: boolean;
+	    user_state: number;
+	    log_id: string;
+	    log_type: string;
+	    presenters: TopicPresenter[];
+	    top_area: TopicTopArea[];
+	    create_time: number;
+	    update_time: number;
+	    state: number;
+	    share_url: string;
+	    ddurl: string;
+	    topic_id_str: string;
+	    last_notes_id: string;
+	    last_notes_id_hazy: string;
+	    last_notes_uid: string;
+	    last_notes_uid_hazy: string;
+	    last_notes_content: string;
+	    last_update_time: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new TopicDetail(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.notes_topic_id = source["notes_topic_id"];
+	        this.topic_id_hazy = source["topic_id_hazy"];
+	        this.name = source["name"];
+	        this.img = source["img"];
+	        this.topmost = source["topmost"];
+	        this.tag = source["tag"];
+	        this.intro = source["intro"];
+	        this.view_count = source["view_count"];
+	        this.notes_count = source["notes_count"];
+	        this.has_new_notes = source["has_new_notes"];
+	        this.user_state = source["user_state"];
+	        this.log_id = source["log_id"];
+	        this.log_type = source["log_type"];
+	        this.presenters = this.convertValues(source["presenters"], TopicPresenter);
+	        this.top_area = this.convertValues(source["top_area"], TopicTopArea);
+	        this.create_time = source["create_time"];
+	        this.update_time = source["update_time"];
+	        this.state = source["state"];
+	        this.share_url = source["share_url"];
+	        this.ddurl = source["ddurl"];
+	        this.topic_id_str = source["topic_id_str"];
+	        this.last_notes_id = source["last_notes_id"];
+	        this.last_notes_id_hazy = source["last_notes_id_hazy"];
+	        this.last_notes_uid = source["last_notes_uid"];
+	        this.last_notes_uid_hazy = source["last_notes_uid_hazy"];
+	        this.last_notes_content = source["last_notes_content"];
+	        this.last_update_time = source["last_update_time"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	
 	
 	
