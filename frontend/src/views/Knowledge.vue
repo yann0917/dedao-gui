@@ -37,11 +37,11 @@
                 <el-icon v-if="item.f_part.is_v==2"><svg t="1677248742045" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18550" width="14" height="14"><path d="M512 0C229.376 0 0 229.376 0 512s229.376 512 512 512 512-229.376 512-512S794.624 0 512 0z m55.296 832L194.56 311.296l174.592-0.512 198.656 313.856 141.824-313.856 112.64 0.512-254.976 520.704z" fill="#ff6b00" p-id="18551"></path></svg></el-icon>
                 <el-icon v-if="item.f_part.is_v==4"><svg t="1677248508098" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6456" width="14" height="14"><path d="M511.953455 1002.146909c-142.987636 0-408.901818-218.763636-408.901818-425.634909L103.051636 164.421818l40.657455-0.674909c0.861091 0 91.624727-1.931636 185.274182-39.936 96.046545-39.028364 157.998545-83.828364 158.580364-84.247273l24.273455-17.687273 24.482909 17.687273c0.581818 0.442182 62.533818 45.218909 158.580364 84.247273 93.649455 38.004364 184.413091 39.936 185.367273 39.936l40.471273 0.674909 0.186182 412.090182C920.948364 783.36 655.034182 1002.146909 511.953455 1002.146909L511.953455 1002.146909zM185.623273 243.409455l0 333.079273c0 159.953455 231.633455 343.063273 326.330182 343.063273 94.72 0 326.330182-183.109818 326.330182-343.063273L838.283636 243.409455c-40.471273-4.375273-106.170182-15.429818-174.405818-43.124364-69.934545-28.439273-123.042909-59.345455-151.947636-77.754182-28.811636 18.408727-81.989818 49.314909-151.854545 77.754182C291.793455 228.002909 226.071273 239.034182 185.623273 243.409455L185.623273 243.409455zM490.077091 731.345455l-173.614545-147.898182 53.387636-62.813091 111.383273 94.813091 211.386182-243.525818 62.417455 54.155636L490.077091 731.345455 490.077091 731.345455zM490.077091 731.345455" fill="#ff6b00" p-id="6457"></path></svg></el-icon>
               </el-col>
-              <el-col :span="4" style="text-align: left; line-height: 10px;">
+              <el-col :span="5" style="text-align: left; line-height: 10px;">
                 <h3>{{ item.f_part.nick_name }}</h3>
                 <el-tag class="ml-2" type="info">{{ item.f_part.time_desc }}</el-tag>
               </el-col>
-              <el-col :span="16">
+              <el-col :span="15">
                 <el-tag class="ml-2" type="success" v-if="item.f_part.slogan" >{{ item.f_part.slogan }}</el-tag>
                 <el-tag class="ml-2" type="warning" v-if="item.f_part.v_info" >{{ item.f_part.v_info }}</el-tag>
               </el-col>
@@ -82,9 +82,9 @@
 
           <div class="s-part" v-if="item.s_part">
             <el-divider />
-            <el-row :gutter="5" align="top">
+            <el-row :gutter="5">
               <el-col :span="3">
-                <el-avatar :size="48" :src="item.s_part.avatar" fit="fill" />
+                <el-avatar :size="48" :src="item.s_part.avatar" fit="cover" style="margin: 10px;"/>
                 <el-icon v-if="item.s_part.is_v==2"><svg t="1677248742045" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18550" width="14" height="14"><path d="M512 0C229.376 0 0 229.376 0 512s229.376 512 512 512 512-229.376 512-512S794.624 0 512 0z m55.296 832L194.56 311.296l174.592-0.512 198.656 313.856 141.824-313.856 112.64 0.512-254.976 520.704z" fill="#ff6b00" p-id="18551"></path></svg></el-icon>
                 <el-icon v-if="item.s_part.is_v==4"><svg t="1677248508098" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6456" width="14" height="14"><path d="M511.953455 1002.146909c-142.987636 0-408.901818-218.763636-408.901818-425.634909L103.051636 164.421818l40.657455-0.674909c0.861091 0 91.624727-1.931636 185.274182-39.936 96.046545-39.028364 157.998545-83.828364 158.580364-84.247273l24.273455-17.687273 24.482909 17.687273c0.581818 0.442182 62.533818 45.218909 158.580364 84.247273 93.649455 38.004364 184.413091 39.936 185.367273 39.936l40.471273 0.674909 0.186182 412.090182C920.948364 783.36 655.034182 1002.146909 511.953455 1002.146909L511.953455 1002.146909zM185.623273 243.409455l0 333.079273c0 159.953455 231.633455 343.063273 326.330182 343.063273 94.72 0 326.330182-183.109818 326.330182-343.063273L838.283636 243.409455c-40.471273-4.375273-106.170182-15.429818-174.405818-43.124364-69.934545-28.439273-123.042909-59.345455-151.947636-77.754182-28.811636 18.408727-81.989818 49.314909-151.854545 77.754182C291.793455 228.002909 226.071273 239.034182 185.623273 243.409455L185.623273 243.409455zM490.077091 731.345455l-173.614545-147.898182 53.387636-62.813091 111.383273 94.813091 211.386182-243.525818 62.417455 54.155636L490.077091 731.345455 490.077091 731.345455zM490.077091 731.345455" fill="#ff6b00" p-id="6457"></path></svg></el-icon>
               </el-col>
@@ -168,10 +168,10 @@
         <li v-for="i in topicList.list"  class="infinite-list-item">
           <el-button text class="topic-item">
           <el-badge :value="i.tag==1?'新':''" class="badge-item">
-            <div style="font-size: large; font-weight: bold; text-align: left;padding-bottom: 10px;">
+            <div style="font-size: large; font-weight: bold; text-align: left;">
               <span style="color:#ff6b00">#</span>{{i.name}} 
             </div>
-            <div style="white-space: pre-wrap; font-weight:light;text-align: left;">{{i.intro}}</div>
+            <div style="white-space: pre-wrap; font-weight:light; text-align: left;">{{i.intro}}</div>
           </el-badge>
           </el-button>
         </li>
@@ -190,7 +190,6 @@
   import { services } from '../../wailsjs/go/models'
   import { useRoute, useRouter } from 'vue-router'
   import { userStore } from '../stores/user';
-import { it } from 'element-plus/es/locale'
   
   const store = userStore()
   const router = useRouter()
@@ -301,9 +300,7 @@ import { it } from 'element-plus/es/locale'
       text-align: left ;
   }
   }
-  .topic-item {
-    height: 120px;
-}
+
   .el-tag {
     margin-right: 5px;
       // height: auto;
@@ -322,7 +319,9 @@ import { it } from 'element-plus/es/locale'
   border: 1px solid var(--el-border-color);
   border-radius:15px;
 }
-
+.topic-item {
+    height: 110px;
+}
 ul {
   padding: 0;
   margin: 0;
