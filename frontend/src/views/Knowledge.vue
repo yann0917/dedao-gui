@@ -98,7 +98,7 @@
               <div class="imageBox">
                 <el-image v-for="i in item.s_part.images" :src="i" :preview-src-list="item.s_part.images.map((v,i)=>{
                   return v
-                })" :initial-index="0"  fit="cover"  :style="item.f_part.images?.length>1?'height:245px;width: 32%;':'width: 32%;'"/>
+                })" :initial-index="0"  fit="cover"  :style="item.s_part.images?.length>1?'height:245px;width: 32%;':'width: 32%;'"/>
               </div>
             </div>
             <div class="note-line" v-if="item.s_part.base_source.title !=''">
