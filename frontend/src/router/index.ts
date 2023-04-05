@@ -22,6 +22,22 @@ const router = createRouter({
     routes: [
         {
             path: "/",
+            meta: { name: "首页", icon:"House", menuType: 2 },
+            redirect: '/home',
+            children: [
+                {
+                    path: 'home',
+                    name: "home",
+                    component: () => import("../views/Home.vue"),
+                    meta: {
+                        name: "首页", requiresAuth:false
+                    },
+                   
+                }
+            ],
+        },
+        {
+            path: "/",
             meta: { name: "课程", icon:"Management",menuType: 2 },
             redirect: '/course',
             children: [
