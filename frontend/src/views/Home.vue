@@ -4,20 +4,30 @@
       <el-menu
         default-active=""
         class="classification"
-        collapse="true"
-        router="true"
+        :collapse="true"
+        :router="true"
         active-text-color="#ffd04b"
         @open="handleOpen"
         @close="handleClose"
+        @mouseleave="mouseleave"
       >
         <el-sub-menu
           :index="item.enid"
-          v-for="item in initial.homeData.categoryList"
+          v-for="(item, index) in initial.homeData.categoryList"
+          v-show="index < moreCategory"
         >
           <template #title>{{ item.name }}</template>
           <el-menu-item :index="i.enid" v-for="i in item.labelList">
             <template #title>{{ i.name }}</template>
           </el-menu-item>
+        </el-sub-menu>
+
+        <el-sub-menu
+          index="more"
+          @mouseenter="mouseenter"
+          v-show="9 == moreCategory"
+        >
+          <template #title>更多</template>
         </el-sub-menu>
       </el-menu>
     </el-col>
@@ -57,7 +67,7 @@
                 :key="item.id"
                 class="scrollbar-item"
                 text
-                @click="handleLabel(item.enid,4)"
+                @click="handleLabel(item.enid, 4)"
               >
                 {{ item.name }}
               </el-button>
@@ -71,7 +81,7 @@
                 :key="item.id"
                 class="scrollbar-item"
                 text
-                @click="handleLabel(item.enid,2)"
+                @click="handleLabel(item.enid, 2)"
               >
                 {{ item.name }}
               </el-button>
@@ -87,16 +97,20 @@
                   v-for="(item, index) in freeResourceList.list"
                 >
                   <img :src="ossProcess(item.logo)" :alt="item.name" />
-                  <div style="padding: 14px">
-                    <span style="display: block; text-align: left;">{{ item.name }}</span>
-                    <el-alert type="info" :closable="false">
-                      <p>{{ item.intro }}</p>
-                      <el-tag class="ml-2" type="warning">{{
-                        item.score
-                      }}</el-tag></el-alert>
-                    <div class="bottom">
-                      <el-button text class="button">立即学习</el-button>
-                    </div>
+                  <div style="padding: 16px; text-align: left">
+                    <span style="display: block">{{ item.name }}</span>
+                    <p style="font-size: small">{{ item.intro }}</p>
+                    <el-rate
+                      v-model.number="item.score"
+                      disabled
+                      show-score
+                      allow-half
+                      size="small"
+                      text-color="#ff6b00"
+                    />
+                  </div>
+                  <div class="bottom">
+                    <el-button text class="button">立即学习</el-button>
                   </div>
                 </el-card>
               </div>
@@ -107,24 +121,31 @@
                 <el-card
                   :body-style="{ padding: '0px' }"
                   shadow="hover"
-                  v-for="(item, index) in courseContentList.product_list"
+                  v-for="item in courseContentList.product_list"
                 >
                   <img
                     :src="ossProcess(item.horizontal_image)"
                     :alt="item.title"
                   />
-                  <div style="padding: 10px">
-                    <span style="display: block; text-align: left;">{{ item.title }}</span>
-                    <el-alert type="info" :closable="false">
-                      <span>{{ item.intro }}<br/></span>
-                      <span>{{ item.learn_user_count }}人加入学习</span>
-                      <el-tag class="ml-2" type="warning">{{
-                        item.score
-                      }}</el-tag></el-alert
-                    >
-                    <div class="bottom">
-                      <el-button text class="button">立即学习</el-button>
-                    </div>
+                  <div style="padding: 6px; text-align: left">
+                    <span style="display: block">{{ item.title }}</span>
+                    <p style="font-size: small; line-height: 0">
+                      {{ item.intro }}
+                    </p>
+                    <el-rate
+                      :model-value=handleScore(item.score)
+                      disabled
+                      show-score
+                      allow-half
+                      size="small"
+                      text-color="#ff6b00"
+                    />
+                    <p style="font-size: small; line-height: 0">
+                      {{ item.learn_user_count }}人加入学习
+                    </p>
+                  </div>
+                  <div class="bottom">
+                    <el-button text class="button">立即学习</el-button>
                   </div>
                 </el-card>
               </div>
@@ -149,17 +170,22 @@
                     "
                   >
                     <template #reference>
-                      <div style="padding: 10px; text-align: left">
-                        <span style=" ;">{{ ebookTitle(item.title) }}</span>
-                        <el-alert type="info" :closable="false">
-                          <p>{{ item.author_list.toString() }}</p>
-                          <span v-if="item.user_score_count>0">{{ item.user_score_count }}人评分</span>
-                          <span v-if="item.score.length==0">暂无评分</span>
-                          <el-tag class="ml-2" type="warning" v-if="item.score.length>0">{{
-                            item.score
-                          }}</el-tag>
-                          </el-alert
-                        >
+                      <div style="padding: 6px; text-align: left">
+                        <span>{{ ebookTitle(item.title) }}</span>
+                        <p style="font-size: small; line-height: 0;">{{ authorList(item.author_list) }}</p>
+                          <span style="font-size: small;" v-if="item.user_score_count > 0"
+                            >{{ item.user_score_count }}人评分</span
+                          >
+                          <span style="font-size: small;" v-if="item.score.length == 0">暂无评分</span>
+                          <el-rate 
+                            :model-value=handleScore(item.score)
+                            disabled
+                            show-score
+                            allow-half
+                            size="small"
+                            text-color="#ff6b00"
+                            v-if="item.score.length > 0"
+                          />
                       </div>
                     </template>
                   </el-popover>
@@ -213,6 +239,8 @@ const total = ref(0);
 const pageSize = ref(4);
 const dialogVisible = ref(false);
 
+const moreCategory = ref(9);
+
 let initial = reactive(new services.HomeInitState());
 let ebookLabelList = reactive(new services.SunflowerLabelList());
 let courseLabelList = reactive(new services.SunflowerLabelList());
@@ -226,7 +254,7 @@ onBeforeMount(() => {
   GetHomeInitialState()
     .then((state) => {
       Object.assign(initial, state);
-      console.log(state);
+      // console.log(state);
     })
     .catch((error) => {
       console.log(error);
@@ -290,24 +318,24 @@ const getFreeResourceList = async () => {
 };
 getFreeResourceList();
 
-const handleLabel = (enid:string,nType: number) => {
-  if(nType==2) {
-    pageSize.value = 6
+const handleLabel = (enid: string, nType: number) => {
+  if (nType == 2) {
+    pageSize.value = 6;
   }
-  if(nType==4) {
-    pageSize.value = 4
+  if (nType == 4) {
+    pageSize.value = 4;
   }
-  sunflowerLabelContent(enid, nType)
+  sunflowerLabelContent(enid, nType);
 };
 
-const sunflowerLabelContent = async (enid:string  ,nType:number) => {
+const sunflowerLabelContent = async (enid: string, nType: number) => {
   await SunflowerLabelContent(enid, nType, page.value, pageSize.value)
     .then((list) => {
-      if(nType==2) {
+      if (nType == 2) {
         Object.assign(ebookContentList, list);
-    } else if (nType==4) {
-    Object.assign(courseContentList, list);
-  }
+      } else if (nType == 4) {
+        Object.assign(courseContentList, list);
+      }
       console.log(list);
     })
     .catch((error) => {
@@ -327,12 +355,31 @@ const ebookTitle = (title: string) => {
   }
 };
 
+const authorList = (authors: string[]) => {
+  if (authors.length > 1) {
+    return authors[0] + " 等";
+  } else {
+    return authors.toString();
+  }
+};
 const ebookPopoverContent = (intro: string, introduction: string) => {
   if (intro.concat(introduction).length <= 146) {
     return intro.concat(introduction);
   } else {
     return intro.concat(introduction).substring(0, 146).concat("...");
   }
+};
+
+const mouseenter = () => {
+  moreCategory.value = initial.homeData.categoryList.length;
+};
+
+const mouseleave = () => {
+  moreCategory.value = 9;
+};
+
+const handleScore = (score: string) => {
+  return parseFloat(score);
 };
 
 const openDialog = () => {
@@ -365,7 +412,6 @@ h4 {
 }
 .classification {
   width: 180px;
-  /* height: 376px; */
   box-shadow: 0 5px 10px rgba(51, 51, 51, 0.06);
 }
 
@@ -377,8 +423,16 @@ h4 {
   cursor: pointer;
   z-index: 300;
 }
+
+/* .el-sub-menu__title:hover {
+  background-color: rgba(255, 107, 0, 0.06) !important;
+} */
+
+.el-menu-item:hover {
+  background-color: rgba(255, 107, 0, 0.06) !important;
+}
 .el-carousel {
-  height: 600px;
+  height: 380px;
 }
 /* .el-scrollbar {
   height: 100px;
@@ -394,7 +448,7 @@ h4 {
 
 .cards-cover .el-card {
   flex-shrink: 0;
-  width: 310px;
+  width: 290px;
   margin-right: 20px;
   /* background: var(--el-color-info-light-9); */
   /* color: var(--el-color-info); */
@@ -406,7 +460,7 @@ h4 {
 }
 .ebook-cards-cover .el-card {
   flex-shrink: 0;
-  width: 200px;
+  width: 186px;
   margin-right: 20px;
   /* background: var(--el-color-info-light-9); */
   /* color: var(--el-color-info); */
