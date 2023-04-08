@@ -67,7 +67,7 @@
                 :key="item.id"
                 class="scrollbar-item"
                 text
-                @click="handleLabel(item.enid, 4)"
+                @click="handleLabel(item, 4)"
               >
                 {{ item.name }}
               </el-button>
@@ -81,7 +81,7 @@
                 :key="item.id"
                 class="scrollbar-item"
                 text
-                @click="handleLabel(item.enid, 2)"
+                @click="handleLabel(item, 2)"
               >
                 {{ item.name }}
               </el-button>
@@ -196,19 +196,17 @@
 
           <el-button
             size="large"
-            key="course"
-            type=""
+            type="info"
             text
             v-if="item.type == 'class'"
-            >更多 视频课 课程 ></el-button
+            >更多 {{ currentCourse }} 课程 ></el-button
           >
           <el-button
             size="large"
-            key="ebook"
-            type=""
+            type="info"
             text
             v-if="item.type == 'ebook'"
-            >更多 小说 电子书 ></el-button
+            >更多 {{currentEbook}} 电子书 ></el-button
           >
         </div>
       </div>
@@ -240,6 +238,8 @@ const pageSize = ref(4);
 const dialogVisible = ref(false);
 
 const moreCategory = ref(9);
+const currentCourse = ref('')
+const currentEbook = ref('')
 
 let initial = reactive(new services.HomeInitState());
 let ebookLabelList = reactive(new services.SunflowerLabelList());
@@ -274,10 +274,13 @@ onMounted(() => {
   SunflowerLabelList(2)
     .then((result) => {
       Object.assign(ebookLabelList, result);
+      currentEbook.value = ebookLabelList.list[0]?.name
+
       SunflowerLabelContent("", 2, 0, 6)
         .then((list) => {
           console.log(list);
           Object.assign(ebookContentList, list);
+         
         })
         .catch((error) => {
           console.log(error);
@@ -291,6 +294,7 @@ onMounted(() => {
     SunflowerLabelList(4)
       .then((result) => {
         Object.assign(courseLabelList, result);
+        currentCourse.value=courseLabelList.list[0]?.name
         SunflowerLabelContent("", 4, 0, 4)
           .then((list) => {
             console.log(list);
@@ -318,14 +322,16 @@ const getFreeResourceList = async () => {
 };
 getFreeResourceList();
 
-const handleLabel = (enid: string, nType: number) => {
+const handleLabel = (item: services.Navigation, nType: number) => {
   if (nType == 2) {
     pageSize.value = 6;
+    currentEbook.value = item.name
   }
   if (nType == 4) {
     pageSize.value = 4;
+    currentCourse.value = item.name
   }
-  sunflowerLabelContent(enid, nType);
+  sunflowerLabelContent(item.enid, nType);
 };
 
 const sunflowerLabelContent = async (enid: string, nType: number) => {
@@ -421,12 +427,18 @@ h4 {
   height: 38px;
   line-height: 38px;
   cursor: pointer;
-  z-index: 300;
 }
 
-/* .el-sub-menu__title:hover {
+/* .el-menu .el-sub-menu:hover {
   background-color: rgba(255, 107, 0, 0.06) !important;
 } */
+.el-menu .el-menu-item {
+  position: relative;
+  width: 100%;
+  height: 38px;
+  line-height: 38px;
+  cursor: pointer;
+}
 
 .el-menu-item:hover {
   background-color: rgba(255, 107, 0, 0.06) !important;
