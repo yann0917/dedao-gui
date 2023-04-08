@@ -17,7 +17,7 @@
           v-show="index < moreCategory"
         >
           <template #title>{{ item.name }}</template>
-          <el-menu-item :index="i.enid" v-for="i in item.labelList">
+          <el-menu-item :index="i.enid" v-for="i in item.labelList" @click="gotoCategory(item, i.enid)">
             <template #title>{{ i.name }}</template>
           </el-menu-item>
         </el-sub-menu>
@@ -133,7 +133,7 @@
                       {{ item.intro }}
                     </p>
                     <el-rate
-                      :model-value=handleScore(item.score)
+                      :model-value="handleScore(item.score)"
                       disabled
                       show-score
                       allow-half
@@ -172,42 +172,51 @@
                     <template #reference>
                       <div style="padding: 6px; text-align: left">
                         <span>{{ ebookTitle(item.title) }}</span>
-                        <p style="font-size: small; line-height: 0;">{{ authorList(item.author_list) }}</p>
-                          <span style="font-size: small;" v-if="item.user_score_count > 0"
-                            >{{ item.user_score_count }}人评分</span
-                          >
-                          <span style="font-size: small;" v-if="item.score.length == 0">暂无评分</span>
-                          <el-rate 
-                            :model-value=handleScore(item.score)
-                            disabled
-                            show-score
-                            allow-half
-                            size="small"
-                            text-color="#ff6b00"
-                            v-if="item.score.length > 0"
-                          />
+                        <p style="font-size: small; line-height: 0">
+                          {{ authorList(item.author_list) }}
+                        </p>
+                        <span
+                          style="font-size: small"
+                          v-if="item.user_score_count > 0"
+                          >{{ item.user_score_count }}人评分</span
+                        >
+                        <span
+                          style="font-size: small"
+                          v-if="item.score.length == 0"
+                          >暂无评分</span
+                        >
+                        <el-rate
+                          :model-value="handleScore(item.score)"
+                          disabled
+                          show-score
+                          allow-half
+                          size="small"
+                          text-color="#ff6b00"
+                          v-if="item.score.length > 0"
+                        />
                       </div>
                     </template>
                   </el-popover>
                 </el-card>
               </div>
             </el-scrollbar>
+            <el-button
+              size="large"
+              type="info"
+              text
+              v-if="item.type == 'class'"
+              @click="gotoCategory(currentCourse, '')"
+              >更多 {{ currentCourse.name }} 课程 ></el-button
+            >
+            <el-button
+              size="large"
+              type="info"
+              text
+              v-if="item.type == 'ebook'"
+              @click="gotoCategory(currentEbook, '')"
+              >更多 {{ currentEbook.name }} 电子书 ></el-button
+            >
           </div>
-
-          <el-button
-            size="large"
-            type="info"
-            text
-            v-if="item.type == 'class'"
-            >更多 {{ currentCourse }} 课程 ></el-button
-          >
-          <el-button
-            size="large"
-            type="info"
-            text
-            v-if="item.type == 'ebook'"
-            >更多 {{currentEbook}} 电子书 ></el-button
-          >
         </div>
       </div>
     </div>
@@ -238,8 +247,6 @@ const pageSize = ref(4);
 const dialogVisible = ref(false);
 
 const moreCategory = ref(9);
-const currentCourse = ref('')
-const currentEbook = ref('')
 
 let initial = reactive(new services.HomeInitState());
 let ebookLabelList = reactive(new services.SunflowerLabelList());
@@ -248,6 +255,9 @@ let courseLabelList = reactive(new services.SunflowerLabelList());
 let freeResourceList = reactive(new services.SunflowerResourceList());
 let ebookContentList = reactive(new services.SunflowerContent());
 let courseContentList = reactive(new services.SunflowerContent());
+
+let currentCourse = reactive(new services.Navigation());
+let currentEbook = reactive(new services.Navigation());
 
 onBeforeMount(() => {
   // 分类
@@ -274,13 +284,11 @@ onMounted(() => {
   SunflowerLabelList(2)
     .then((result) => {
       Object.assign(ebookLabelList, result);
-      currentEbook.value = ebookLabelList.list[0]?.name
-
+      Object.assign(currentEbook, ebookLabelList.list[0]);
       SunflowerLabelContent("", 2, 0, 6)
         .then((list) => {
           console.log(list);
           Object.assign(ebookContentList, list);
-         
         })
         .catch((error) => {
           console.log(error);
@@ -294,7 +302,7 @@ onMounted(() => {
     SunflowerLabelList(4)
       .then((result) => {
         Object.assign(courseLabelList, result);
-        currentCourse.value=courseLabelList.list[0]?.name
+        Object.assign(currentCourse, courseLabelList.list[0]);
         SunflowerLabelContent("", 4, 0, 4)
           .then((list) => {
             console.log(list);
@@ -325,11 +333,11 @@ getFreeResourceList();
 const handleLabel = (item: services.Navigation, nType: number) => {
   if (nType == 2) {
     pageSize.value = 6;
-    currentEbook.value = item.name
+    Object.assign(currentEbook, item);
   }
   if (nType == 4) {
     pageSize.value = 4;
-    currentCourse.value = item.name
+    Object.assign(currentCourse, item);
   }
   sunflowerLabelContent(item.enid, nType);
 };
@@ -385,7 +393,7 @@ const mouseleave = () => {
 };
 
 const handleScore = (score: string) => {
-  return parseFloat(score);
+  return score != "" ? parseFloat(score) : 0;
 };
 
 const openDialog = () => {
@@ -396,10 +404,25 @@ const closeDialog = () => {
   dialogVisible.value = false;
 };
 const handleOpen = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath);
+  // console.log(key, keyPath);
 };
 const handleClose = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath);
+  // console.log(key, keyPath);
+};
+
+const gotoCategory = (item: any, label_id: string) => {
+  // services.Navigation
+  console.log(item);
+  router.push({
+    path: `/category`,
+    query: {
+      id: item.id,
+      enid: item.enid,
+      name: item.name,
+      nav_type: item.nav_type,
+      label_id: label_id,
+    },
+  });
 };
 </script>
 

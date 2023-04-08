@@ -33,7 +33,14 @@ const router = createRouter({
                         name: "首页", requiresAuth:false
                     },
                    
-                }
+                },{
+                    path: 'category',
+                    name: "category",
+                    component: () => import("../views/Algo.vue"),
+                    meta: {
+                        name: "分类", hideMenu:true, requiresAuth:false
+                    },
+                },
             ],
         },
         {
