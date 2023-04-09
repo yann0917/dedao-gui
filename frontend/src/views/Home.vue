@@ -459,7 +459,7 @@ h4 {
   border-right: 0;
 }
 .classification {
-  width: 180px;
+  width: 190px;
   box-shadow: 0 5px 10px rgba(51, 51, 51, 0.06);
 }
 
