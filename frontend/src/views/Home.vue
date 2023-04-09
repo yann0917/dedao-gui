@@ -1,5 +1,5 @@
 <template>
-  <el-row class="tac">
+  <el-row :gutter="30" class="home-banner">
     <el-col :span="4">
       <el-menu
         default-active=""
@@ -17,7 +17,11 @@
           v-show="index < moreCategory"
         >
           <template #title>{{ item.name }}</template>
-          <el-menu-item :index="i.enid" v-for="i in item.labelList" @click="gotoCategory(item, i.enid)">
+          <el-menu-item
+            :index="i.enid"
+            v-for="i in item.labelList"
+            @click="gotoCategory(item, i.enid)"
+          >
             <template #title>{{ i.name }}</template>
           </el-menu-item>
         </el-sub-menu>
@@ -41,7 +45,12 @@
         </el-carousel-item>
       </el-carousel>
     </el-col>
-    <el-col :span="4" class="user"></el-col>
+    <el-col :span="4" class="user">
+      <div :class="initial.isLogin == false?'not-login':'login'">
+        <div class="receive"></div>
+        <el-button class="login-btn"> 登录 | 注册 </el-button>
+      </div>
+    </el-col>
   </el-row>
 
   <div class="module">
@@ -60,28 +69,25 @@
         </div>
 
         <div class="home-container">
-          <el-scrollbar v-if="item.type == 'class'">
-            <div class="scrollbar-flex-content">
+          <el-scrollbar>
+            <div class="scrollbar-flex-content"  v-if="item.type == 'class'">
               <el-button
-                v-for="item in courseLabelList.list"
+                v-for="item, index in courseLabelList.list"
                 :key="item.id"
-                class="scrollbar-item"
+                :class="idxCourseLabel === index ? 'active-btn' : 'scrollbar-item'"
                 text
-                @click="handleLabel(item, 4)"
+                @click="handleLabel(item,index, 4)"
               >
                 {{ item.name }}
               </el-button>
             </div>
-          </el-scrollbar>
-
-          <el-scrollbar v-if="item.type == 'ebook'">
-            <div class="scrollbar-flex-content">
+            <div class="scrollbar-flex-content" v-if="item.type == 'ebook'">
               <el-button
-                v-for="item in ebookLabelList.list"
+                v-for="item, index in ebookLabelList.list"
                 :key="item.id"
-                class="scrollbar-item"
+                :class="idxEbookLabel === index ? 'active-btn' : 'scrollbar-item'"
                 text
-                @click="handleLabel(item, 2)"
+                @click="handleLabel(item,index, 2)"
               >
                 {{ item.name }}
               </el-button>
@@ -158,7 +164,10 @@
                   shadow="hover"
                   v-for="(item, index) in ebookContentList.product_list"
                 >
-                  <img :src="ossProcess(item.index_image)" :alt="item.title" />
+                  <img
+                    :src="ossEbookProcess(item.index_image)"
+                    :alt="item.title"
+                  />
 
                   <el-popover
                     placement="top-end"
@@ -247,6 +256,9 @@ const pageSize = ref(4);
 const dialogVisible = ref(false);
 
 const moreCategory = ref(9);
+const idxEbookLabel = ref(0)
+const idxCourseLabel = ref(0)
+
 
 let initial = reactive(new services.HomeInitState());
 let ebookLabelList = reactive(new services.SunflowerLabelList());
@@ -330,14 +342,16 @@ const getFreeResourceList = async () => {
 };
 getFreeResourceList();
 
-const handleLabel = (item: services.Navigation, nType: number) => {
+const handleLabel = (item: services.Navigation,index:number, nType: number) => {
   if (nType == 2) {
     pageSize.value = 6;
     Object.assign(currentEbook, item);
+    idxEbookLabel.value = index
   }
   if (nType == 4) {
     pageSize.value = 4;
     Object.assign(currentCourse, item);
+    idxCourseLabel.value = index
   }
   sunflowerLabelContent(item.enid, nType);
 };
@@ -361,6 +375,10 @@ const ossProcess = (url: string) => {
   return url + "?x-oss-process=image/crop,h_608/resize,w_1080,h_608,m_fill";
 };
 
+const ossEbookProcess = (url: string) => {
+  return url + "?x-oss-process=image/crop,h_790/resize,w_600,h_790,m_fill";
+};
+
 const ebookTitle = (title: string) => {
   if (title.length <= 9) {
     return title;
@@ -376,6 +394,7 @@ const authorList = (authors: string[]) => {
     return authors.toString();
   }
 };
+
 const ebookPopoverContent = (intro: string, introduction: string) => {
   if (intro.concat(introduction).length <= 146) {
     return intro.concat(introduction);
@@ -474,7 +493,8 @@ h4 {
 } */
 .scrollbar-flex-content {
   display: flex;
-  border-radius: 8px;
+  /* border-radius: 8px; */
+  /* background: var(--el-color-info-light-9); */
 }
 .cards-cover {
   display: flex;
@@ -506,7 +526,7 @@ h4 {
   align-items: center;
   justify-content: center;
   width: 100px;
-  height: 50px;
+  height: 40px;
   text-align: center;
   background: var(--el-color-info-light-9);
   color: var(--el-color-info);
@@ -538,5 +558,48 @@ h4 {
 }
 .el-col {
   border-radius: 4px;
+}
+.active-btn {
+  font-weight: 500;
+  height: 40px;
+  color: #fff;
+  border-radius: 8px;
+  background: #ff6b00;
+  box-shadow: 0px 6px 10px rgba(251, 72, 16, 0.2);
+}
+.el-button.is-text:not(.is-disabled):hover {
+background-color: var(--el-fill-color);
+}
+
+.home-banner .user {
+  box-shadow: 0 5px 10px rgba(51, 51, 51, 0.06);
+  height: 380px;
+}
+
+.home-banner .user .not-login .receive {
+    width: 89%;
+    height: 0;
+    padding-bottom: calc(89% * (13 / 8));
+    margin: 36px auto 0;
+    background: url(https://piccdn2.umiwi.com/fe-oss/default/MTYzNTIzNTI3OTIw.png) no-repeat;
+    background-size: contain;
+}
+
+.home-banner .user .not-login .login-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 148px;
+    height: 32px;
+    margin: 14px auto 0;
+    border-radius: 6px;
+    line-height: 28px;
+}
+
+.home-banner .user .not-login .login-btn .line {
+    display: inline-block;
+    width: 1px;
+    height: 14px;
+    margin: 0 8px;
 }
 </style>
