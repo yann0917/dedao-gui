@@ -4,26 +4,42 @@
       <div class="filter-container filter-section-dash">
         <el-row :gutter="10">
           <el-col :span="2" style="font-size: larger">
-            {{ filter.filter.product_types.title }}</el-col
+            {{ productTypes.title }}</el-col
           >
           <el-button
             text
             style="font-size: small"
-            v-for="item in filter.filter.product_types.options"
+            v-for="item in productTypes.options"
+            :class="productType == item.value ? 'active-btn' : ''"
             >{{ item.name }}</el-button
           >
         </el-row>
         <el-divider border-style="dashed" />
         <el-row :gutter="20">
           <el-col :span="2" style="font-size: larger">
-            {{ filter.filter.navigations.title }}</el-col
+            {{ navigations.title }}</el-col
           >
           <el-button
             text
             style="font-size: small"
-            v-for="item in filter.filter.navigations.options"
+            v-for="item in navigations.options"
+            :class="enid == item.value ? 'active-btn' : ''"
             >{{ item.name }}</el-button
           >
+     
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="2" style="font-size: larger;">{{ }}</el-col>
+          <div style="background-color: #f7f7f7; display: flex;">
+            <el-button
+            text
+            style="font-size: small"
+            v-for="item in subOptions"
+            :class="labelId == item.value ? 'active-btn' : ''"
+            >{{ item.name }}</el-button
+          >
+          </div>
+     
         </el-row>
       </div>
       <!-- <div class="filter-container filter-section-dash">{{ filter }}</div> -->
@@ -57,7 +73,10 @@
                 <p v-if="item.product_type==66" style="font-size: small; line-height: 0;">
                   共{{ item.phase_num }}{{ item.price_desc }}
                 </p>
-                <el-rate
+                <span v-if="item.score== ''" style="text-align: left;font-size: small">
+                  暂无评分
+                </span>
+                <el-rate v-else
                   :model-value="handleScore(item.score)"
                   disabled
                   show-score
@@ -107,9 +126,15 @@ const currentEbook = ref("");
 let filter = reactive(new services.AlgoFilterResp());
 let product = reactive(new services.AlgoProductResp());
 
+let productTypes = reactive(new services.Strategy())
+let navigations = reactive(new services.Strategy())
+let subOption = reactive(new services.Option())
+let subOptions = reactive([subOption])
+
 let enid = ref();
 let name = ref();
 let navType = ref();
+let productType = ref();
 let labelId = ref();
 
 onMounted(() => {
@@ -122,18 +147,14 @@ onMounted(() => {
       name.value = route.query.name;
       navType.value = route.query.nav_type;
       labelId.value = route.query.label_id;
+      productType.value = route.query.product_type
 
       param.navigation_id = enid.value;
       param.classfc_name = name.value != "" ? name.value : "全部";
       param.label_id = labelId.value;
       param.page_size = 18;
       param.product_types = "0";
-
-      if (navType.value == 2) {
-        param.product_types = "2";
-      } else if (navType.value == 4) {
-        param.product_types = "66";
-      }
+      param.product_types = productType.value
       param.sort_strategy = "HOT";
     },
     () =>
@@ -141,6 +162,16 @@ onMounted(() => {
         .then((list) => {
           console.log(list);
           Object.assign(filter, list);
+
+          Object.assign(productTypes, filter.filter.product_types);
+          Object.assign(navigations, filter.filter.navigations);
+
+          navigations.options.forEach(item=>{
+            if(item.value == enid.value) {
+              console.log(item);
+              Object.assign(subOptions, item.sub_options);
+            }
+          })
 
           getAlgoProduct(param)
             .then((list) => {
@@ -171,11 +202,23 @@ const getAlgoFilter = async (param: services.AlgoFilterParam) => {
     .then((list) => {
       console.log(list);
       Object.assign(filter, list);
+
+      Object.assign(productTypes, filter.filter.product_types);
+      Object.assign(navigations, filter.filter.navigations);
+
+      navigations.options.forEach(item=>{
+        if(item.value == enid.value) {
+          console.log(item);
+          Object.assign(subOptions, item.sub_options);
+        }
+      })
+      getAlgoProduct(param)
     })
     .catch((error) => {
       console.log(error);
     });
 };
+
 const getAlgoProduct = async (param: services.AlgoFilterParam) => {
   await AlgoProduct(param)
     .then((list) => {
@@ -221,5 +264,9 @@ const authorList = (authors: string[]) => {
     margin-right: 10px;
     background: var(--default-background);
     background-size: contain;
+}
+.active-btn {
+  font-weight: 500;
+  color: #ff6b00;
 }
 </style>
