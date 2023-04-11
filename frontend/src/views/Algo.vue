@@ -9,8 +9,11 @@
           <el-button
             text
             style="font-size: small"
-            v-for="item in productTypes.options"
-            :class="productType == item.value ? 'active-btn' : ''"
+            v-for="(item, index) in productTypes.options"
+            @click="handleFilter(item, index, 1)"
+            :class="
+              productType == item.value || idxProd == index ? 'active-btn' : ''
+            "
             >{{ item.name }}</el-button
           >
         </el-row>
@@ -22,24 +25,28 @@
           <el-button
             text
             style="font-size: small"
-            v-for="item in navigations.options"
-            :class="enid == item.value ? 'active-btn' : ''"
+            v-for="(item, index) in navigations.options"
+            :class="enid == item.value || idxLabel == index ? 'active-btn' : ''"
+            @click="handleFilter(item, index, 2)"
             >{{ item.name }}</el-button
           >
-     
         </el-row>
         <el-row :gutter="20">
-          <el-col :span="2" style="font-size: larger;">{{ }}</el-col>
-          <div style="background-color: #f7f7f7; display: flex;">
+          <el-col :span="2" style="font-size: larger">{{}}</el-col>
+          <div style="background-color: #f7f7f7; display: flex">
             <el-button
-            text
-            style="font-size: small"
-            v-for="item in subOptions"
-            :class="labelId == item.value ? 'active-btn' : ''"
-            >{{ item.name }}</el-button
-          >
+              text
+              style="font-size: small"
+              v-for="(item, index) in subOptions"
+              :class="
+                labelId == item.value || idxSubLabel == index
+                  ? 'active-btn'
+                  : ''
+              "
+              @click="handleFilter(item, index, 3)"
+              >{{ item.name }}</el-button
+            >
           </div>
-     
         </el-row>
       </div>
       <!-- <div class="filter-container filter-section-dash">{{ filter }}</div> -->
@@ -53,47 +60,73 @@
 
       <div class="category-source-list">
         <el-row :gutter="20">
-        <el-col :span="8" v-for="(item, index) in product.product_list" style="padding: 5px;">
-          <el-card :body-style="{ padding: '10px', display: 'flex',}">
-            <img :src="ossProcess(item.index_img)" class="source-container-cover" />
-            <div >
-              <div style="width: 290px; height: 120px; text-align: left">
-                <span style="display: block">{{
-                  productTitle(item.name, 15)
-                }}</span>
-                <span style="font-size: small;">
-                  {{ productTitle(item.intro, 40) }}
-                </span>
-                <span style="font-size: small;display: block" v-if="item.product_type==66">
-                  {{ item.lecturer_name_and_title }}
-                </span>
-                <span style="font-size: small;display: block" v-if="item.product_type==2">
-                  {{ authorList(item.author_list) }}
-                </span>
-                <p v-if="item.product_type==66" style="font-size: small; line-height: 0;">
-                  共{{ item.phase_num }}{{ item.price_desc }}
-                </p>
-                <span v-if="item.score== ''" style="text-align: left;font-size: small">
-                  暂无评分
-                </span>
-                <el-rate v-else
-                  :model-value="handleScore(item.score)"
-                  disabled
-                  show-score
-                  allow-half
-                  size="small"
-                  text-color="#ff6b00"
-                  style="display: block;"
-                />
-                <span v-if="item.product_type==66" style="text-align: right;font-size: x-small;display: block;">
-                  {{ item.learn_user_count }}人加入学习
-                </span>
-               
+          <el-col
+            :span="8"
+            v-for="(item, index) in product.product_list"
+            style="padding: 5px"
+          >
+            <el-card :body-style="{ padding: '10px', display: 'flex' }">
+              <img
+                :src="ossProcess(item.index_img)"
+                class="source-container-cover"
+              />
+              <div>
+                <div style="width: 290px; height: 120px; text-align: left">
+                  <span style="display: block">{{
+                    productTitle(item.name, 16)
+                  }}</span>
+                  <span style="font-size: small">
+                    {{ productTitle(item.intro, 40) }}
+                  </span>
+                  <span
+                    style="font-size: small; display: block; color: gray"
+                    v-if="item.product_type == 66"
+                  >
+                    {{ productTitle(item.lecturer_name_and_title, 20) }}
+                  </span>
+                  <span
+                    style="font-size: small; display: block; color: gray"
+                    v-if="item.product_type == 2"
+                  >
+                    {{ authorList(item.author_list) }}
+                  </span>
+                  <p
+                    v-if="item.product_type == 66"
+                    style="font-size: small; line-height: 0; color: gray"
+                  >
+                    共{{ item.phase_num }}{{ item.price_desc }}
+                  </p>
+                  <span
+                    v-if="item.score == ''"
+                    style="text-align: left; font-size: small; color: gray"
+                  >
+                    暂无评分
+                  </span>
+                  <el-rate
+                    v-else
+                    :model-value="handleScore(item.score)"
+                    disabled
+                    show-score
+                    allow-half
+                    size="small"
+                    text-color="#ff6b00"
+                    style="display: block"
+                  />
+                  <span
+                    v-if="item.product_type == 66"
+                    style="
+                      text-align: right;
+                      font-size: x-small;
+                      display: block;
+                    "
+                  >
+                    {{ item.learn_user_count }}人加入学习
+                  </span>
+                </div>
               </div>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
+            </el-card>
+          </el-col>
+        </el-row>
       </div>
     </div>
   </div>
@@ -109,6 +142,7 @@ import {
 } from "../../wailsjs/go/backend/App";
 import { services } from "../../wailsjs/go/models";
 import { useRoute, useRouter } from "vue-router";
+import { id } from "element-plus/es/locale";
 
 const route = useRoute();
 const router = useRouter();
@@ -123,19 +157,22 @@ const moreCategory = ref(9);
 const currentCourse = ref("");
 const currentEbook = ref("");
 
+const idxProd = ref(0);
+const idxLabel = ref(0);
+const idxSubLabel = ref(0);
+
 let filter = reactive(new services.AlgoFilterResp());
 let product = reactive(new services.AlgoProductResp());
 
-let productTypes = reactive(new services.Strategy())
-let navigations = reactive(new services.Strategy())
-let subOption = reactive(new services.Option())
-let subOptions = reactive([subOption])
+let productTypes = reactive(new services.Strategy());
+let navigations = reactive(new services.Strategy());
+let subOptions = reactive([new services.Option()]);
 
-let enid = ref();
-let name = ref();
-let navType = ref();
-let productType = ref();
-let labelId = ref();
+const enid = ref();
+const name = ref();
+const navType = ref();
+const productType = ref();
+const labelId = ref();
 
 onMounted(() => {
   console.log(route.query);
@@ -147,14 +184,17 @@ onMounted(() => {
       name.value = route.query.name;
       navType.value = route.query.nav_type;
       labelId.value = route.query.label_id;
-      productType.value = route.query.product_type
+      productType.value = route.query.product_type;
+
+      param.request_id = "";
+      param.tags_ids = [];
+      param.page = 0;
 
       param.navigation_id = enid.value;
       param.classfc_name = name.value != "" ? name.value : "全部";
       param.label_id = labelId.value;
       param.page_size = 18;
-      param.product_types = "0";
-      param.product_types = productType.value
+      param.product_types = productType.value;
       param.sort_strategy = "HOT";
     },
     () =>
@@ -166,12 +206,16 @@ onMounted(() => {
           Object.assign(productTypes, filter.filter.product_types);
           Object.assign(navigations, filter.filter.navigations);
 
-          navigations.options.forEach(item=>{
-            if(item.value == enid.value) {
-              console.log(item);
-              Object.assign(subOptions, item.sub_options);
+          navigations.options.forEach((item) => {
+            if (item.value == enid.value) {
+              if (
+                item.sub_options != undefined &&
+                item.sub_options?.length > 0
+              ) {
+                Object.assign(subOptions, item.sub_options);
+              } 
             }
-          })
+          });
 
           getAlgoProduct(param)
             .then((list) => {
@@ -196,6 +240,40 @@ onMounted(() => {
   //     console.log(error);
   //   })
 });
+const param = new services.AlgoFilterParam();
+const handleFilter = (item: services.Option, idx: number, nType: number) => {
+  if (nType == 1) {
+    productType.value = item.value;
+    idxProd.value = idx;
+
+    param.product_types = item.value;
+    param.classfc_name = "全部";
+    param.navigation_id = "";
+    param.label_id = "";
+  } else if (nType == 2) {
+    enid.value = item.value;
+    idxLabel.value = idx;
+    if (item.sub_options != undefined && item.sub_options?.length > 0) {
+      Object.assign(subOptions, item.sub_options);
+    } else {
+      // subOptions = [];
+    }
+
+    param.classfc_name = item.name;
+    param.navigation_id = item.value;
+  } else if (nType == 3) {
+    idxSubLabel.value = idx;
+    param.label_id = item.value;
+  }
+  param.request_id = "";
+  param.tags_ids = [];
+  param.page = 0;
+  param.nav_type = 0;
+  param.page_size = 18;
+  param.sort_strategy = "HOT";
+  console.log(param);
+  getAlgoFilter(param);
+};
 
 const getAlgoFilter = async (param: services.AlgoFilterParam) => {
   await AlgoFilter(param)
@@ -206,17 +284,21 @@ const getAlgoFilter = async (param: services.AlgoFilterParam) => {
       Object.assign(productTypes, filter.filter.product_types);
       Object.assign(navigations, filter.filter.navigations);
 
-      navigations.options.forEach(item=>{
-        if(item.value == enid.value) {
+      navigations.options.forEach((item) => {
+        if (item.value == enid.value) {
           console.log(item);
-          Object.assign(subOptions, item.sub_options);
+          if (item.sub_options !=undefined && item.sub_options?.length>0) {
+                Object.assign(subOptions, item.sub_options);
+              } else {
+                subOptions = reactive([])
+              }
         }
-      })
-      getAlgoProduct(param)
+      });
     })
     .catch((error) => {
       console.log(error);
     });
+  getAlgoProduct(param);
 };
 
 const getAlgoProduct = async (param: services.AlgoFilterParam) => {
@@ -238,7 +320,7 @@ const handleScore = (score: string) => {
   return score != "" ? parseFloat(score) : 0;
 };
 
-const productTitle = (title: string, len:number) => {
+const productTitle = (title: string, len: number) => {
   if (title.length <= len) {
     return title;
   } else {
@@ -257,13 +339,13 @@ const authorList = (authors: string[]) => {
 
 <style scoped>
 .category-source-container .source-container-cover {
-    height: 112px;
-    min-width: 84px;
-    width: 84px;
-    position: relative;
-    margin-right: 10px;
-    background: var(--default-background);
-    background-size: contain;
+  height: 112px;
+  min-width: 84px;
+  width: 84px;
+  position: relative;
+  margin-right: 10px;
+  background: var(--default-background);
+  background-size: contain;
 }
 .active-btn {
   font-weight: 500;
