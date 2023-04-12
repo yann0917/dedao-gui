@@ -34,20 +34,20 @@
         <el-row :gutter="20">
           <el-col :span="2" style="font-size: larger">{{}}</el-col>
           <el-col :span="22">
-            <div style="background-color: #f7f7f7; text-align: left;">
-            <el-button
-              text
-              style="font-size: small;padding: 7px;"
-              v-for="(item, index) in subOptions"
-              :class="
-                labelId == item.value || idxSubLabel == index
-                  ? 'active-btn'
-                  : ''
-              "
-              @click="handleFilter(item, index, 3)"
-              >{{ item.name }}</el-button
-            >
-          </div>
+            <div style="background-color: #f7f7f7; text-align: left">
+              <el-button
+                text
+                style="font-size: small; padding: 7px"
+                v-for="(item, index) in subOptions"
+                :class="
+                  labelId == item.value || idxSubLabel == index
+                    ? 'active-btn'
+                    : ''
+                "
+                @click="handleFilter(item, index, 3)"
+                >{{ item.name }}</el-button
+              >
+            </div>
           </el-col>
         </el-row>
       </div>
@@ -56,77 +56,103 @@
     </div>
 
     <div class="category-source-container">
-      <p style="text-align: left">已为你找到{{ filter.total }}个内容</p>
+      <p style="text-align: left">已为你找到 <span style="color:#ff6b00">{{ filter.total }}</span> 个内容</p>
       <div class="sort-filter"></div>
       <el-divider />
 
       <div class="category-source-list">
-        <el-row :gutter="20">
-          <el-col
-            :span="8"
-            v-for="(item, index) in product.product_list"
-            style="padding: 5px"
-          >
-            <el-card :body-style="{ padding: '10px', display: 'flex' }">
-              <img
-                :src="ossProcess(item.index_img)"
-                class="source-container-cover"
-              />
-              <div>
-                <div style="width: 290px; height: 120px; text-align: left">
-                  <span style="display: block">{{
-                    productTitle(item.name, 16)
-                  }}</span>
-                  <span style="font-size: small">
-                    {{ productTitle(item.intro, 40) }}
-                  </span>
-                  <span
-                    style="font-size: small; display: block; color: gray"
-                    v-if="item.product_type == 66"
-                  >
-                    {{ productTitle(item.lecturer_name_and_title, 20) }}
-                  </span>
-                  <span
-                    style="font-size: small; display: block; color: gray"
-                    v-if="item.product_type == 2"
-                  >
-                    {{ authorList(item.author_list) }}
-                  </span>
-                  <p
-                    v-if="item.product_type == 66"
-                    style="font-size: small; line-height: 0; color: gray"
-                  >
-                    共{{ item.phase_num }}{{ item.price_desc }}
-                  </p>
-                  <span
-                    v-if="item.score == ''"
-                    style="text-align: left; font-size: small; color: gray"
-                  >
-                    暂无评分
-                  </span>
-                  <el-rate
-                    v-else
-                    :model-value="handleScore(item.score)"
-                    disabled
-                    show-score
-                    allow-half
-                    size="small"
-                    text-color="#ff6b00"
-                    style="display: block"
+        <el-row :gutter="10">
+          <el-col :span="24">
+            <ul
+              v-infinite-scroll="loadProduction"
+              class="infinite-list"
+              style="overflow-y: auto; max-height: 900px"
+              :infinite-scroll-disabled="infLoadingProd"
+              infinite-scroll-distance="10"
+            >
+              <li
+                class="infinite-list-item"
+                v-for="(item, index) in product_list.product_list"
+              >
+                <el-card
+                  class="box-card"
+                  shadow="hover"
+                  :body-style="{ display: 'flex' }"
+                  style="width: 402px"
+                >
+                  <img
+                    :src="ossProcess(item.index_img)"
+                    class="source-container-cover"
                   />
-                  <span
-                    v-if="item.product_type == 66"
-                    style="
-                      text-align: right;
-                      font-size: x-small;
-                      display: block;
-                    "
-                  >
-                    {{ item.learn_user_count }}人加入学习
-                  </span>
-                </div>
-              </div>
-            </el-card>
+                  <div>
+                    <div style="width: 290px; height: 120px; text-align: left">
+                      <span style="display: block">{{
+                        productTitle(item.name, 16)
+                      }}</span>
+                      <span style="font-size: small">
+                        {{ productTitle(item.intro, 40) }}
+                      </span>
+                      <span
+                        style="font-size: small; display: block; color: gray"
+                        v-if="item.product_type == 66"
+                      >
+                        {{ productTitle(item.lecturer_name_and_title, 20) }}
+                      </span>
+                      <span
+                        style="font-size: small; display: block; color: gray"
+                        v-if="item.product_type == 2"
+                      >
+                        {{ authorList(item.author_list) }}
+                      </span>
+                      <p
+                        v-if="item.product_type == 66"
+                        style="font-size: small; line-height: 0; color: gray"
+                      >
+                        共{{ item.phase_num }}{{ item.price_desc }}
+                      </p>
+                      <el-row>
+                        <el-col :span="14">
+                          <span
+                            v-if="item.score == ''"
+                            style="
+                            text-align: left;
+                              font-size: small;
+                              color: gray;
+                            "
+                          >
+                            暂无评分
+                          </span>
+
+                          <el-rate
+                            v-else
+                            :model-value="handleScore(item.score)"
+                            disabled
+                            show-score
+                            allow-half
+                            size="small"
+                            text-color="#ff6b00"
+                            style="display: block"
+                          />
+                        </el-col>
+                        <el-col :span="10">
+                          <span
+                            v-if="item.product_type == 66"
+                            style="
+                            font-weight: 200;
+                            font-size:70%;
+                            text-align: right;
+                            color: gray;
+                            "
+                          >
+                            {{ item.learn_user_count }}人加入学习
+                          </span>
+                        </el-col>
+                      </el-row>
+                    </div>
+                  </div>
+                </el-card>
+              </li>
+            </ul>
           </el-col>
         </el-row>
       </div>
@@ -144,7 +170,6 @@ import {
 } from "../../wailsjs/go/backend/App";
 import { services } from "../../wailsjs/go/models";
 import { useRoute, useRouter } from "vue-router";
-import { id } from "element-plus/es/locale";
 
 const route = useRoute();
 const router = useRouter();
@@ -155,21 +180,23 @@ const total = ref(0);
 const pageSize = ref(4);
 const dialogVisible = ref(false);
 
-const moreCategory = ref(9);
-const currentCourse = ref("");
-const currentEbook = ref("");
-
 const idxProd = ref(0);
 const idxLabel = ref(0);
 const idxSubLabel = ref(0);
 
+const infLoadingProd = ref(true);
+
 let filter = reactive(new services.AlgoFilterResp());
 let product = reactive(new services.AlgoProductResp());
+let product_list = reactive(new services.AlgoProductResp());
+product_list.product_list = [];
 
 let productTypes = reactive(new services.Strategy());
 let navigations = reactive(new services.Strategy());
-let subOptions = reactive([new services.Option()]);
-
+let subOptions = reactive([]);
+const initialState = () => ({
+  foo: 0,
+})
 const enid = ref();
 const name = ref();
 const navType = ref();
@@ -177,8 +204,6 @@ const productType = ref();
 const labelId = ref();
 
 onMounted(() => {
-  console.log(route.query);
-  console.log(route.params);
   let param = new services.AlgoFilterParam();
   watch(
     () => {
@@ -208,16 +233,16 @@ onMounted(() => {
           Object.assign(productTypes, filter.filter.product_types);
           Object.assign(navigations, filter.filter.navigations);
 
-          navigations.options.forEach((item) => {
-            if (item.value == enid.value) {
-              if (
-                item.sub_options != undefined &&
-                item.sub_options?.length > 0
-              ) {
-                Object.assign(subOptions, item.sub_options);
-              } 
-            }
-          });
+          // navigations.options.forEach((item) => {
+          //   if (item.value == enid.value) {
+          //     if (
+          //       item.sub_options != undefined &&
+          //       item.sub_options?.length > 0
+          //     ) {
+                
+          //     }
+          //   }
+          // });
 
           getAlgoProduct(param)
             .then((list) => {
@@ -256,11 +281,14 @@ const handleFilter = (item: services.Option, idx: number, nType: number) => {
     enid.value = item.value;
     idxLabel.value = idx;
     idxSubLabel.value = 0;
-    param.label_id = ''
+    param.label_id = "";
+
+    subOptions.splice(0, subOptions.length)
     if (item.sub_options != undefined && item.sub_options?.length > 0) {
-      Object.assign(subOptions, item.sub_options);
-    } else {
-      // subOptions = [];
+      let subOption = JSON.parse(JSON.stringify(item.sub_options));
+      subOption.forEach((item)=>{
+        subOptions.push(item)
+      })
     }
 
     param.classfc_name = item.name;
@@ -275,7 +303,8 @@ const handleFilter = (item: services.Option, idx: number, nType: number) => {
   param.nav_type = 0;
   param.page_size = 18;
   param.sort_strategy = "HOT";
-  console.log(param);
+  // console.log(param);
+  product_list.product_list = [];
   getAlgoFilter(param);
 };
 
@@ -287,17 +316,6 @@ const getAlgoFilter = async (param: services.AlgoFilterParam) => {
 
       Object.assign(productTypes, filter.filter.product_types);
       Object.assign(navigations, filter.filter.navigations);
-
-      navigations.options.forEach((item) => {
-        if (item.value == enid.value) {
-          console.log(item);
-          if (item.sub_options !=undefined && item.sub_options?.length>0) {
-                Object.assign(subOptions, item.sub_options);
-              } else {
-                subOptions = reactive([])
-              }
-        }
-      });
     })
     .catch((error) => {
       console.log(error);
@@ -310,10 +328,14 @@ const getAlgoProduct = async (param: services.AlgoFilterParam) => {
     .then((list) => {
       console.log(list);
       Object.assign(product, list);
+      product_list.is_more = product.is_more;
+      product_list.total = product.total;
+      product_list.product_list.push(...product.product_list);
     })
     .catch((error) => {
       console.log(error);
     });
+  infLoadingProd.value = false;
 };
 
 const ossProcess = (url: string) => {
@@ -339,9 +361,18 @@ const authorList = (authors: string[]) => {
     return authors.toString();
   }
 };
+
+const loadProduction = () => {
+  infLoadingProd.value = true;
+  if (product.is_more === 1) {
+    page.value += 1;
+    param.page = page.value;
+    getAlgoProduct(param);
+  }
+};
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .category-source-container .source-container-cover {
   height: 112px;
   min-width: 84px;
@@ -354,5 +385,39 @@ const authorList = (authors: string[]) => {
 .active-btn {
   font-weight: 500;
   color: #ff6b00;
+}
+
+ul {
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  list-style: none;
+  display: flex;
+}
+ul li {
+  flex-shrink: 0;
+}
+.infinite-list {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  list-style: none;
+  flex-wrap: wrap;
+}
+.infinite-list .infinite-list-item {
+  margin: 5px;
+}
+.infinite-list .infinite-list-item:last-child {
+  margin-bottom: 0;
+}
+
+.infinite-list .infinite-list-item + .list-item {
+  margin-top: 10px;
+}
+
+.el-card {
+  --el-card-padding: 10px;
 }
 </style>
