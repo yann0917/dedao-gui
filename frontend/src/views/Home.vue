@@ -39,8 +39,7 @@
     <el-col :span="16" class="banner">
       <el-carousel :interval="5000" arrow="always">
         <el-carousel-item v-for="item in initial.homeData.banner" :key="item">
-          <el-image :src="item.img">
-            <a :href="item.url"></a>
+          <el-image :src="item.img" @click="BrowserOpenURL(item.url)">
           </el-image>
         </el-carousel-item>
       </el-carousel>
@@ -245,6 +244,7 @@ import {
   SunflowerResourceList,
 } from "../../wailsjs/go/backend/App";
 import { services } from "../../wailsjs/go/models";
+import { BrowserOpenURL } from "../../wailsjs/runtime";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -495,6 +495,9 @@ h4 {
 .el-carousel {
   height: 380px;
 }
+.el-carousel__item{
+  height: 380px;
+}
 /* .el-scrollbar {
   height: 100px;
 } */
@@ -541,6 +544,7 @@ h4 {
 .el-scrollbar__wrap {
   overflow-x: hidden;
 }
+
 .module-title-wrap {
   text-align: left;
   padding-top: 20px;

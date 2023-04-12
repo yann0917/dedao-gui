@@ -2,6 +2,7 @@ package backend
 
 import (
 	"context"
+	"fmt"
 )
 
 // App struct
@@ -18,4 +19,8 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) Startup(ctx context.Context) {
 	a.Ctx = ctx
+}
+
+func (a *App) Shutdown(ctx context.Context) {
+	fmt.Println(a.Ctx)
 }

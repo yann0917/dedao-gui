@@ -33,10 +33,11 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :span="2" style="font-size: larger">{{}}</el-col>
-          <div style="background-color: #f7f7f7; display: flex">
+          <el-col :span="22">
+            <div style="background-color: #f7f7f7; text-align: left;">
             <el-button
               text
-              style="font-size: small"
+              style="font-size: small;padding: 7px;"
               v-for="(item, index) in subOptions"
               :class="
                 labelId == item.value || idxSubLabel == index
@@ -47,6 +48,7 @@
               >{{ item.name }}</el-button
             >
           </div>
+          </el-col>
         </el-row>
       </div>
       <!-- <div class="filter-container filter-section-dash">{{ filter }}</div> -->
@@ -253,6 +255,8 @@ const handleFilter = (item: services.Option, idx: number, nType: number) => {
   } else if (nType == 2) {
     enid.value = item.value;
     idxLabel.value = idx;
+    idxSubLabel.value = 0;
+    param.label_id = ''
     if (item.sub_options != undefined && item.sub_options?.length > 0) {
       Object.assign(subOptions, item.sub_options);
     } else {
