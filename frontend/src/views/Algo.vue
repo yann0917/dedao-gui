@@ -51,18 +51,20 @@
           </el-col>
         </el-row>
       </div>
-      <!-- <div class="filter-container filter-section-dash">{{ filter }}</div> -->
       <div class="filter-container"></div>
     </div>
 
     <div class="category-source-container">
       <p style="text-align: left">已为你找到 <span style="color:#ff6b00">{{ filter.total }}</span> 个内容</p>
-      <div class="sort-filter"></div>
+      <div class="sort-filter">
+        <el-row>
+          <el-col :span="1" v-for="item,index in sort.options">
+            {{ item.name }}</el-col>
+        </el-row>
+      </div>
       <el-divider />
 
       <div class="category-source-list">
-        <el-row :gutter="10">
-          <el-col :span="24">
             <ul
               v-infinite-scroll="loadProduction"
               class="infinite-list"
@@ -70,6 +72,7 @@
               :infinite-scroll-disabled="infLoadingProd"
               infinite-scroll-distance="10"
             >
+            <el-space wrap>
               <li
                 class="infinite-list-item"
                 v-for="(item, index) in product_list.product_list"
@@ -78,7 +81,8 @@
                   class="box-card"
                   shadow="hover"
                   :body-style="{ display: 'flex' }"
-                  style="width: 402px"
+                  style="width: 400px"
+                  @click="handleProd(item.id_out)"
                 >
                   <img
                     :src="ossProcess(item.index_img)"
@@ -90,11 +94,11 @@
                         productTitle(item.name, 16)
                       }}</span>
                       <span style="font-size: small">
-                        {{ productTitle(item.intro, 40) }}
+                        {{ productTitle(item.intro, item.item_type == 66? 20:40) }}
                       </span>
                       <span
                         style="font-size: small; display: block; color: gray"
-                        v-if="item.product_type == 66"
+                        v-if="item.item_type == 66"
                       >
                         {{ productTitle(item.lecturer_name_and_title, 20) }}
                       </span>
@@ -105,7 +109,7 @@
                         {{ authorList(item.author_list) }}
                       </span>
                       <p
-                        v-if="item.product_type == 66"
+                        v-if="item.item_type == 66"
                         style="font-size: small; line-height: 0; color: gray"
                       >
                         共{{ item.phase_num }}{{ item.price_desc }}
@@ -115,7 +119,7 @@
                           <span
                             v-if="item.score == ''"
                             style="
-                            text-align: left;
+                              text-align: left;
                               font-size: small;
                               color: gray;
                             "
@@ -134,12 +138,12 @@
                             style="display: block"
                           />
                         </el-col>
-                        <el-col :span="10">
+                        <el-col :span="2"></el-col>
+                        <el-col :span="8">
                           <span
-                            v-if="item.product_type == 66"
-                            style="
-                            font-weight: 200;
-                            font-size:70%;
+                            v-if="item.learn_user_count > 0"
+                            style="font-weight: 200;
+                           font-size:70%;
                             text-align: right;
                             color: gray;
                             "
@@ -152,16 +156,18 @@
                   </div>
                 </el-card>
               </li>
+            </el-space>
             </ul>
-          </el-col>
-        </el-row>
       </div>
     </div>
+  </div>
+  <div v-if="productType == 2" >
+    <EbookInfo :enid= "prodEnid" :dialog-visible="dialogVisible" @show-info=""></EbookInfo>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onBeforeMount, onMounted, watch } from "vue";
+import { ref, reactive, onBeforeMount, onMounted, watch} from "vue";
 import { ElTable, ElMessage } from "element-plus";
 import {
   SearchHot,
@@ -170,6 +176,7 @@ import {
 } from "../../wailsjs/go/backend/App";
 import { services } from "../../wailsjs/go/models";
 import { useRoute, useRouter } from "vue-router";
+import  EbookInfo  from '../components/EbookInfo.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -179,7 +186,7 @@ const page = ref(0);
 const total = ref(0);
 const pageSize = ref(4);
 const dialogVisible = ref(false);
-
+const prodEnid = ref("");
 const idxProd = ref(0);
 const idxLabel = ref(0);
 const idxSubLabel = ref(0);
@@ -193,10 +200,9 @@ product_list.product_list = [];
 
 let productTypes = reactive(new services.Strategy());
 let navigations = reactive(new services.Strategy());
-let subOptions = reactive([]);
-const initialState = () => ({
-  foo: 0,
-})
+let sort = reactive(new services.Strategy());
+let subOptions = reactive([] as services.Option[]);
+
 const enid = ref();
 const name = ref();
 const navType = ref();
@@ -232,7 +238,7 @@ onMounted(() => {
 
           Object.assign(productTypes, filter.filter.product_types);
           Object.assign(navigations, filter.filter.navigations);
-
+          Object.assign(sort, filter.filter.sort_strategy)
           // navigations.options.forEach((item) => {
           //   if (item.value == enid.value) {
           //     if (
@@ -316,6 +322,7 @@ const getAlgoFilter = async (param: services.AlgoFilterParam) => {
 
       Object.assign(productTypes, filter.filter.product_types);
       Object.assign(navigations, filter.filter.navigations);
+      Object.assign(sort, filter.filter.sort_strategy)
     })
     .catch((error) => {
       console.log(error);
@@ -370,6 +377,12 @@ const loadProduction = () => {
     getAlgoProduct(param);
   }
 };
+
+const handleProd = (enid:string)=>{
+  prodEnid.value = enid
+  dialogVisible.value = true
+  console.log(prodEnid)
+}
 </script>
 
 <style scoped lang="scss">
@@ -406,9 +419,7 @@ ul li {
   list-style: none;
   flex-wrap: wrap;
 }
-.infinite-list .infinite-list-item {
-  margin: 5px;
-}
+
 .infinite-list .infinite-list-item:last-child {
   margin-bottom: 0;
 }
