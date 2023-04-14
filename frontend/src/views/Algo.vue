@@ -82,7 +82,7 @@
                   shadow="hover"
                   :body-style="{ display: 'flex' }"
                   style="width: 400px"
-                  @click="handleProd(item.id_out)"
+                  @click="handleProd(item.id_out, item.item_type)"
                 >
                   <img
                     :src="ossProcess(item.index_img)"
@@ -104,7 +104,7 @@
                       </span>
                       <span
                         style="font-size: small; display: block; color: gray"
-                        v-if="item.product_type == 2"
+                        v-if="item.item_type == 2"
                       >
                         {{ authorList(item.author_list) }}
                       </span>
@@ -122,7 +122,7 @@
                               text-align: left;
                               font-size: small;
                               color: gray;
-                            "
+                           "
                           >
                             暂无评分
                           </span>
@@ -143,7 +143,7 @@
                           <span
                             v-if="item.learn_user_count > 0"
                             style="font-weight: 200;
-                           font-size:70%;
+                            font-size:70%;
                             text-align: right;
                             color: gray;
                             "
@@ -161,9 +161,7 @@
       </div>
     </div>
   </div>
-  <div v-if="productType == 2" >
-    <EbookInfo :enid= "prodEnid" :dialog-visible="dialogVisible" @show-info=""></EbookInfo>
-  </div>
+    <EbookInfo v-if="ebookVisible" :enid= "prodEnid" :dialog-visible="ebookVisible" @close="closeDialog"></EbookInfo>
 </template>
 
 <script lang="ts" setup>
@@ -185,8 +183,11 @@ const loading = ref(true);
 const page = ref(0);
 const total = ref(0);
 const pageSize = ref(4);
-const dialogVisible = ref(false);
+
+const ebookVisible = ref(false);
+const courseVisible = ref(false);
 const prodEnid = ref("");
+
 const idxProd = ref(0);
 const idxLabel = ref(0);
 const idxSubLabel = ref(0);
@@ -378,11 +379,21 @@ const loadProduction = () => {
   }
 };
 
-const handleProd = (enid:string)=>{
+const handleProd = (enid:string, iType:number)=>{
   prodEnid.value = enid
-  dialogVisible.value = true
+  if (iType == 2) {
+    ebookVisible.value = true
+  }
   console.log(prodEnid)
 }
+
+const openDialog = () => {
+    ebookVisible.value = true
+}
+const closeDialog = () => {
+  ebookVisible.value = false
+}
+
 </script>
 
 <style scoped lang="scss">
