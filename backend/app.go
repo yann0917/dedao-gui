@@ -2,7 +2,6 @@ package backend
 
 import (
 	"context"
-	"fmt"
 )
 
 // App struct
@@ -22,5 +21,5 @@ func (a *App) Startup(ctx context.Context) {
 }
 
 func (a *App) Shutdown(ctx context.Context) {
-	fmt.Println(a.Ctx)
+	// fmt.Println(a.Ctx)
 }

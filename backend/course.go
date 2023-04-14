@@ -1,8 +1,6 @@
 package backend
 
 import (
-	"fmt"
-
 	jsoniter "github.com/json-iterator/go"
 	"github.com/yann0917/dedao/app"
 	"github.com/yann0917/dedao/services"
@@ -59,8 +57,8 @@ func (a *App) ArticleDetail(aType int, aEnid string) (markdown string, err error
 
 func (a *App) GetVolcPlayAuthToken(mediaID, securityToken string) (info *services.MediaVolc, err error) {
 	info, err = Instance.GetVolcPlayAuthToken(mediaID, securityToken)
-	fmt.Println(info)
-	fmt.Println(err)
+	// fmt.Println(info)
+	// fmt.Println(err)
 	return
 }
 

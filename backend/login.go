@@ -2,7 +2,6 @@ package backend
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/yann0917/dedao/app"
 	"github.com/yann0917/dedao/config"
@@ -35,7 +34,7 @@ func (a *App) GetQrcode() (qrCode QrCodeResp, err error) {
 	if err != nil {
 		return
 	}
-	fmt.Printf("code:%#v\n", code)
+	// fmt.Printf("code:%#v\n", code)
 	qrCode.Token = token
 	if code != nil {
 		qrCode.QrCode = code.Data.QrCode
@@ -50,14 +49,14 @@ func (a *App) CheckLogin(token, qrCodeString string) (result LoginResult, err er
 		return
 	}
 	result.Cookie = cookie
-	fmt.Println(cookie)
+	// fmt.Println(cookie)
 	if check != nil {
 		if check.Data.Status == 1 {
 			err = app.LoginByCookie(cookie)
 			if err != nil {
 				return
 			}
-			fmt.Println("扫码成功")
+			// fmt.Println("扫码成功")
 		} else if check.Data.Status == 2 {
 			err = errors.New("登录失败，二维码已过期")
 			return
@@ -80,7 +79,7 @@ func (a *App) EbookUserInfo() (user *services.EbookVIPInfo, err error) {
 	if err != nil {
 		return
 	}
-	fmt.Println(user)
+	// fmt.Println(user)
 	return
 }
 
@@ -89,6 +88,6 @@ func (a *App) OdobUserInfo() (user *services.OdobVip, err error) {
 	if err != nil {
 		return
 	}
-	fmt.Println(user)
+	// fmt.Println(user)
 	return
 }
