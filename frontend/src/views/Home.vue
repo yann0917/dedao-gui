@@ -45,9 +45,39 @@
       </el-carousel>
     </el-col>
     <el-col :span="4" class="user">
-      <div :class="initial.isLogin == false?'not-login':'login'">
-        <div class="receive"></div>
-        <el-button class="login-btn"> 登录 | 注册 </el-button>
+      <div :class="initial.isLogin == false ? 'not-login' : 'logged'">
+        <div v-if="initial.isLogin == false">
+          <div class="receive"></div>
+          <el-button class="login-btn" @click="openLoginDialog()">
+            登录
+          </el-button>
+        </div>
+        <div v-else>
+          <div class="personal">
+            <el-avatar :size="72" :src="user.avatar" fit="fill" />
+            <h3>{{ user.nickname }}</h3>
+          </div>
+          <div class="data">
+            <p class="time">
+              <span>今日学习</span
+              ><span
+                ><em style="font-size: 22px">{{
+                  (user.today_study_time / 60).toFixed(0)
+                }}</em>
+                分钟</span
+              >
+            </p>
+            <el-divider border-style="dotted" />
+            <p class="time">
+              <span>连续学习</span
+              ><span
+                ><em style="font-size: 22px">{{ user.study_serial_days }}</em>
+                天</span
+              >
+            </p>
+          </div>
+          <!-- <el-button class="button" @click="logout()"> 退出 </el-button> -->
+        </div>
       </div>
     </el-col>
   </el-row>
@@ -69,24 +99,28 @@
 
         <div class="home-container">
           <el-scrollbar>
-            <div class="scrollbar-flex-content"  v-if="item.type == 'class'">
+            <div class="scrollbar-flex-content" v-if="item.type == 'class'">
               <el-button
-                v-for="item, index in courseLabelList.list"
+                v-for="(item, index) in courseLabelList.list"
                 :key="item.id"
-                :class="idxCourseLabel === index ? 'active-btn' : 'scrollbar-item'"
+                :class="
+                  idxCourseLabel === index ? 'active-btn' : 'scrollbar-item'
+                "
                 text
-                @click="handleLabel(item,index, 4)"
+                @click="handleLabel(item, index, 4)"
               >
                 {{ item.name }}
               </el-button>
             </div>
             <div class="scrollbar-flex-content" v-if="item.type == 'ebook'">
               <el-button
-                v-for="item, index in ebookLabelList.list"
+                v-for="(item, index) in ebookLabelList.list"
                 :key="item.id"
-                :class="idxEbookLabel === index ? 'active-btn' : 'scrollbar-item'"
+                :class="
+                  idxEbookLabel === index ? 'active-btn' : 'scrollbar-item'
+                "
                 text
-                @click="handleLabel(item,index, 2)"
+                @click="handleLabel(item, index, 2)"
               >
                 {{ item.name }}
               </el-button>
@@ -101,6 +135,7 @@
                   shadow="hover"
                   v-for="(item, index) in freeResourceList.list"
                 >
+                <div @click="handleProd(item.enid, item.class_type)">
                   <img :src="ossProcess(item.logo)" :alt="item.name" />
                   <div style="padding: 16px; text-align: left">
                     <span style="display: block">{{ item.name }}</span>
@@ -117,6 +152,7 @@
                   <div class="bottom">
                     <el-button text class="button">立即学习</el-button>
                   </div>
+                </div>
                 </el-card>
               </div>
             </el-scrollbar>
@@ -128,6 +164,7 @@
                   shadow="hover"
                   v-for="item in courseContentList.product_list"
                 >
+                <div @click="handleProd(item.product_enid, item.product_type)">
                   <img
                     :src="ossProcess(item.horizontal_image)"
                     :alt="item.title"
@@ -152,6 +189,7 @@
                   <div class="bottom">
                     <el-button text class="button">立即学习</el-button>
                   </div>
+                </div>
                 </el-card>
               </div>
             </el-scrollbar>
@@ -163,48 +201,50 @@
                   shadow="hover"
                   v-for="(item, index) in ebookContentList.product_list"
                 >
-                  <img
-                    :src="ossEbookProcess(item.index_image)"
-                    :alt="item.title"
-                  />
+                  <div @click="handleProd(item.product_enid, item.product_type)">
+                    <img
+                      :src="ossEbookProcess(item.index_image)"
+                      :alt="item.title"
+                    />
 
-                  <el-popover
-                    placement="top-end"
-                    :title="item.title"
-                    :width="200"
-                    trigger="hover"
-                    :content="
-                      ebookPopoverContent(item.intro, item.introduction)
-                    "
-                  >
-                    <template #reference>
-                      <div style="padding: 6px; text-align: left">
-                        <span>{{ ebookTitle(item.title) }}</span>
-                        <p style="font-size: small; line-height: 0">
-                          {{ authorList(item.author_list) }}
-                        </p>
-                        <span
-                          style="font-size: small"
-                          v-if="item.user_score_count > 0"
-                          >{{ item.user_score_count }}人评分</span
-                        >
-                        <span
-                          style="font-size: small"
-                          v-if="item.score.length == 0"
-                          >暂无评分</span
-                        >
-                        <el-rate
-                          :model-value="handleScore(item.score)"
-                          disabled
-                          show-score
-                          allow-half
-                          size="small"
-                          text-color="#ff6b00"
-                          v-if="item.score.length > 0"
-                        />
-                      </div>
-                    </template>
-                  </el-popover>
+                    <el-popover
+                      placement="top-end"
+                      :title="item.title"
+                      :width="200"
+                      trigger="hover"
+                      :content="
+                        ebookPopoverContent(item.intro, item.introduction)
+                      "
+                    >
+                      <template #reference>
+                        <div style="padding: 6px; text-align: left">
+                          <span>{{ ebookTitle(item.title) }}</span>
+                          <p style="font-size: small; line-height: 0">
+                            {{ authorList(item.author_list) }}
+                          </p>
+                          <span
+                            style="font-size: small"
+                            v-if="item.user_score_count > 0"
+                            >{{ item.user_score_count }}人评分</span
+                          >
+                          <span
+                            style="font-size: small"
+                            v-if="item.score.length == 0"
+                            >暂无评分</span
+                          >
+                          <el-rate
+                            :model-value="handleScore(item.score)"
+                            disabled
+                            show-score
+                            allow-half
+                            size="small"
+                            text-color="#ff6b00"
+                            v-if="item.score.length > 0"
+                          />
+                        </div>
+                      </template>
+                    </el-popover>
+                  </div>
                 </el-card>
               </div>
             </el-scrollbar>
@@ -230,21 +270,42 @@
     </div>
   </div>
 
-  <el-backtop :right="100" :bottom="100" />
+  <QrLogin
+    v-if="loginVisible"
+    :dialog-visible="loginVisible"
+    @close="closeDialog"
+  ></QrLogin>
+  <EbookInfo
+    v-if="ebookVisible"
+    :enid="prodEnid"
+    :dialog-visible="ebookVisible"
+    @close="closeDialog"
+  ></EbookInfo>
+  <CourseInfo
+    v-if="courseVisible"
+    :enid="prodEnid"
+    :dialog-visible="courseVisible"
+    @close="closeDialog"
+  ></CourseInfo>
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive, onBeforeMount, onMounted } from "vue";
-import { ElTable, ElMessage } from "element-plus";
+import { ElTable, ElMessage, ElDivider } from "element-plus";
 import {
   GetHomeInitialState,
   SearchHot,
   SunflowerLabelList,
   SunflowerLabelContent,
   SunflowerResourceList,
+  UserInfo,
+  Logout,
 } from "../../wailsjs/go/backend/App";
 import { services } from "../../wailsjs/go/models";
-import { BrowserOpenURL } from "../../wailsjs/runtime";
+import { BrowserOpenURL, WindowReloadApp } from "../../wailsjs/runtime";
+import QrLogin from "../components/QrLogin.vue";
+import EbookInfo from "../components/EbookInfo.vue";
+import CourseInfo from "../components/CourseInfo.vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -254,11 +315,14 @@ const page = ref(0);
 const total = ref(0);
 const pageSize = ref(4);
 const dialogVisible = ref(false);
+const loginVisible = ref(false);
+const ebookVisible = ref(false);
+const courseVisible = ref(false);
+const prodEnid = ref("");
 
 const moreCategory = ref(9);
-const idxEbookLabel = ref(0)
-const idxCourseLabel = ref(0)
-
+const idxEbookLabel = ref(0);
+const idxCourseLabel = ref(0);
 
 let initial = reactive(new services.HomeInitState());
 let ebookLabelList = reactive(new services.SunflowerLabelList());
@@ -270,13 +334,17 @@ let courseContentList = reactive(new services.SunflowerContent());
 
 let currentCourse = reactive(new services.Navigation());
 let currentEbook = reactive(new services.Navigation());
+let user = reactive(new services.User());
 
 onBeforeMount(() => {
   // 分类
   GetHomeInitialState()
     .then((state) => {
       Object.assign(initial, state);
-      // console.log(state);
+      console.log(state);
+      if (initial.isLogin == true) {
+        getUserInfo();
+      }
     })
     .catch((error) => {
       console.log(error);
@@ -333,6 +401,7 @@ onMounted(() => {
 const getFreeResourceList = async () => {
   await SunflowerResourceList()
     .then((list) => {
+      console.log("-----------------");
       Object.assign(freeResourceList, list);
       console.log(freeResourceList);
     })
@@ -342,16 +411,53 @@ const getFreeResourceList = async () => {
 };
 getFreeResourceList();
 
-const handleLabel = (item: services.Navigation,index:number, nType: number) => {
+const getUserInfo = async () => {
+  await UserInfo()
+    .then((result) => {
+      Object.assign(user, result);
+      console.log(user);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const logout = async () => {
+  await Logout()
+    .then((result) => {
+      console.log(result);
+      WindowReloadApp();
+      router.push("/home");
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const handleProd = (enid: string, iType: number) => {
+  prodEnid.value = enid;
+  if (iType == 2) {
+    ebookVisible.value = true;
+  } else {
+    // 4-专栏,36-大师课,66-class,22-course
+    courseVisible.value = true;
+  }
+};
+
+const handleLabel = (
+  item: services.Navigation,
+  index: number,
+  nType: number
+) => {
   if (nType == 2) {
     pageSize.value = 6;
     Object.assign(currentEbook, item);
-    idxEbookLabel.value = index
+    idxEbookLabel.value = index;
   }
   if (nType == 4) {
     pageSize.value = 4;
     Object.assign(currentCourse, item);
-    idxCourseLabel.value = index
+    idxCourseLabel.value = index;
   }
   sunflowerLabelContent(item.enid, nType);
 };
@@ -373,6 +479,10 @@ const sunflowerLabelContent = async (enid: string, nType: number) => {
 
 const ossProcess = (url: string) => {
   return url + "?x-oss-process=image/crop,h_608/resize,w_1080,h_608,m_fill";
+};
+
+const ossAvatarProcess = (url: string) => {
+  return url + "?x-oss-process=image/resize,w_96,m_lfit";
 };
 
 const ossEbookProcess = (url: string) => {
@@ -415,12 +525,19 @@ const handleScore = (score: string) => {
   return score != "" ? parseFloat(score) : 0;
 };
 
+const openLoginDialog = () => {
+  loginVisible.value = true;
+};
+
 const openDialog = () => {
   dialogVisible.value = true;
 };
 const closeDialog = () => {
   //   initForm()
   dialogVisible.value = false;
+  loginVisible.value = false;
+  ebookVisible.value = false;
+  courseVisible.value = false;
 };
 const handleOpen = (key: string, keyPath: string[]) => {
   // console.log(key, keyPath);
@@ -432,11 +549,11 @@ const handleClose = (key: string, keyPath: string[]) => {
 const gotoCategory = (item: any, label_id: string) => {
   // services.Navigation
   console.log(item);
-  let product_type = '0'
+  let product_type = "0";
   if (item.nav_type == 2) {
-    product_type = '2'
+    product_type = "2";
   } else if (item.nav_type == 4) {
-    product_type = '66'
+    product_type = "66";
   }
   router.push({
     path: `/category`,
@@ -495,7 +612,7 @@ h4 {
 .el-carousel {
   height: 380px;
 }
-.el-carousel__item{
+.el-carousel__item {
   height: 380px;
 }
 /* .el-scrollbar {
@@ -579,7 +696,7 @@ h4 {
   box-shadow: 0px 6px 10px rgba(251, 72, 16, 0.2);
 }
 .el-button.is-text:not(.is-disabled):hover {
-background-color: var(--el-fill-color);
+  background-color: var(--el-fill-color);
 }
 
 .home-banner .user {
@@ -588,29 +705,81 @@ background-color: var(--el-fill-color);
 }
 
 .home-banner .user .not-login .receive {
-    width: 89%;
-    height: 0;
-    padding-bottom: calc(89% * (13 / 8));
-    margin: 36px auto 0;
-    background: url(https://piccdn2.umiwi.com/fe-oss/default/MTYzNTIzNTI3OTIw.png) no-repeat;
-    background-size: contain;
+  width: 89%;
+  height: 0;
+  padding-bottom: calc(89% * (13 / 8));
+  margin: 36px auto 0;
+  background: url(https://piccdn2.umiwi.com/fe-oss/default/MTYzNTIzNTI3OTIw.png)
+    no-repeat;
+  background-size: contain;
 }
 
 .home-banner .user .not-login .login-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 148px;
-    height: 32px;
-    margin: 14px auto 0;
-    border-radius: 6px;
-    line-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 148px;
+  margin: 14px auto 0;
+  border-radius: 8px;
+  line-height: 28px;
+  font-weight: bold;
+  border-color: #ff6b00;
+  background-color: #ff6b00;
+  color: #fff;
 }
 
 .home-banner .user .not-login .login-btn .line {
-    display: inline-block;
-    width: 1px;
-    height: 14px;
-    margin: 0 8px;
+  display: inline-block;
+  width: 1px;
+  height: 14px;
+  margin: 0 8px;
+}
+
+.home-banner .user .logged .personal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.home-banner .user .logged .personal .nickname {
+  width: 100%;
+  height: 24px;
+  margin-top: 4px;
+  line-height: 24px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  font-size: 16px;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+.home-banner .user .logged .data {
+  width: 148px;
+  height: 144px;
+  margin-top: 8px;
+  padding: 6px 12px 0;
+  border-radius: 10px;
+  background: url(https://piccdn2.umiwi.com/fe-oss/default/MTYzNTMwNDkxMjc1.png)
+    no-repeat center bottom / 148px 40px;
+  box-shadow: 0 5px 10px rgba(255, 107, 0, 0.1);
+}
+
+.home-banner .user .logged .data .time {
+  display: flex;
+  padding: 2px 0;
+  line-height: 22px;
+  justify-content: space-between;
+}
+
+.home-banner .user .logged .button {
+  height: 32px;
+  margin-top: 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  border-color: #ff6b00;
+  background-color: #ff6b00;
+  color: #fff;
 }
 </style>

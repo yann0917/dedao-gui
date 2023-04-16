@@ -162,6 +162,7 @@
     </div>
   </div>
     <EbookInfo v-if="ebookVisible" :enid= "prodEnid" :dialog-visible="ebookVisible" @close="closeDialog"></EbookInfo>
+    <CourseInfo v-if="courseVisible" :enid= "prodEnid" :dialog-visible="courseVisible" @close="closeDialog"></CourseInfo>
 </template>
 
 <script lang="ts" setup>
@@ -175,6 +176,7 @@ import {
 import { services } from "../../wailsjs/go/models";
 import { useRoute, useRouter } from "vue-router";
 import  EbookInfo  from '../components/EbookInfo.vue';
+import CourseInfo from "../components/CourseInfo.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -383,8 +385,9 @@ const handleProd = (enid:string, iType:number)=>{
   prodEnid.value = enid
   if (iType == 2) {
     ebookVisible.value = true
+  } else if(iType == 66) {
+    courseVisible.value = true
   }
-  console.log(prodEnid)
 }
 
 const openDialog = () => {
@@ -392,6 +395,7 @@ const openDialog = () => {
 }
 const closeDialog = () => {
   ebookVisible.value = false
+  courseVisible.value = false
 }
 
 </script>

@@ -50,6 +50,10 @@ export function EbookInfo(arg1) {
   return window['go']['backend']['App']['EbookInfo'](arg1);
 }
 
+export function EbookShelfAdd(arg1) {
+  return window['go']['backend']['App']['EbookShelfAdd'](arg1);
+}
+
 export function EbookUserInfo() {
   return window['go']['backend']['App']['EbookUserInfo']();
 }
@@ -68,6 +72,10 @@ export function GetVolcPlayAuthToken(arg1, arg2) {
 
 export function GetVolcPlayInfo(arg1) {
   return window['go']['backend']['App']['GetVolcPlayInfo'](arg1);
+}
+
+export function Logout() {
+  return window['go']['backend']['App']['Logout']();
 }
 
 export function NotesTimeline(arg1) {

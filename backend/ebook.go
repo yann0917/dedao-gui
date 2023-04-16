@@ -13,3 +13,8 @@ func (a *App) EbookCommentList(enid string, page, limit int) (list *services.Ebo
 	list, err = app.EbookCommentList(enid, "like_count", page, limit)
 	return
 }
+
+func (a *App) EbookShelfAdd(enids []string) (resp *services.EbookShelfAddResp, err error) {
+	resp, err = app.EbookShelfAdd(enids)
+	return
+}

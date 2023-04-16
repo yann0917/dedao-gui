@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/json-iterator/go v1.1.12
 	github.com/wailsapp/wails/v2 v2.4.1
-	github.com/yann0917/dedao v0.0.9
+	github.com/yann0917/dedao v0.1.0
 )
 
 require (

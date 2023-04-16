@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="60%" :before-close="closeDialog">
+  <el-dialog v-model="dialogVisible" width="75%" :before-close="closeDialog">
     <template #header="{titleId, titleClass }">
       <div class="my-header">
         <h4 :id="titleId" :class="titleClass">{{ebookInfo.operating_title}}</h4>
@@ -19,7 +19,10 @@
                 <span style="color:#ff6b00">{{ ebookInfo.price }}元</span>
                 <el-tag class="ml-2" type="warning" v-if="ebookInfo.is_vip_book==1" round>
                   <el-icon><HotWater /></el-icon>会员免费</el-tag>
-                  <el-tag class="ml-2" type="info" v-if="ebookInfo.read_time">阅读总时长：{{secondToHour(ebookInfo.read_time)}}</el-tag>
+                <el-tag class="ml-2" type="info" v-if="ebookInfo.read_time">阅读总时长：{{secondToHour(ebookInfo.read_time)}}</el-tag>
+                <el-button v-if="ebookInfo.is_on_bookshelf==false" @click="ebookShelfAdd(ebookInfo.enid)">
+                  <el-icon><Plus /></el-icon>加入书架
+                </el-button>
               </el-col>
             </el-row>
           </div>
@@ -29,7 +32,7 @@
             <span class="info-value">{{ ebookInfo.product_score }}</span>
             <span class="info-text">用户推荐指数</span>
           </div>
-          <div class="item-content">
+          <div class="item-content" v-if="ebookInfo.classify_name !=''">
             <span class="info-value">{{ ebookInfo.classify_name }}</span>
             <span class="info-text">类型</span>
           </div>
@@ -79,7 +82,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, defineProps } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
-import { EbookInfo } from '../../wailsjs/go/backend/App'
+import { EbookInfo,EbookShelfAdd } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import { repeat } from 'lodash'
 import { secondToHour } from '../utils/utils'
@@ -112,6 +115,19 @@ const getEbookInfo = async (enid: string) => {
     console.log(info)
     Object.assign(ebookInfo, info)
     openDialog()
+  }).catch((error) => {
+    ElMessage({
+      message: error,
+      type: 'warning'
+    })
+  })
+  return
+}
+
+const ebookShelfAdd = async (enid: string) => {
+  await EbookShelfAdd([enid]).then((info) => {
+    console.log(info)
+    getEbookInfo(enid)
   }).catch((error) => {
     ElMessage({
       message: error,
@@ -208,5 +224,14 @@ const gotoCommentList = (row: any) => {
   background-size: 20px;
   padding-left: 20px;
   background-position: 35%;
+}
+
+.card-header .el-button {
+    /* height: 32px; */
+    border-radius: 8px;
+    font-weight: bold;
+    border-color: #ff6b00;
+    background-color: #ff6b00;
+    color: #fff;
 }
 </style>

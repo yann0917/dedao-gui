@@ -3,6 +3,7 @@ export namespace backend {
 	export class LoginResult {
 	    status: number;
 	    cookie: string;
+	    user?: services.User;
 	
 	    static createFrom(source: any = {}) {
 	        return new LoginResult(source);
@@ -12,7 +13,26 @@ export namespace backend {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.status = source["status"];
 	        this.cookie = source["cookie"];
+	        this.user = this.convertValues(source["user"], services.User);
 	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	export class QrCodeResp {
 	    token: string;
@@ -2197,6 +2217,37 @@ export namespace services {
 		}
 	}
 	
+	export class EbookShelfAddResp {
+	    // Go type: struct { N int "json:\"n\"" }
+	    data: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new EbookShelfAddResp(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.data = this.convertValues(source["data"], Object);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class EbookVIPInfo {
 	    uid: number;
 	    nickname: string;

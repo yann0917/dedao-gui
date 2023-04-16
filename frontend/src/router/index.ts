@@ -156,22 +156,22 @@ const router = createRouter({
                 }
             ]
         },
-        {
-            path: "/",
-            // name: "about",
-            meta: { name: "关于", icon:"InfoFilled", menuType: 2 },
-            redirect: "/about",
-            children: [
-                {
-                    path: 'about',
-                    name: "about",
-                    component: () => import("../views/About.vue"),
-                    meta: {
-                        name: "关于", requiresAuth:false
-                    },
-                }
-            ],
-        },
+        // {
+        //     path: "/",
+        //     // name: "about",
+        //     meta: { name: "关于", icon:"InfoFilled", menuType: 2 },
+        //     redirect: "/about",
+        //     children: [
+        //         {
+        //             path: 'about',
+        //             name: "about",
+        //             component: () => import("../views/About.vue"),
+        //             meta: {
+        //                 name: "关于", requiresAuth:false
+        //             },
+        //         }
+        //     ],
+        // },
         {
             path: "/user",
             // name: "user",
@@ -208,16 +208,16 @@ const router = createRouter({
 });
 
 
-router.beforeEach(async (to, from, next) => {
-    // ✅ 这样做是可行的，因为路由器在安装完之后就会开始导航。
-    // Pinia 也将被安装。
-    const store = userStore()
-    if (to.name !=="login" && to.meta.requiresAuth && !store.user?.nickname) {
-        next( {path:'/user/login'})
-    } else {
-        next()
-    }
-  })
+// router.beforeEach(async (to, from, next) => {
+//     // ✅ 这样做是可行的，因为路由器在安装完之后就会开始导航。
+//     // Pinia 也将被安装。
+//     const store = userStore()
+//     if (to.name !=="login" && to.meta.requiresAuth && !store.user?.nickname) {
+//         next( {path:'/user/login'})
+//     } else {
+//         next()
+//     }
+//   })
 
   // 全局解析守卫 它在每次导航时都会触发，但是确保在导航被确认之前，同时在所有组件内守卫和异步路由组件被解析之后，解析守卫就被正确调用。
   router.beforeResolve(async to => {

@@ -27,6 +27,8 @@ export function EbookDownload(arg1:number,arg2:number):Promise<void>;
 
 export function EbookInfo(arg1:string):Promise<any>;
 
+export function EbookShelfAdd(arg1:Array<string>):Promise<any>;
+
 export function EbookUserInfo():Promise<any>;
 
 export function GetHomeInitialState():Promise<services.HomeInitState>;
@@ -36,6 +38,8 @@ export function GetQrcode():Promise<backend.QrCodeResp>;
 export function GetVolcPlayAuthToken(arg1:string,arg2:string):Promise<any>;
 
 export function GetVolcPlayInfo(arg1:string):Promise<any>;
+
+export function Logout():Promise<void>;
 
 export function NotesTimeline(arg1:string):Promise<any>;
 

@@ -29,7 +29,7 @@
       <template #default="scope">
         <el-button icon="ChatDotRound" size="small" type="primary" link @click="gotoCommentList(scope.row)">书评
                 </el-button>
-        <el-button icon="view" size="small" type="primary" link @click="getEbookInfo(scope.row.enid)">详情</el-button>
+        <el-button icon="view" size="small" type="primary" link @click="handleProd(scope.row.enid)">详情</el-button>
         <el-button icon="download" size="small" type="primary" link @click="openDownloadDialog(scope.row)">下载
         </el-button>
 
@@ -37,66 +37,7 @@
     </el-table-column>
   </el-table>
   <Pagination :total="total" @pageChange="handleChangePage"></Pagination>
-
-  <el-dialog v-model="dialogVisible" width="60%" :before-close="closeDialog">
-    <template #header="{titleId, titleClass }">
-      <div class="my-header">
-        <h4 :id="titleId" :class="titleClass">{{ebookInfo.operating_title}}</h4>
-        <el-alert :title="ebookInfo.author_list.join(' ')+' 著/'+ebookInfo.press.name" type="info" :closable="false" center />
-      </div>
-    </template>
-    <el-space wrap>
-      <el-card v-for="i in 1" :key="i" class="box-card" width="100%">
-        <template #header>
-          <div class="card-header">
-            <el-row :gutter="5" align="middle">
-              <el-col :span="6">
-                <el-row justify="center">
-                  <el-image :src="ebookInfo.cover" fit="cover" />
-                </el-row>
-                <el-row justify="center">
-                  <el-tag type="success">{{ebookInfo.book_author}}</el-tag>
-                  <el-tag type="success" v-if="ebookInfo.classify_name">{{ebookInfo.classify_name}}</el-tag>
-                </el-row>
-              </el-col>
-              <el-col :span="18" style="text-align:left">
-                <p class="author-info" v-html="ebookInfo.author_info?.replaceAll('\n','<br/>')"></p><br />
-                <el-tag class="ml-2" type="warning" v-if="ebookInfo.is_vip_book==1" round>
-                  <el-icon><HotWater /></el-icon>会员免费</el-tag>
-                <el-tag class="ml-2" type="danger" v-if="ebookInfo.is_tts_switch==true" round>
-                  <el-icon><Microphone /></el-icon>可朗读
-                </el-tag>
-                <el-tag class="ml-2" type="danger" v-else round>
-                  <el-icon><Mute /></el-icon>不可朗读
-                </el-tag>
-              </el-col>
-            </el-row>
-          </div>
-        </template>
-        <div class="book-tag" style="text-align:left">
-          <el-tag  class="ml-2" type="info">出版日期：{{ebookInfo.publish_time}}</el-tag>
-          <el-tag class="ml-2" type="success" v-if="ebookInfo.douban_score">豆瓣评分：{{ebookInfo.douban_score}}</el-tag>
-          <el-tag class="ml-2" type="warning" v-if="ebookInfo.count">字数：{{Math.ceil(ebookInfo.count/1000)}}千字</el-tag>
-          <el-tag class="ml-2" type="info" v-if="ebookInfo.read_time">阅读总时长：{{secondToHour(ebookInfo.read_time)}}</el-tag>
-        </div>
-        <el-divider content-position="left">{{ebookInfo.press.name}}</el-divider>
-        <el-alert v-html="ebookInfo.press.brief?.replaceAll('\n','<br/>')" type="info" :closable="false" align="left" />
-
-        <el-divider content-position="left">简 介</el-divider>
-        <div class="book-intro" style="text-align:left">
-          <p>{{ebookInfo.other_share_summary}}</p>
-          <p v-html="ebookInfo.book_intro?.replaceAll('\n','<br/>')"></p>
-        </div>
-        <el-divider content-position="left">目 录</el-divider>
-        <div class="catalog">
-          <el-scrollbar height="320px" align="left">
-            <span v-for="item in ebookInfo.catalog_list" :key="item.playOrder" class="scrollbar-catalog-item">
-            {{repeat("&nbsp;&nbsp;", item.level)+ item.text }}<br/></span>
-          </el-scrollbar>
-        </div>
-      </el-card>
-    </el-space>
-  </el-dialog>
+  <EbookInfo v-if="dialogVisible" :enid= "prodEnid" :dialog-visible="dialogVisible" @close="closeDialog"></EbookInfo>
 
   <el-dialog v-model="dialogDownloadVisible" title="请选择下载格式" align-center center width="30%">
     <el-select v-model="downloadType" placeholder="请选择下载格式">
@@ -117,15 +58,14 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
-import { CourseList, CourseCategory, EbookInfo, EbookDownload } from '../../wailsjs/go/backend/App'
+import { CourseList, CourseCategory, EbookDownload } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import Pagination from '../components/Pagination.vue'
-import { repeat } from 'lodash'
-import { secondToHour } from '../utils/utils'
-import { useRouter } from 'vue-router'
-import { userStore } from '../stores/user';
-import { Local } from '../utils/storage';
+import  EbookInfo from '../components/EbookInfo.vue'
 
+import { useRouter } from 'vue-router'
+import { userStore } from '../stores/user'
+import { Local } from '../utils/storage'
 
 const store = userStore()
 const router = useRouter()
@@ -135,6 +75,7 @@ const total = ref(0)
 const pageSize = ref(15)
 const searchInfo = ref({})
 const dialogVisible = ref(false)
+const prodEnid = ref("")
 
 const dialogDownloadVisible = ref(false)
 const downloadType = ref(1)
@@ -189,19 +130,12 @@ const getTableData = async () => {
   })
 }
 
-const getEbookInfo = async (enid: string) => {
-  await EbookInfo(enid).then((info) => {
-    console.log(info)
-    Object.assign(ebookInfo, info)
-    openDialog()
-  }).catch((error) => {
-    ElMessage({
-      message: error,
-      type: 'warning'
-    })
-  })
-  return
+const handleProd = (enid:string)=>{
+  prodEnid.value = enid
+  dialogVisible.value = true
 }
+
+
 function handleChange() {
 }
 
