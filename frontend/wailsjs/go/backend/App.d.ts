@@ -47,6 +47,8 @@ export function OdobDownload(arg1:number,arg2:number):Promise<void>;
 
 export function OdobUserInfo():Promise<any>;
 
+export function OpenDirectoryDialog(arg1:string):Promise<string>;
+
 export function SearchHot():Promise<any>;
 
 export function SunflowerLabelContent(arg1:string,arg2:number,arg3:number,arg4:number):Promise<any>;

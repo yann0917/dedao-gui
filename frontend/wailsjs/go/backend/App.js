@@ -90,6 +90,10 @@ export function OdobUserInfo() {
   return window['go']['backend']['App']['OdobUserInfo']();
 }
 
+export function OpenDirectoryDialog(arg1) {
+  return window['go']['backend']['App']['OpenDirectoryDialog'](arg1);
+}
+
 export function SearchHot() {
   return window['go']['backend']['App']['SearchHot']();
 }

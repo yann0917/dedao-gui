@@ -40,9 +40,14 @@
   <EbookInfo v-if="dialogVisible" :enid= "prodEnid" :dialog-visible="dialogVisible" @close="closeDialog"></EbookInfo>
 
   <el-dialog v-model="dialogDownloadVisible" title="请选择下载格式" align-center center width="30%">
-    <el-select v-model="downloadType" placeholder="请选择下载格式">
-      <el-option v-for="item in downloadTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-    </el-select>
+      <el-form >
+          <el-form-item label="下载格式" label-width="80px">
+              <el-select v-model="downloadType" placeholder="请选择下载格式">
+                  <el-option v-for="item in downloadTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+          </el-form-item>
+      </el-form>
+
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="closeDownloadDialog">取消</el-button>
@@ -58,7 +63,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
-import { CourseList, CourseCategory, EbookDownload } from '../../wailsjs/go/backend/App'
+import { CourseList, CourseCategory, EbookDownload,OpenDirectoryDialog } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import Pagination from '../components/Pagination.vue'
 import  EbookInfo from '../components/EbookInfo.vue'
@@ -66,6 +71,7 @@ import  EbookInfo from '../components/EbookInfo.vue'
 import { useRouter } from 'vue-router'
 import { userStore } from '../stores/user'
 import { Local } from '../utils/storage'
+import {str} from "video.js";
 
 const store = userStore()
 const router = useRouter()
@@ -152,6 +158,7 @@ const closeDialog = () => {
 
 
 const openDownloadDialog = (row: any) => {
+    // openDialogDir("Select download directory")
   downloadId.value = row.id
   dialogDownloadVisible.value = true
 }
@@ -172,6 +179,14 @@ const download = async (id: number, dType: number) => {
   })
   closeDownloadDialog()
   return
+}
+
+const openDialogDir = async (title: string) => {
+    await OpenDirectoryDialog(title).then((result)=>{
+        console.log(result)
+    }).catch((error)=>{
+        console.log(error)
+    })
 }
 
 const gotoCommentList = (row: any) => {

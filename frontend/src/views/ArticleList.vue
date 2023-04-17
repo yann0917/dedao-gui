@@ -44,9 +44,13 @@
     :total="total" :layout="layout" @current-change="handleChangePage" @size-change="handleSizeChange" />
 
   <el-dialog v-model="dialogDownloadVisible" title="请选择下载格式" align-center center width="30%">
-    <el-select v-model="downloadType" placeholder="请选择下载格式">
-      <el-option v-for="item in downloadTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-    </el-select>
+      <el-form >
+          <el-form-item label="下载格式" label-width="80px">
+              <el-select v-model="downloadType" placeholder="请选择下载格式">
+                  <el-option v-for="item in downloadTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+          </el-form-item>
+      </el-form>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="closeDownloadDialog">取消</el-button>
