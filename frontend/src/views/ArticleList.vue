@@ -43,27 +43,17 @@
   <el-pagination background v-model:currentPage="page" v-model:page-size="pageSize" :page-sizes="pageSizes"
     :total="total" :layout="layout" @current-change="handleChangePage" @size-change="handleSizeChange" />
 
-  <el-dialog v-model="dialogDownloadVisible" title="请选择下载格式" align-center center width="30%">
-      <el-form >
-          <el-form-item label="下载格式" label-width="80px">
-              <el-select v-model="downloadType" placeholder="请选择下载格式">
-                  <el-option v-for="item in downloadTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
-          </el-form-item>
-      </el-form>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="closeDownloadDialog">取消</el-button>
-        <el-button type="primary" @click="download(downloadId, downloadaId, downloadType)">
-          确认
-        </el-button>
-      </span>
-    </template>
+  <download-dialog
+      v-if="dialogDownloadVisible"
+      :dialog-visible="dialogDownloadVisible"
+      :download-type-options="downloadTypeOptions"
+      :prod-type="66"
+      :download-id="downloadId"
+      :article-id="downloadaId"
+      @close="closeDownloadDialog">
+  </download-dialog>
 
-  </el-dialog>
-
-
-  <el-drawer :title="media?.title" direction="btt" v-model="audioVisible" @close="closeAudio" @open="open"
+<el-drawer :title="media?.title" direction="btt" v-model="audioVisible" @close="closeAudio" @open="open"
     @opened="openVideo(media)">
     <div style="position:relative;" v-html="audiohtml"></div>
   </el-drawer>
@@ -80,10 +70,11 @@
 import { ref, reactive, onMounted, onUnmounted,watch, nextTick } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
-import { ArticleList, CourseDownload } from '../../wailsjs/go/backend/App'
+import { ArticleList } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import { useRoute, useRouter } from 'vue-router'
 import { secondToHour } from '../utils/utils'
+import DownloadDialog from "../components/DownloadDialog.vue";
 
 import videojs from 'video.js'
 import "video.js/dist/video-js.css"
@@ -270,19 +261,6 @@ const closeDownloadDialog = () => {
   //   initForm()
   downloadType.value = 1
   dialogDownloadVisible.value = false
-}
-
-const download = async (id: number, aid: number, dType: number) => {
-  await CourseDownload(id, aid, dType).then((info) => {
-    console.log(info)
-  }).catch((error) => {
-    ElMessage({
-      message: error,
-      type: 'warning'
-    })
-  })
-  closeDownloadDialog()
-  return
 }
 
 const gotoArticleDetail = (row: any) => {

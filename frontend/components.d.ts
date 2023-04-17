@@ -8,6 +8,7 @@ export {}
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     CourseInfo: typeof import('./src/components/CourseInfo.vue')['default']
+    DownloadDialog: typeof import('./src/components/DownloadDialog.vue')['default']
     EbookInfo: typeof import('./src/components/EbookInfo.vue')['default']
     ElAlert: typeof import('element-plus/es')['ElAlert']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
@@ -23,7 +24,6 @@ declare module '@vue/runtime-core' {
     ElDialog: typeof import('element-plus/es')['ElDialog']
     ElDivider: typeof import('element-plus/es')['ElDivider']
     ElDrawer: typeof import('element-plus/es')['ElDrawer']
-    ElDropdown: typeof import('element-plus/es')['ElDropdown']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElHeader: typeof import('element-plus/es')['ElHeader']

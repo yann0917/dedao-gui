@@ -28,37 +28,28 @@
             </template>
         </el-table-column>
     </el-table>
-    <Pagination :total="total" @pageChange="handleChangePage"></Pagination>
-    <CourseInfo v-if="dialogVisible" :enid= "prodEnid" :dialog-visible="dialogVisible" @close="closeDialog"></CourseInfo>
-
-    <el-dialog v-model="dialogDownloadVisible" title="请选择下载格式" align-center center width="30%">
-        <el-form >
-            <el-form-item label="下载格式" label-width="80px">
-                <el-select v-model="downloadType" placeholder="请选择下载格式">
-                    <el-option v-for="item in downloadTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
-            </el-form-item>
-        </el-form>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="closeDownloadDialog">取消</el-button>
-                <el-button type="primary" @click="download(downloadId, downloadType)">
-                    确认
-                </el-button>
-            </span>
-        </template>
-    </el-dialog>
+    <pagination :total="total" @pageChange="handleChangePage"></pagination>
+    <course-info v-if="dialogVisible" :enid= "prodEnid" :dialog-visible="dialogVisible" @close="closeDialog"></course-info>
+    <download-dialog
+        v-if="dialogDownloadVisible"
+        :dialog-visible="dialogDownloadVisible"
+        :download-type-options="downloadTypeOptions"
+        :prod-type="66"
+        :download-id="downloadId"
+        @close="closeDownloadDialog">
+    </download-dialog>
 </template>
   
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
-import { CourseList, CourseCategory, CourseDownload } from '../../wailsjs/go/backend/App'
+import { CourseList, CourseCategory } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import { useRouter } from 'vue-router'
 import { userStore } from '../stores/user';
 import Pagination from '../components/Pagination.vue'
 import CourseInfo from '../components/CourseInfo.vue'
+import DownloadDialog from "../components/DownloadDialog.vue";
 import { Local } from '../utils/storage';
 
 const store = userStore()
@@ -160,18 +151,6 @@ const closeDownloadDialog = () => {
     dialogDownloadVisible.value = false
 }
 
-const download = async (id: number, dType: number) => {
-    await CourseDownload(id, 0, dType).then((info) => {
-        console.log(info)
-    }).catch((error) => {
-        ElMessage({
-            message: error,
-            type: 'warning'
-        })
-    })
-    closeDownloadDialog()
-    return
-}
 </script>
   
 <style scoped>

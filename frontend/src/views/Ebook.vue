@@ -37,41 +37,30 @@
     </el-table-column>
   </el-table>
   <Pagination :total="total" @pageChange="handleChangePage"></Pagination>
-  <EbookInfo v-if="dialogVisible" :enid= "prodEnid" :dialog-visible="dialogVisible" @close="closeDialog"></EbookInfo>
+  <ebook-info v-if="dialogVisible" :enid= "prodEnid" :dialog-visible="dialogVisible" @close="closeDialog"></ebook-info>
 
-  <el-dialog v-model="dialogDownloadVisible" title="请选择下载格式" align-center center width="30%">
-      <el-form >
-          <el-form-item label="下载格式" label-width="80px">
-              <el-select v-model="downloadType" placeholder="请选择下载格式">
-                  <el-option v-for="item in downloadTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
-          </el-form-item>
-      </el-form>
-
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="closeDownloadDialog">取消</el-button>
-        <el-button type="primary" @click="download(downloadId,downloadType)">
-          确认
-        </el-button>
-      </span>
-    </template>
-  </el-dialog>
-
+  <download-dialog
+      v-if="dialogDownloadVisible"
+      :dialog-visible="dialogDownloadVisible"
+      :download-type-options="downloadTypeOptions"
+      :prod-type="2"
+      :download-id="downloadId"
+      @close="closeDownloadDialog">
+  </download-dialog>
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
-import { CourseList, CourseCategory, EbookDownload,OpenDirectoryDialog } from '../../wailsjs/go/backend/App'
+import { CourseList, CourseCategory,OpenDirectoryDialog } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import Pagination from '../components/Pagination.vue'
-import  EbookInfo from '../components/EbookInfo.vue'
+import EbookInfo from '../components/EbookInfo.vue'
+import DownloadDialog from "../components/DownloadDialog.vue";
 
 import { useRouter } from 'vue-router'
 import { userStore } from '../stores/user'
 import { Local } from '../utils/storage'
-import {str} from "video.js";
 
 const store = userStore()
 const router = useRouter()
@@ -91,11 +80,7 @@ const downloadTypeOptions = [
 ]
 
 let tableData = reactive(new services.CourseList)
-let ebookInfo = reactive(new services.EbookDetail)
 
-const fontWeight = reactive({
-  'font-weight': 'bold', 
-})
 onMounted(() => {
   CourseCategory().then(result => {
     result.forEach((item, key) => {
@@ -166,19 +151,6 @@ const closeDownloadDialog = () => {
   //   initForm()
   downloadType.value = 1
   dialogDownloadVisible.value = false
-}
-
-const download = async (id: number, dType: number) => {
-  await EbookDownload(id, dType).then((info) => {
-    console.log(info)
-  }).catch((error) => {
-    ElMessage({
-      message: error,
-      type: 'warning'
-    })
-  })
-  closeDownloadDialog()
-  return
 }
 
 const openDialogDir = async (title: string) => {

@@ -45,8 +45,8 @@
       </el-carousel>
     </el-col>
     <el-col :span="4" class="user">
-      <div :class="initial.isLogin == false ? 'not-login' : 'logged'">
-        <div v-if="initial.isLogin == false">
+      <div :class="!initial.isLogin ? 'not-login' : 'logged'">
+        <div v-if="!initial.isLogin">
           <div class="receive"></div>
           <el-button class="login-btn" @click="openLoginDialog()">
             登录
@@ -342,7 +342,7 @@ onBeforeMount(() => {
     .then((state) => {
       Object.assign(initial, state);
       console.log(state);
-      if (initial.isLogin == true) {
+      if (initial.isLogin) {
         getUserInfo();
       }
     })
@@ -401,7 +401,6 @@ onMounted(() => {
 const getFreeResourceList = async () => {
   await SunflowerResourceList()
     .then((list) => {
-      console.log("-----------------");
       Object.assign(freeResourceList, list);
       console.log(freeResourceList);
     })
@@ -782,4 +781,11 @@ h4 {
   background-color: #ff6b00;
   color: #fff;
 }
+
+.home-banner .banner .el-carousel {
+    box-shadow: 0 5px 10px rgba(51, 51, 51, 0.06);
+    /*height: 380px;*/
+    border-radius: 8px;
+}
+
 </style>
