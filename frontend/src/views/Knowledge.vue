@@ -3,36 +3,24 @@
     <el-space wrap>
     <el-row :gutter="20">
     <el-col :span="16" class="notes">
-      <ul v-infinite-scroll="loadNotes" 
-      class="infinite-note-list" 
-      style="overflow-y: auto; max-height: 900px;"  
+      <ul v-infinite-scroll="loadNotes"
+      class="infinite-note-list"
+      style="overflow-y: auto; max-height: 900px;"
       :infinite-scroll-disabled="infLoadingNote"
       infinite-scroll-distance="10"	>
       <li class="infinite-note-list-item">
       <el-card v-for="item in noteList.notes" :key="item.f_part.note_id_hazy" class="box-card" shadow="hover" style="width: 800px;">
         <template #header>
           <div class="card-header">
-
             <el-row :gutter="20" align="top">
               <el-col :span="24" v-if="item.comb?.length">
                 <svg t="1677244742093" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3684" width="14" height="14"><path d="M922.026667 439.04l-267.221334-282.368v185.258667h-85.333333c-250.325333 0-455.253333 181.504-481.322667 413.44 115.157333-133.674667 291.925333-218.922667 480.682667-218.922667h85.077333l0.554667 185.173333 267.52-282.581333z m-438.528 189.44C268.8 662.570667 87.04 821.76 47.232 1024A529.664 529.664 0 0 1 0 805.461333C0 502.272 254.976 256.597333 569.472 256.597333V40.96a35.242667 35.242667 0 0 1 10.368-30.208 39.68 39.68 0 0 1 54.4 0l378.794667 400.298667a35.413333 35.413333 0 0 1 10.88 27.861333 35.498667 35.498667 0 0 1-10.88 27.904l-376.704 398.08a37.973333 37.973333 0 0 1-56.448 2.133333 35.114667 35.114667 0 0 1-10.410667-30.208l-0.64-215.082666c-26.88 0-53.546667 2.005333-79.701333 5.845333l-5.632 0.853333z" fill="#8a8a8a" p-id="3685"></path></svg>
-                  
-                <span style="font-size: small;" v-if="item.comb.length<=2">  
-                    {{ ' '+item.comb.map((v,i)=>{
-                  return v.name
-                }).join("、")+"转发了" }}</span>
-                 <span style="font-size: small;" v-else="item.comb.length>2">  
-                    {{ ' '+item.comb.map((v,i)=>{
-                      if(i<2) {
-                        return v.name
-                      }
-                }).join("、")+"和其他"+(item.comb.length-2)+"转发了" }}</span>
+                  <span  style="font-size: small;">{{handleComb(item.comb)}}</span>
               </el-col>
             </el-row>
 
             <el-row :gutter="20">
               <el-col :span="4">
-                
                 <el-avatar :size="72" :src="item.f_part.avatar" fit="fill" />
                 <el-icon v-if="item.f_part.is_v==2"><svg t="1677248742045" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18550" width="14" height="14"><path d="M512 0C229.376 0 0 229.376 0 512s229.376 512 512 512 512-229.376 512-512S794.624 0 512 0z m55.296 832L194.56 311.296l174.592-0.512 198.656 313.856 141.824-313.856 112.64 0.512-254.976 520.704z" fill="#ff6b00" p-id="18551"></path></svg></el-icon>
                 <el-icon v-if="item.f_part.is_v==4"><svg t="1677248508098" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6456" width="14" height="14"><path d="M511.953455 1002.146909c-142.987636 0-408.901818-218.763636-408.901818-425.634909L103.051636 164.421818l40.657455-0.674909c0.861091 0 91.624727-1.931636 185.274182-39.936 96.046545-39.028364 157.998545-83.828364 158.580364-84.247273l24.273455-17.687273 24.482909 17.687273c0.581818 0.442182 62.533818 45.218909 158.580364 84.247273 93.649455 38.004364 184.413091 39.936 185.367273 39.936l40.471273 0.674909 0.186182 412.090182C920.948364 783.36 655.034182 1002.146909 511.953455 1002.146909L511.953455 1002.146909zM185.623273 243.409455l0 333.079273c0 159.953455 231.633455 343.063273 326.330182 343.063273 94.72 0 326.330182-183.109818 326.330182-343.063273L838.283636 243.409455c-40.471273-4.375273-106.170182-15.429818-174.405818-43.124364-69.934545-28.439273-123.042909-59.345455-151.947636-77.754182-28.811636 18.408727-81.989818 49.314909-151.854545 77.754182C291.793455 228.002909 226.071273 239.034182 185.623273 243.409455L185.623273 243.409455zM490.077091 731.345455l-173.614545-147.898182 53.387636-62.813091 111.383273 94.813091 211.386182-243.525818 62.417455 54.155636L490.077091 731.345455 490.077091 731.345455zM490.077091 731.345455" fill="#ff6b00" p-id="6457"></path></svg></el-icon>
@@ -89,11 +77,11 @@
                 <el-icon v-if="item.s_part.is_v==4"><svg t="1677248508098" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6456" width="14" height="14"><path d="M511.953455 1002.146909c-142.987636 0-408.901818-218.763636-408.901818-425.634909L103.051636 164.421818l40.657455-0.674909c0.861091 0 91.624727-1.931636 185.274182-39.936 96.046545-39.028364 157.998545-83.828364 158.580364-84.247273l24.273455-17.687273 24.482909 17.687273c0.581818 0.442182 62.533818 45.218909 158.580364 84.247273 93.649455 38.004364 184.413091 39.936 185.367273 39.936l40.471273 0.674909 0.186182 412.090182C920.948364 783.36 655.034182 1002.146909 511.953455 1002.146909L511.953455 1002.146909zM185.623273 243.409455l0 333.079273c0 159.953455 231.633455 343.063273 326.330182 343.063273 94.72 0 326.330182-183.109818 326.330182-343.063273L838.283636 243.409455c-40.471273-4.375273-106.170182-15.429818-174.405818-43.124364-69.934545-28.439273-123.042909-59.345455-151.947636-77.754182-28.811636 18.408727-81.989818 49.314909-151.854545 77.754182C291.793455 228.002909 226.071273 239.034182 185.623273 243.409455L185.623273 243.409455zM490.077091 731.345455l-173.614545-147.898182 53.387636-62.813091 111.383273 94.813091 211.386182-243.525818 62.417455 54.155636L490.077091 731.345455 490.077091 731.345455zM490.077091 731.345455" fill="#ff6b00" p-id="6457"></path></svg></el-icon>
               </el-col>
               <el-col :span="6">
-                <h4>{{ item.s_part.nick_name }}</h4>
+                <h4>{{ item.s_part?.nick_name }}</h4>
               </el-col>
             </el-row>
 
-            <span style="white-space: pre-wrap;">{{item.s_part.note }}</span>
+            <span style="white-space: pre-wrap;">{{item.s_part?.note }}</span>
             <div class="box" v-if="item.s_part.images?.length>0">
               <div class="imageBox">
                 <el-image v-for="i in item.s_part.images" :src="i" :preview-src-list="item.s_part.images.map((v,i)=>{
@@ -103,7 +91,7 @@
             </div>
             <div class="note-line" v-if="item.s_part.base_source.title !=''">
               <div v-if="item.notes_type == 4">
-                {{item.s_part.note_line }}
+                {{item.s_part?.note_line }}
               <el-divider />
               </div>
             <div class="base-source">
@@ -112,8 +100,8 @@
                   <el-image :src="item.s_part.base_source.img" fit="cover" style="width:90%;"/>
                 </el-col>
                 <el-col :span="16" style="text-align: left;line-height: 2.2em;">
-                  <div style="font-weight: bold;">{{ item.s_part.base_source.title }}</div>
-                  <div style="font-size: small;">{{ item.s_part.base_source.sub_title }}</div>
+                  <div style="font-weight: bold;">{{ item.s_part?.base_source.title }}</div>
+                  <div style="font-size: small;">{{ item.s_part?.base_source.sub_title }}</div>
                 </el-col>
               </el-row>
             </div>
@@ -125,7 +113,7 @@
               {{ '#'+item.topic?.topic_name }}
             </el-tag>
           </div>
-          
+
           <div class="note-count" style="padding-top: 1em;">
             <el-row :gutter="20">
               <el-col :span="4">
@@ -148,7 +136,7 @@
             {{ item.note_count?.like_count }}
               </el-col>
             </el-row>
-          
+
           </div>
         </div>
       </el-card>
@@ -156,23 +144,23 @@
   </ul>
 
     </el-col>
-   
+
     <el-col :span="8" justify="center" class="topic"  v-if="topicList.list.length>0">
       <h2 style="text-align: left;"><span style="color:#ff6b00">#</span>推荐话题</h2>
-      <ul v-infinite-scroll="loadTopic" 
-      class="infinite-list" 
-      style="overflow-y: auto; max-height: 800px;" 
+      <ul v-infinite-scroll="loadTopic"
+      class="infinite-list"
+      style="overflow-y: auto; max-height: 800px;"
       :infinite-scroll-disabled="infLoadingTopic"
       infinite-scroll-distance="10"
       >
         <li v-for="i in topicList.list"  class="infinite-list-item">
           <el-button text class="topic-item">
-          <el-badge :value="i.tag==1?'新':''" class="badge-item">
-            <div style="font-size: large; font-weight: bold; text-align: left;">
-              <span style="color:#ff6b00">#</span>{{i.name}} 
+            <div class="title">
+                <span style="color:#ff6b00">#</span>{{i.name}}
+                <el-badge :value="i.tag==1?'新':i.tag==2?'热':''" class="badge-item" :type="i.tag==2?'warning':'danger'">
+                </el-badge>
             </div>
-            <div style="white-space: pre-wrap; font-weight:light; text-align: left;">{{i.intro}}</div>
-          </el-badge>
+            <div class="intro">{{i.intro}}</div>
           </el-button>
         </li>
       </ul>
@@ -180,9 +168,9 @@
   </el-row>
     </el-space>
   </div>
-       
+
   </template>
-  
+
   <script lang="ts" setup>
   import { ref, reactive, onMounted, watch } from 'vue'
   import { ElMessage } from 'element-plus'
@@ -190,7 +178,7 @@
   import { services } from '../../wailsjs/go/models'
   import { useRoute, useRouter } from 'vue-router'
   import { userStore } from '../stores/user';
-  
+
   const store = userStore()
   const router = useRouter()
   const route = useRoute()
@@ -212,18 +200,17 @@
   let isMore= ref(false)
   let maxId= ref("")
   let enid = ref()
-  let breadcrumbTitle = ref()
-  
+
   const topicPage = ref(0)
   const topicHasMore = ref(false)
   const topicPageSize = ref(20)
- 
+
 
   onMounted(() => {
     getTableData()
     getTopicAll()
   })
-  
+
   const loadTopic = () => {
     infLoadingTopic.value=true
     if (topicHasMore.value === true) {
@@ -231,14 +218,14 @@
       getTopicAll()
     }
   }
-  
+
   const loadNotes = () => {
     infLoadingNote.value = true
     if (noteList.is_more === true) {
       getTableData()
     }
   }
-  
+
   const getTableData = async () => {
     await NotesTimeline(maxId.value).then((table) => {
       console.log(table)
@@ -263,7 +250,7 @@
       noteList.is_more= tableData.is_more
       noteList.max_id = tableData.max_id
       noteList.notes.push(...tableData.notes)
-     
+
     }).catch((error) => {
       ElMessage({
         message: error,
@@ -272,7 +259,7 @@
     })
     infLoadingNote.value = false
   }
-  
+
   const getTopicAll =async () => {
     await TopicAll(topicPage.value, topicPageSize.value).then((result)=>{
       Object.assign(topicAll, result)
@@ -289,8 +276,20 @@
     infLoadingTopic.value = false
   }
 
+  const handleComb = (list: services.Comb[]) => {
+    if (list.length<=2) {
+        return list.map((v,i)=>{
+            return v.name
+        }).join("、")+"转发了"
+    } else {
+        return list.map((v,i)=>{
+            if(i<2) {
+                return v.name
+            }
+        }).join("、")+"和其他"+(list.length-2)+"转发了"
+    }
+  }
   </script>
-  
 
   <style scoped lang="scss">
   .el-card{
@@ -298,7 +297,7 @@
     .card-header,
     .card-content {
       text-align: left ;
-  }
+    }
   }
 
   .el-tag {
@@ -322,7 +321,24 @@
 .topic-item {
     height: 110px;
 }
-ul {
+/* 深度选择器（样式穿透）*/
+  :deep .el-button>span {
+      display: inline-block;
+      align-items: center;
+  }
+.topic-item .title {
+    font-size: large;
+    font-weight: bold;
+    text-align: left;
+    margin-bottom: 10px;
+}
+.topic-item .intro{
+    white-space: pre-wrap;
+    font-weight:normal;
+    text-align: left;
+    line-height: 1.5;
+}
+  ul {
   padding: 0;
   margin: 0;
   text-align: left;
@@ -349,15 +365,15 @@ ul {
   margin-bottom: 0;
 }
 
-.infinite-list .infinite-list-item + .list-item {
+.infinite-list .infinite-list-item+.list-item {
   margin-top: 10px;
 }
 
 .note-line{
   border-radius: 0.4em;
-  white-space: pre-wrap; 
-  background:rgb(242, 241, 241); 
-  opacity: 1; 
+  white-space: pre-wrap;
+  background:rgb(242, 241, 241);
+  opacity: 1;
   padding-top: 1em;
   text-align: left;
 }

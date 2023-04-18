@@ -44,12 +44,12 @@
                     <el-tag class="ml-2" type="danger">{{ courseInfo.class_comment_info?.count }}条评价</el-tag>
                 </div>
 
-                <el-divider content-position="left">
-                    <el-rate v-model="averageScore" disabled show-score :allow-half="true" text-color="#ff9900" />
-                </el-divider>
-                <div class="comment-info flex items-left" style="text-align: left;">
+                <div class="comment-info flex items-left" style="text-align: left;" v-if="courseInfo.class_comment_info?.comment_list.length >0">
+                    <el-divider content-position="left">
+                        <el-rate v-model="averageScore" disabled show-score :allow-half="true" text-color="#ff9900" />
+                    </el-divider>
                     <el-carousel height="200px" direction="vertical" loop>
-                        <el-carousel-item v-for="item in courseInfo.class_comment_info?.comment_list" :key="item.id">
+                        <el-carousel-item v-for="item in courseInfo.class_comment_info.comment_list" :key="item.id">
                             <p class="text-large font-600 mr-3" v-if="item.title"> {{ item.title }} </p>
                             <p class="text-sm mr-2" style="color: var(--el-text-color-regular)"
                                 v-if="item.no_style_content">
