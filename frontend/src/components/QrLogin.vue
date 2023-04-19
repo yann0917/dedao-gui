@@ -86,7 +86,7 @@ const getQrcode = () => {
     });
 };
 
-timeState.timer = setInterval(() => {
+timeState.timer = window.setInterval(() => {
   timeState.time--;
   if (!timeState.time) {
     timeState.time = 600;
