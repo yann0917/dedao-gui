@@ -10,7 +10,8 @@
     <el-table-column prop="title" label="标题" width="380" />
     <el-table-column prop="audio.duration" label="时长" width="100">
       <template #default="scope">
-        <span v-if="scope.row.audio?.duration">{{ secondToHour(scope.row.audio?.duration) }}</span>
+          <span v-if="scope.row.video_status == 1">{{ secondToHour(scope.row.video[0]?.duration) }}</span>
+          <span v-else-if="scope.row.audio?.duration">{{ secondToHour(scope.row.audio?.duration) }}</span>
       </template>
     </el-table-column>
     <el-table-column prop="summary" label="简介">
@@ -21,7 +22,7 @@
             <span slot="reference" v-if="scope.row.summary && scope.row.summary.length <= 30">{{ scope.row.summary
             }}</span>
             <span slot="reference" v-if="scope.row.summary && scope.row.summary.length > 30">{{
-                scope.row.summary.substr(0, 30)
+                scope.row.summary.substring(0, 30)
                 + "..."
             }}</span>
           </template>
@@ -53,7 +54,7 @@
       @close="closeDownloadDialog">
   </download-dialog>
 
-<el-drawer :title="media?.title" direction="btt" v-model="audioVisible" @close="closeAudio" @open="open"
+  <el-drawer :title="media?.title" direction="btt" v-model="audioVisible" @close="closeAudio" @open="open"
     @opened="openVideo(media)">
     <div style="position:relative;" v-html="audiohtml"></div>
   </el-drawer>
