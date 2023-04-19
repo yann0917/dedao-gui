@@ -19,7 +19,7 @@
           :content="scope.row.intro">
           <template #reference>
             <span slot="reference" v-if="scope.row.intro && scope.row.intro.length <= 30">{{ scope.row.intro }}</span>
-            <span slot="reference" v-if="scope.row.intro && scope.row.intro.length > 30">{{ scope.row.intro.substr(0,
+            <span slot="reference" v-if="scope.row.intro && scope.row.intro.length > 30">{{ scope.row.intro.substring(0,
                 30)
                 + "..."
             }}</span>
@@ -98,11 +98,12 @@
 import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue'
 import 'element-plus/es/components/message/style/css'
 import { ElTable, ElMessage } from 'element-plus'
-import { CourseList, CourseCategory, OdobDownload } from '../../wailsjs/go/backend/App'
+import {CourseList, CourseCategory, OdobDownload,SetDownloadDir} from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import Pagination from '../components/Pagination.vue'
 import { useRouter } from 'vue-router'
 import { userStore } from '../stores/user';
+import { settingStore } from "../stores/setting";
 import { Local } from '../utils/storage';
 
 import { secondToHour } from '../utils/utils'
@@ -114,8 +115,8 @@ let media = ref()
 const videoVisible = ref(false)
 const videohtml = ref('')
 
-
 const store = userStore()
+const setStore = settingStore()
 const router = useRouter()
 const loading = ref(true)
 const page = ref(1)
@@ -257,9 +258,23 @@ getTableData()
 const openDownloadDialog = (row: any) => {
   downloadId.value = row.id
   dialogDownloadVisible.value = true
+  if (setStore.getDownloadDir == "") {
+      ElMessage({
+          message: '请设置文件保存目录',
+          type: 'warning'
+      })
+      router.push('/setting')
+  } else {
+      SetDownloadDir(setStore.getDownloadDir).then(() => {
+      }).catch((error) => {
+          ElMessage({
+              message: error,
+              type: 'warning'
+          })
+      })
+  }
 }
 const closeDownloadDialog = () => {
-  //   initForm()
   downloadType.value = 1
   dialogDownloadVisible.value = false
 }
@@ -282,7 +297,6 @@ const gotoArticleDetail = (row: any) => {
   let id = row.audio_detail.alias_id
   router.push({ path: `/odob/${id}`, query: { from: "odob" } })
 }
-
 
 </script>
   

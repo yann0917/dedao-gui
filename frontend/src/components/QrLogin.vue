@@ -34,7 +34,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onBeforeMount, onMounted, onBeforeUnmount } from "vue";
 import { ElTable, ElMessage } from "element-plus";
-import { GetQrcode, CheckLogin, UserInfo } from "../../wailsjs/go/backend/App";
+import { GetQrcode, CheckLogin } from "../../wailsjs/go/backend/App";
 import { useRouter } from "vue-router";
 import { userStore } from "../stores/user";
 import { services } from "../../wailsjs/go/models";

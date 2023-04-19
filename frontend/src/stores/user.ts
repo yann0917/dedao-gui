@@ -11,6 +11,3 @@ export const userStore = defineStore("userStore",  {
     },
     persist: true,
 });
-
-
-

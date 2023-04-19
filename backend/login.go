@@ -66,7 +66,7 @@ func (a *App) CheckLogin(token, qrCodeString string) (result LoginResult, err er
 }
 
 func (a *App) Logout() (err error) {
-	err = config.Instance.DeleteConfigFile()
+	err = app.Logout()
 	return
 }
 

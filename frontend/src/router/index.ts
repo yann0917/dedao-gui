@@ -156,6 +156,22 @@ const router = createRouter({
                 }
             ]
         },
+        {
+            path: "/",
+            // name: "about",
+            meta: { name: "设置", icon:"Setting", menuType: 2 },
+            redirect: "/setting",
+            children: [
+                {
+                    path: 'setting',
+                    name: "setting",
+                    component: () => import("../views/Setting.vue"),
+                    meta: {
+                        name: "设置", requiresAuth:false
+                    },
+                }
+            ],
+        },
         // {
         //     path: "/",
         //     // name: "about",

@@ -2,18 +2,17 @@
   <!-- <div class="theme-color-popper"> -->
     <el-drawer v-model="drawer" title="I am the title" :with-header="false">
       <span>With default value</span>
-    <el-color-picker v-model="systeamColor" :predefine="predefineColors" show-alpha @change="setThemeColor" />
+    <el-color-picker v-model="systemColor" :predefine="predefineColors" show-alpha @change="setThemeColor('')" />
   </el-drawer>
   <!-- </div> -->
 </template>
   
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { ElColorPicker} from 'element-plus';
 import {setThemeColor} from '../utils/utils'
 
 const drawer = ref(true)
-const systeamColor = ref('rgba(19, 206, 102, 0.8)')
+const systemColor = ref('rgba(19, 206, 102, 0.8)')
 const predefineColors = ref([
   '#ff4500',
   '#ff8c00',

@@ -1,5 +1,5 @@
 <template>
-  <QrLogin v-if="dialogVisible" :dialog-visible="dialogVisible" @close="closeDialog"></QrLogin>
+  <qr-login v-if="dialogVisible" :dialog-visible="dialogVisible" @close="closeDialog"></qr-login>
 </template>
 
 <script lang="ts" setup>

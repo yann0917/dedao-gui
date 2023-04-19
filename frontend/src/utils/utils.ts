@@ -1,5 +1,6 @@
-import { themeStore } from "../stores/theme";
-const store = themeStore()
+import {settingStore} from "../stores/setting";
+import {OpenDirectoryDialog} from "../../wailsjs/go/backend/App";
+const store = settingStore()
 export const secondToHour = function (msd:number) {
     let second = 0; // 秒  
     let minute = 0; // 分  
@@ -45,7 +46,7 @@ export function setThemeColor(color:any) {
   body?.style.setProperty("--van-primary-color", color);
   // nprogress.style.setProperty("background", color);
   // 此行判断是否为白天/暗夜模式，可根据自身业务调整代码
-  let mixColor = store.settings.theme === "light" ? "#ffffff" : "#000000"; 
+  let mixColor = store.setting.theme === "light" ? "#ffffff" : "#000000";
   // 此行判断是否为白天/暗夜模式，可根据自身业务调整代码
   for (let i = 1; i < 10; i++) {
     el.style.setProperty(`--el-color-primary-light-${i}`, colourBlend(color, mixColor, i / 10));
@@ -53,11 +54,11 @@ export function setThemeColor(color:any) {
   }
   el.style.setProperty(`--el-color-primary-dark-2`, colourBlend(color, mixColor, 0.2));
   if (mixColor == "#ffffff") {
-    store.settings.theme="light"
+    store.setting.theme="light"
   } else {
-    store.settings.theme="dark"
+    store.setting.theme="dark"
   }
-  store.settings.color = color
+  store.setting.color = color
 }
 
 export function colourBlend(c1:any, c2:any, ratio:any) {
@@ -108,5 +109,13 @@ export function unloadJs(src:string) {
     script.onerror = ()=>{
       reject();
     }
+  })
+}
+
+export const openDialogDir = async (title: string) => {
+  await OpenDirectoryDialog(title).then((result)=>{
+    console.log(result)
+  }).catch((error)=>{
+    console.log(error)
   })
 }

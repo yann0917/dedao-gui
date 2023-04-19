@@ -52,7 +52,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
-import { CourseList, CourseCategory,OpenDirectoryDialog } from '../../wailsjs/go/backend/App'
+import {CourseList, CourseCategory, OpenDirectoryDialog, SetDownloadDir} from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import Pagination from '../components/Pagination.vue'
 import EbookInfo from '../components/EbookInfo.vue'
@@ -60,9 +60,11 @@ import DownloadDialog from "../components/DownloadDialog.vue";
 
 import { useRouter } from 'vue-router'
 import { userStore } from '../stores/user'
+import {settingStore} from "../stores/setting";
 import { Local } from '../utils/storage'
 
 const store = userStore()
+const setStore = settingStore()
 const router = useRouter()
 const loading = ref(true)
 const page = ref(1)
@@ -146,6 +148,21 @@ const openDownloadDialog = (row: any) => {
     // openDialogDir("Select download directory")
   downloadId.value = row.id
   dialogDownloadVisible.value = true
+  if (setStore.getDownloadDir == "") {
+      ElMessage({
+          message: '请设置文件保存目录',
+          type: 'warning'
+      })
+      router.push('/setting')
+  } else {
+      SetDownloadDir(setStore.getDownloadDir).then(() => {
+      }).catch((error) => {
+          ElMessage({
+              message: error,
+              type: 'warning'
+          })
+      })
+  }
 }
 const closeDownloadDialog = () => {
   //   initForm()

@@ -18,8 +18,12 @@ func (a *App) OpenDirectoryDialog(title string) (dir string, err error) {
 		TreatPackagesAsDirectories: false,
 	}
 	dir, err = runtime.OpenDirectoryDialog(a.Ctx, dialogOptions)
-	app.OutputDir = dir
+	app.SetOutputDir(dir)
 	return
+}
+
+func (a *App) SetDownloadDir(dir string) {
+	app.SetOutputDir(dir)
 }
 
 func (a *App) CourseDownload(id, aid, dType int) (err error) {

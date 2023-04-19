@@ -98,6 +98,10 @@ export function SearchHot() {
   return window['go']['backend']['App']['SearchHot']();
 }
 
+export function SetDownloadDir(arg1) {
+  return window['go']['backend']['App']['SetDownloadDir'](arg1);
+}
+
 export function SunflowerLabelContent(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['SunflowerLabelContent'](arg1, arg2, arg3, arg4);
 }

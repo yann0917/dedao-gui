@@ -51,6 +51,8 @@ export function OpenDirectoryDialog(arg1:string):Promise<string>;
 
 export function SearchHot():Promise<any>;
 
+export function SetDownloadDir(arg1:string):Promise<void>;
+
 export function SunflowerLabelContent(arg1:string,arg2:number,arg3:number,arg4:number):Promise<any>;
 
 export function SunflowerLabelList(arg1:number):Promise<any>;

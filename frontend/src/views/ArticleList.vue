@@ -71,7 +71,7 @@
 import { ref, reactive, onMounted, onUnmounted,watch, nextTick } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
-import { ArticleList } from '../../wailsjs/go/backend/App'
+import {ArticleList, SetDownloadDir} from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import { useRoute, useRouter } from 'vue-router'
 import { secondToHour } from '../utils/utils'
@@ -79,6 +79,7 @@ import DownloadDialog from "../components/DownloadDialog.vue";
 
 import videojs from 'video.js'
 import "video.js/dist/video-js.css"
+import {settingStore} from "../stores/setting";
 
 const audioPlayer = ref()
 let media = ref()
@@ -98,6 +99,7 @@ const dialogVisible = ref(false)
 const layout = ref('total, sizes, next')
 const pageSizes = ref([10, 15, 20, 30, 50]);
 const route = useRoute()
+const setStore = settingStore()
 const router = useRouter()
 
 const dialogDownloadVisible = ref(false)
@@ -257,6 +259,21 @@ const openDownloadDialog = (row: any) => {
   downloadId.value = row.class_id
   downloadaId.value = row.id
   dialogDownloadVisible.value = true
+  if (setStore.getDownloadDir == "") {
+      ElMessage({
+          message: '请设置文件保存目录',
+          type: 'warning'
+      })
+      router.push('/setting')
+  } else {
+      SetDownloadDir(setStore.getDownloadDir).then(() => {
+      }).catch((error) => {
+          ElMessage({
+              message: error,
+              type: 'warning'
+          })
+      })
+  }
 }
 const closeDownloadDialog = () => {
   //   initForm()
