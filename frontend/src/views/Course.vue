@@ -43,7 +43,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
-import {CourseList, CourseCategory, SetDownloadDir} from '../../wailsjs/go/backend/App'
+import {CourseList, CourseCategory, SetDir} from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import { useRouter } from 'vue-router'
 import { userStore } from '../stores/user';
@@ -153,7 +153,9 @@ const openDownloadDialog = (row: any) => {
         })
         router.push('/setting')
     } else {
-        SetDownloadDir(setStore.getDownloadDir).then(() => {
+        SetDir([setStore.getDownloadDir,
+            setStore.getFfmpegDirDir,
+            setStore.getWkDir]).then(() => {
         }).catch((error) => {
             ElMessage({
                 message: error,

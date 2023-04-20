@@ -1,8 +1,8 @@
 package backend
 
 import (
-	"github.com/yann0917/dedao/app"
-	"github.com/yann0917/dedao/services"
+	"github.com/yann0917/dedao-gui/backend/app"
+	"github.com/yann0917/dedao-gui/backend/services"
 )
 
 // NotesTimeline 知识城邦首页时间线列表

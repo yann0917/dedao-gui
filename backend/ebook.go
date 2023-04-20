@@ -1,8 +1,8 @@
 package backend
 
 import (
-	"github.com/yann0917/dedao/app"
-	"github.com/yann0917/dedao/services"
+	"github.com/yann0917/dedao-gui/backend/app"
+	"github.com/yann0917/dedao-gui/backend/services"
 )
 
 func (a *App) EbookInfo(enid string) (info *services.EbookDetail, err error) {

@@ -12,7 +12,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/linux"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
-	_ "github.com/yann0917/dedao/config"
+	_ "github.com/yann0917/dedao-gui/backend/config"
 )
 
 //go:embed all:frontend/dist

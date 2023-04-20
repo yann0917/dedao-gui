@@ -3,9 +3,9 @@ package backend
 import (
 	"errors"
 
-	"github.com/yann0917/dedao/app"
-	"github.com/yann0917/dedao/config"
-	"github.com/yann0917/dedao/services"
+	"github.com/yann0917/dedao-gui/backend/app"
+	"github.com/yann0917/dedao-gui/backend/config"
+	"github.com/yann0917/dedao-gui/backend/services"
 )
 
 type QrCodeResp struct {

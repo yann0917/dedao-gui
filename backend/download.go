@@ -4,7 +4,8 @@ import (
 	"os"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"github.com/yann0917/dedao/app"
+	"github.com/yann0917/dedao-gui/backend/app"
+	"github.com/yann0917/dedao-gui/backend/utils"
 )
 
 func (a *App) OpenDirectoryDialog(title string) (dir string, err error) {
@@ -22,8 +23,10 @@ func (a *App) OpenDirectoryDialog(title string) (dir string, err error) {
 	return
 }
 
-func (a *App) SetDownloadDir(dir string) {
-	app.SetOutputDir(dir)
+func (a *App) SetDir(dir []string) {
+	app.OutputDir = dir[0]
+	utils.FfmpegDir = dir[1]
+	utils.WkToPdfDir = dir[2]
 }
 
 func (a *App) CourseDownload(id, aid, dType int) (err error) {

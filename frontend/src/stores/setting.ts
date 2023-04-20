@@ -6,13 +6,21 @@ export const settingStore = defineStore("setting", {
             setting: {
                 downloadDir: "",
                 theme: "",
-                color: ""
+                color: "",
+                ffmpegDir: "",
+                wkhtmltopdfDir: "",
             },
         }
     },
     getters: {
         getDownloadDir: (state) => {
             return state.setting.downloadDir
+        },
+        getFfmpegDirDir: (state) => {
+            return state.setting.ffmpegDir
+        },
+        getWkDir: (state) => {
+            return state.setting.wkhtmltopdfDir
         },
         getColor:(state)=>{
             return state.setting.color

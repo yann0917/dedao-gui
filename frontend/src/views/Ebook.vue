@@ -52,7 +52,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
-import {CourseList, CourseCategory, OpenDirectoryDialog, SetDownloadDir} from '../../wailsjs/go/backend/App'
+import {CourseList, CourseCategory, OpenDirectoryDialog, SetDir} from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import Pagination from '../components/Pagination.vue'
 import EbookInfo from '../components/EbookInfo.vue'
@@ -155,7 +155,9 @@ const openDownloadDialog = (row: any) => {
       })
       router.push('/setting')
   } else {
-      SetDownloadDir(setStore.getDownloadDir).then(() => {
+      SetDir([setStore.getDownloadDir,
+          setStore.getFfmpegDirDir,
+          setStore.getWkDir]).then(() => {
       }).catch((error) => {
           ElMessage({
               message: error,

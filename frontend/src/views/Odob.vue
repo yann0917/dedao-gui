@@ -98,7 +98,7 @@
 import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue'
 import 'element-plus/es/components/message/style/css'
 import { ElTable, ElMessage } from 'element-plus'
-import {CourseList, CourseCategory, OdobDownload,SetDownloadDir} from '../../wailsjs/go/backend/App'
+import {CourseList, CourseCategory, OdobDownload, SetDir} from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import Pagination from '../components/Pagination.vue'
 import { useRouter } from 'vue-router'
@@ -265,7 +265,9 @@ const openDownloadDialog = (row: any) => {
       })
       router.push('/setting')
   } else {
-      SetDownloadDir(setStore.getDownloadDir).then(() => {
+      SetDir([setStore.getDownloadDir,
+          setStore.getFfmpegDirDir,
+          setStore.getWkDir]).then(() => {
       }).catch((error) => {
           ElMessage({
               message: error,

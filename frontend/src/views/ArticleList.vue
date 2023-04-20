@@ -71,7 +71,7 @@
 import { ref, reactive, onMounted, onUnmounted,watch, nextTick } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
-import {ArticleList, SetDownloadDir} from '../../wailsjs/go/backend/App'
+import { ArticleList, SetDir} from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import { useRoute, useRouter } from 'vue-router'
 import { secondToHour } from '../utils/utils'
@@ -266,7 +266,9 @@ const openDownloadDialog = (row: any) => {
       })
       router.push('/setting')
   } else {
-      SetDownloadDir(setStore.getDownloadDir).then(() => {
+      SetDir([setStore.getDownloadDir,
+          setStore.getFfmpegDirDir,
+          setStore.getWkDir]).then(() => {
       }).catch((error) => {
           ElMessage({
               message: error,

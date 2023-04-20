@@ -2,8 +2,8 @@ package backend
 
 import (
 	jsoniter "github.com/json-iterator/go"
-	"github.com/yann0917/dedao/app"
-	"github.com/yann0917/dedao/services"
+	"github.com/yann0917/dedao-gui/backend/app"
+	"github.com/yann0917/dedao-gui/backend/services"
 )
 
 func (a *App) CourseCategory() (list []services.CourseCategory, err error) {

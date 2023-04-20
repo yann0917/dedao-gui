@@ -1,6 +1,6 @@
 package backend
 
-import "github.com/yann0917/dedao/services"
+import "github.com/yann0917/dedao-gui/backend/services"
 
 func (a *App) GetHomeInitialState() (state services.HomeInitState, err error) {
 	state, err = Instance.GetHomeInitialState()
