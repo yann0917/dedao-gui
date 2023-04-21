@@ -245,6 +245,7 @@
                       </template>
                     </el-popover>
                   </div>
+
                 </el-card>
               </div>
             </el-scrollbar>
@@ -325,6 +326,8 @@ const idxEbookLabel = ref(0);
 const idxCourseLabel = ref(0);
 
 let initial = reactive(new services.HomeInitState());
+initial.homeData= reactive(new services.HomeData)
+
 let ebookLabelList = reactive(new services.SunflowerLabelList());
 let courseLabelList = reactive(new services.SunflowerLabelList());
 
@@ -373,7 +376,6 @@ onMounted(() => {
         .catch((error) => {
           console.log(error);
         });
-      // console.log(result);
     })
     .catch((error) => {
       console.log(error);
@@ -557,12 +559,12 @@ const gotoCategory = (item: any, label_id: string) => {
   router.push({
     path: `/category`,
     query: {
-      id: item.id,
-      enid: item.enid,
-      name: item.name,
-      nav_type: item.nav_type,
-      label_id: label_id,
-      product_type: product_type,
+        id: item.id,
+        enid: item.enid,
+        name: item.name,
+        nav_type: item.nav_type,
+        label_id: label_id,
+        product_type: product_type,
     },
   });
 };

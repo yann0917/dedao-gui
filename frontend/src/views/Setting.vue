@@ -82,6 +82,9 @@ const form = reactive({
 })
 
 const notes = reactive([{
+        content: "只有已购买的课程、加入书架的听书和电子书支持下载",
+        link: "",
+    },{
         content: "音频需要借助[ffmpeg]合成",
         link: "https://ffmpeg.org",
     }, {

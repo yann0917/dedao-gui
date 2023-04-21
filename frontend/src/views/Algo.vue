@@ -11,9 +11,7 @@
             style="font-size: small"
             v-for="(item, index) in productTypes.options"
             @click="handleFilter(item, index, 1)"
-            :class="
-              productType == item.value || idxProd == index ? 'active-btn' : ''
-            "
+            :class="idxProd == index ? 'active-btn' : ''"
             >{{ item.name }}</el-button
           >
         </el-row>
@@ -26,7 +24,7 @@
             text
             style="font-size: small"
             v-for="(item, index) in navigations.options"
-            :class="enid == item.value || idxLabel == index ? 'active-btn' : ''"
+            :class="idxLabel == index ? 'active-btn' : ''"
             @click="handleFilter(item, index, 2)"
             >{{ item.name }}</el-button
           >
@@ -39,11 +37,7 @@
                 text
                 style="font-size: small; padding: 7px"
                 v-for="(item, index) in subOptions"
-                :class="
-                  labelId == item.value || idxSubLabel == index
-                    ? 'active-btn'
-                    : ''
-                "
+                :class="idxSubLabel == index? 'active-btn': ''"
                 @click="handleFilter(item, index, 3)"
                 >{{ item.name }}</el-button
               >
@@ -58,7 +52,7 @@
       <p style="text-align: left">已为你找到 <span style="color:#ff6b00">{{ filter.total }}</span> 个内容</p>
       <div class="sort-filter">
         <el-row>
-          <el-col :span="1" v-for="item,index in sort.options">
+          <el-col :span="1" v-for="item in sort.options">
             {{ item.name }}</el-col>
         </el-row>
       </div>
@@ -138,8 +132,8 @@
                             style="display: block"
                           />
                         </el-col>
-                        <el-col :span="2"></el-col>
-                        <el-col :span="8">
+                        <el-col :span="1"></el-col>
+                        <el-col :span="9">
                           <span
                             v-if="item.learn_user_count > 0"
                             style="font-weight: 200;
@@ -193,8 +187,7 @@ const prodEnid = ref("");
 const idxProd = ref(0);
 const idxLabel = ref(0);
 const idxSubLabel = ref(0);
-
-const infLoadingProd = ref(true);
+const infLoadingProd = ref(false);
 
 let filter = reactive(new services.AlgoFilterResp());
 let product = reactive(new services.AlgoProductResp());
@@ -211,62 +204,51 @@ const name = ref();
 const navType = ref();
 const productType = ref();
 const labelId = ref();
+let param = new services.AlgoFilterParam();
 
 onMounted(() => {
-  let param = new services.AlgoFilterParam();
-  watch(
-    () => {
-      enid.value = route.query.enid;
-      name.value = route.query.name;
-      navType.value = route.query.nav_type;
-      labelId.value = route.query.label_id;
-      productType.value = route.query.product_type;
+    enid.value = route.query.enid;
+    name.value = route.query.name;
+    navType.value = route.query.nav_type;
+    labelId.value = route.query.label_id;
+    productType.value = route.query.product_type;
+    param.request_id = "";
+    param.tags_ids = [];
+    param.page = 0;
 
-      param.request_id = "";
-      param.tags_ids = [];
-      param.page = 0;
-
-      param.navigation_id = enid.value;
-      param.classfc_name = name.value != "" ? name.value : "全部";
-      param.label_id = labelId.value;
-      param.page_size = 18;
-      param.product_types = productType.value;
-      param.sort_strategy = "HOT";
-    },
-    () =>
-      getAlgoFilter(param)
-        .then((list) => {
-          console.log(list);
-          Object.assign(filter, list);
-
-          Object.assign(productTypes, filter.filter.product_types);
-          Object.assign(navigations, filter.filter.navigations);
-          Object.assign(sort, filter.filter.sort_strategy)
-          // navigations.options.forEach((item) => {
-          //   if (item.value == enid.value) {
-          //     if (
-          //       item.sub_options != undefined &&
-          //       item.sub_options?.length > 0
-          //     ) {
-                
-          //     }
-          //   }
-          // });
-
-          getAlgoProduct(param)
-            .then((list) => {
-              console.log(list);
-              Object.assign(product, list);
+    param.navigation_id = enid.value;
+    param.classfc_name = name.value != "" ? name.value : "全部";
+    param.label_id = labelId.value;
+    param.page_size = 18;
+    param.product_types = productType.value;
+    param.sort_strategy = "HOT";
+    getAlgoFilter(param)
+        .then(() => {
+            productTypes.options.forEach((item,index)=> {
+                if (item.value == productType.value) {
+                    idxProd.value = index;
+                }
             })
-            .catch((error) => {
-              console.log(error);
+            navigations.options.forEach((item, index) => {
+                if (item.value == enid.value) {
+                    idxLabel.value = index;
+                    if (item.sub_options != undefined && item.sub_options?.length > 0) {
+                        let subOption = JSON.parse(JSON.stringify(item.sub_options));
+                        subOption.forEach((item,index)=>{
+                            if (item.value == labelId.value) {
+                                idxSubLabel.value = index;
+                            }
+                            subOptions.push(item)
+                        })
+                    }
+                }
             });
+            getAlgoProduct(param);
         })
         .catch((error) => {
-          console.log(error);
-        }),
-    { immediate: true }
-  );
+            console.log(error);
+        })
+
   // 热搜词
   // SearchHot()
   //   .then((result) => {
@@ -276,45 +258,46 @@ onMounted(() => {
   //     console.log(error);
   //   })
 });
-const param = new services.AlgoFilterParam();
+// let param = new services.AlgoFilterParam();
 const handleFilter = (item: services.Option, idx: number, nType: number) => {
-  if (nType == 1) {
-    productType.value = item.value;
-    idxProd.value = idx;
+    if (nType == 1) {
+        productType.value = item.value;
+        idxProd.value = idx;
 
-    param.product_types = item.value;
-    param.classfc_name = "全部";
-    param.navigation_id = "";
-    param.label_id = "";
-  } else if (nType == 2) {
-    enid.value = item.value;
-    idxLabel.value = idx;
-    idxSubLabel.value = 0;
-    param.label_id = "";
+        param.product_types = item.value;
+        param.classfc_name = item.name;
+        param.navigation_id = "";
+        param.label_id = "";
+        subOptions.splice(0, subOptions.length)
+    } else if (nType == 2) {
+        enid.value = item.value;
+        idxLabel.value = idx;
+        idxSubLabel.value = 0;
+        param.label_id = "";
+        subOptions.splice(0, subOptions.length)
+        if (item.sub_options != undefined && item.sub_options?.length > 0) {
+          let subOption = JSON.parse(JSON.stringify(item.sub_options));
+          subOption.forEach((item)=>{
+            subOptions.push(item)
+          })
+        }
 
-    subOptions.splice(0, subOptions.length)
-    if (item.sub_options != undefined && item.sub_options?.length > 0) {
-      let subOption = JSON.parse(JSON.stringify(item.sub_options));
-      subOption.forEach((item)=>{
-        subOptions.push(item)
-      })
+        param.classfc_name = item.name;
+        param.navigation_id = item.value;
+    } else if (nType == 3) {
+        idxSubLabel.value = idx;
+        param.label_id = item.value;
     }
-
-    param.classfc_name = item.name;
-    param.navigation_id = item.value;
-  } else if (nType == 3) {
-    idxSubLabel.value = idx;
-    param.label_id = item.value;
-  }
-  param.request_id = "";
-  param.tags_ids = [];
-  param.page = 0;
-  param.nav_type = 0;
-  param.page_size = 18;
-  param.sort_strategy = "HOT";
-  // console.log(param);
-  product_list.product_list = [];
-  getAlgoFilter(param);
+    param.request_id = "";
+    param.tags_ids = [];
+    param.page = 0;
+    param.nav_type = 0;
+    param.page_size = 18;
+    param.sort_strategy = "HOT";
+    // console.log(param);
+    product_list.product_list = [];
+    getAlgoFilter(param);
+    getAlgoProduct(param);
 };
 
 const getAlgoFilter = async (param: services.AlgoFilterParam) => {
@@ -330,10 +313,10 @@ const getAlgoFilter = async (param: services.AlgoFilterParam) => {
     .catch((error) => {
       console.log(error);
     });
-  getAlgoProduct(param);
 };
 
 const getAlgoProduct = async (param: services.AlgoFilterParam) => {
+    console.log(param)
   await AlgoProduct(param)
     .then((list) => {
       console.log(list);
