@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -10,7 +9,6 @@ import (
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
-	"github.com/yann0917/dedao-gui/backend/config"
 	"github.com/yann0917/dedao-gui/backend/downloader"
 	"github.com/yann0917/dedao-gui/backend/services"
 	"github.com/yann0917/dedao-gui/backend/utils"
@@ -23,19 +21,22 @@ type DeDaoDownloader interface {
 }
 
 type CourseDownload struct {
-	DownloadType int // 1:mp3, 2:PDF文档, 3:markdown文档
-	ID           int
-	AID          int
+	DownloadType int    // 1:mp3, 2:PDF文档, 3:markdown文档
+	ID           int    // 课程 id
+	AID          int    // 文章 id
+	EnId         string // 课程 enid
 }
 
 type OdobDownload struct {
 	DownloadType int // 1:mp3, 2:PDF文档, 3:markdown文档
 	ID           int
+	Data         *services.Course
 }
 
 type EBookDownload struct {
 	DownloadType int // 1:html, 2:PDF文档, 3:epub
 	ID           int
+	EnID         string
 }
 
 func SetOutputDir(dir string) {
@@ -43,7 +44,7 @@ func SetOutputDir(dir string) {
 }
 
 func (d *CourseDownload) Download() error {
-	course, err := CourseInfo(d.ID)
+	course, err := getService().CourseInfo(d.EnId)
 	if err != nil {
 		return err
 	}
@@ -99,7 +100,7 @@ func (d *CourseDownload) Download() error {
 		if err != nil {
 			return err
 		}
-		if err := DownloadMarkdown(CateCourse, d.ID, d.AID, path); err != nil {
+		if err := DownloadMarkdown(articles, d.AID, path); err != nil {
 			return err
 		}
 	}
@@ -115,7 +116,7 @@ func (d *OdobDownload) Download() error {
 			Title: fileName,
 		}
 		downloadData.Type = "audio"
-		downloadData.Data = extractOdobDownloadData(d.ID)
+		downloadData.Data = extOdobDownloadData(d.Data)
 		errors := make([]error, 0)
 		path, err := utils.Mkdir(OutputDir, utils.FileName(fileName, ""), "MP3")
 		if err != nil {
@@ -142,7 +143,7 @@ func (d *OdobDownload) Download() error {
 		if err != nil {
 			return err
 		}
-		if err := DownloadMarkdown(CateAudioBook, d.ID, 0, path); err != nil {
+		if err := DownloadOdobMarkdown(d.Data, path); err != nil {
 			return err
 		}
 	}
@@ -150,7 +151,7 @@ func (d *OdobDownload) Download() error {
 }
 
 func (d *EBookDownload) Download() error {
-	detail, err := EbookDetail(d.ID)
+	detail, err := EbookDetail(d.EnID)
 	if err != nil {
 		return err
 	}
@@ -279,49 +280,36 @@ func extractCourseDownloadData(articles *services.ArticleList, aid int, flag int
 	return data
 }
 
-// 生成 AudioBook 下载数据
-func extractOdobDownloadData(aid int) []downloader.Datum {
+// extOdobDownloadData 生成 AudioBook 下载数据
+func extOdobDownloadData(info *services.Course) []downloader.Datum {
 	data := downloader.EmptyData
 	audioIds := map[int]string{}
 
 	audioData := make([]*downloader.Datum, 0)
-	article := config.Instance.GetIDMap(CateAudioBook, aid)
-	aliasID := article["audio_alias_id"].(string)
-	if aliasID == "" {
-		list, err := CourseListAll(CateAudioBook)
-		if err != nil {
-			return nil
-		}
-		for _, course := range list.List {
-			if aid > 0 && course.ID == aid {
-				article = GetCourseIDMap(&course)
-				break
-			}
-		}
-	}
+	aliasID := info.AudioDetail.AliasID
 
-	audioIds[aid] = article["audio_alias_id"].(string)
+	audioIds[info.ID] = aliasID
 
 	var urls []downloader.URL
-	key := article["enid"].(string)
+	key := info.Enid
 	streams := map[string]downloader.Stream{
 		key: {
 			URLs:    urls,
-			Size:    int(article["audio_size"].(int)),
+			Size:    info.AudioDetail.Size,
 			Quality: key,
 		},
 	}
 	isCanDL := true
-	if !article["has_play_auth"].(bool) {
+	if !info.HasPlayAuth {
 		isCanDL = false
 	}
 	datum := &downloader.Datum{
-		ID:      aid,
-		Enid:    article["enid"].(string),
-		ClassID: int(article["class_id"].(int)),
-		Title:   article["title"].(string),
+		ID:      info.ID,
+		Enid:    info.Enid,
+		ClassID: info.ClassID,
+		Title:   info.Title,
 		IsCanDL: isCanDL,
-		M3U8URL: article["audio_mp3_play_url"].(string),
+		M3U8URL: info.AudioDetail.Mp3PlayURL,
 		Streams: streams,
 		Type:    "audio",
 	}
@@ -481,86 +469,13 @@ func getMdHeader(level int) string {
 	return ""
 }
 
-func DownloadMarkdown(cType string, id, aid int, path string) error {
-	switch cType {
-	case CateCourse:
-		list, err := ArticleListAll(id, "")
+func DownloadMarkdown(list *services.ArticleList, aid int, path string) error {
+	for _, v := range list.List {
+		if aid > 0 && v.ID != aid {
+			continue
+		}
+		detail, err := ArticleDetail(v.Enid)
 		if err != nil {
-			return err
-		}
-		for _, v := range list.List {
-			if aid > 0 && v.ID != aid {
-				continue
-			}
-			detail, enId, err := ArticleDetail(id, v.ID)
-			if err != nil {
-				fmt.Println(err.Error())
-				return err
-			}
-
-			var content []services.Content
-			err = jsoniter.UnmarshalFromString(detail.Content, &content)
-			if err != nil {
-				return err
-			}
-
-			name := utils.FileName(v.Title, "md")
-			fileName := filepath.Join(path, name)
-			fmt.Printf("正在生成文件：【\033[37;1m%s\033[0m】 ", name)
-			_, exist, err := utils.FileSize(fileName)
-
-			if err != nil {
-				fmt.Printf("\033[31;1m%s\033[0m\n", "失败"+err.Error())
-				return err
-			}
-
-			if exist {
-				fmt.Printf("\033[33;1m%s\033[0m\n", "已存在")
-				return nil
-			}
-
-			res := ContentsToMarkdown(content)
-			// 添加留言
-			commentList, err := ArticleCommentList(enId, "like", 1, 20)
-			if err == nil {
-				res += articleCommentsToMarkdown(commentList.List)
-			}
-
-			f, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0644)
-			if err != nil {
-				fmt.Printf("\033[31;1m%s\033[0m\n", "失败"+err.Error())
-				return err
-			}
-			_, err = f.WriteString(res)
-			if err != nil {
-				fmt.Printf("\033[31;1m%s\033[0m\n", "失败"+err.Error())
-				return err
-			}
-			if err = f.Close(); err != nil {
-				if err != nil {
-					return err
-				}
-			}
-			fmt.Printf("\033[32;1m%s\033[0m\n", "完成")
-		}
-	case CateAudioBook:
-		info := config.Instance.GetIDMap(CateAudioBook, id)
-		aliasID := info["audio_alias_id"].(string)
-		if aliasID == "" {
-			list, err := CourseListAll(cType)
-			if err != nil {
-				return err
-			}
-			for _, v := range list.List {
-				if v.AudioDetail.SourceID == id {
-					aliasID = v.AudioDetail.AliasID
-					break
-				}
-			}
-		}
-		detail, err := OdobArticleDetail(aliasID)
-		if err != nil {
-			fmt.Println(err.Error())
 			return err
 		}
 
@@ -570,31 +485,31 @@ func DownloadMarkdown(cType string, id, aid int, path string) error {
 			return err
 		}
 
-		name := utils.FileName(info["title"].(string), "md")
+		name := utils.FileName(v.Title, "md")
 		fileName := filepath.Join(path, name)
-		fmt.Printf("正在生成文件：【\033[37;1m%s\033[0m】 ", name)
 		_, exist, err := utils.FileSize(fileName)
 
 		if err != nil {
-			fmt.Printf("\033[31;1m%s\033[0m\n", "失败"+err.Error())
 			return err
 		}
 
 		if exist {
-			fmt.Printf("\033[33;1m%s\033[0m\n", "已存在")
 			return nil
 		}
 
 		res := ContentsToMarkdown(content)
+		// 添加留言
+		commentList, err := ArticleCommentList(v.Enid, "like", 1, 20)
+		if err == nil {
+			res += articleCommentsToMarkdown(commentList.List)
+		}
 
 		f, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			fmt.Printf("\033[31;1m%s\033[0m\n", "失败"+err.Error())
 			return err
 		}
 		_, err = f.WriteString(res)
 		if err != nil {
-			fmt.Printf("\033[31;1m%s\033[0m\n", "失败"+err.Error())
 			return err
 		}
 		if err = f.Close(); err != nil {
@@ -602,10 +517,50 @@ func DownloadMarkdown(cType string, id, aid int, path string) error {
 				return err
 			}
 		}
-		fmt.Printf("\033[32;1m%s\033[0m\n", "完成")
+	}
+	return nil
 
-	case CateAce:
+}
 
+func DownloadOdobMarkdown(info *services.Course, path string) error {
+	aliasID := info.AudioDetail.AliasID
+	detail, err := OdobArticleDetail(aliasID)
+	if err != nil {
+		return err
+	}
+
+	var content []services.Content
+	err = jsoniter.UnmarshalFromString(detail.Content, &content)
+	if err != nil {
+		return err
+	}
+
+	name := utils.FileName(info.Title, "md")
+	fileName := filepath.Join(path, name)
+	_, exist, err := utils.FileSize(fileName)
+
+	if err != nil {
+		return err
+	}
+
+	if exist {
+		return nil
+	}
+
+	res := ContentsToMarkdown(content)
+
+	f, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	_, err = f.WriteString(res)
+	if err != nil {
+		return err
+	}
+	if err = f.Close(); err != nil {
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

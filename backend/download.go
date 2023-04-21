@@ -5,6 +5,7 @@ import (
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/yann0917/dedao-gui/backend/app"
+	"github.com/yann0917/dedao-gui/backend/services"
 	"github.com/yann0917/dedao-gui/backend/utils"
 )
 
@@ -29,27 +30,30 @@ func (a *App) SetDir(dir []string) {
 	utils.WkToPdfDir = dir[2]
 }
 
-func (a *App) CourseDownload(id, aid, dType int) (err error) {
+func (a *App) CourseDownload(id, aid, dType int, enid string) (err error) {
 	var d app.CourseDownload
 	d.ID = id
 	d.AID = aid
+	d.EnId = enid
 	d.DownloadType = dType
 	err = d.Download()
 	return
 }
 
-func (a *App) OdobDownload(id, dType int) (err error) {
+func (a *App) OdobDownload(id, dType int, data *services.Course) (err error) {
 	var d app.OdobDownload
 	d.ID = id
 	d.DownloadType = dType
+	d.Data = data
 	err = d.Download()
 	return
 }
 
-func (a *App) EbookDownload(id, dType int) (err error) {
+func (a *App) EbookDownload(id, dType int, enid string) (err error) {
 	var d app.EBookDownload
 	d.ID = id
 	d.DownloadType = dType
+	d.EnID = enid
 	err = d.Download()
 	return
 }

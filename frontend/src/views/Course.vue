@@ -14,7 +14,11 @@
 
         <el-table-column prop="price" label="价格" width="100" />
 
-        <el-table-column prop="publish_num" label="已更新" width="100" />
+        <el-table-column prop="publish_num" label="已更新" width="100" >
+            <template #default="scope">
+                <span>{{ scope.row.publish_num }}/{{scope.row.course_num}}</span>
+            </template>
+        </el-table-column>
         <el-table-column prop="progress" label="已学%" width="100" />
         <el-table-column fixed="right" label="操作" width="200">
             <template #default="scope">
@@ -36,6 +40,7 @@
         :download-type-options="downloadTypeOptions"
         :prod-type="66"
         :download-id="downloadId"
+        :en-id="downloadEnId"
         @close="closeDownloadDialog">
     </download-dialog>
 </template>
@@ -68,7 +73,7 @@ const prodEnid = ref("")
 const dialogDownloadVisible = ref(false)
 const downloadType = ref(1)
 const downloadId = ref(0)
-
+const downloadEnId = ref('')
 const downloadTypeOptions = [
     { value: 1, label: "MP3" }, { value: 2, label: "PDF" }, { value: 3, label: "Markdown" }
 ]
@@ -145,6 +150,7 @@ const closeDialog = () => {
 
 const openDownloadDialog = (row: any) => {
     downloadId.value = row.id
+    downloadEnId.value = row.enid
     dialogDownloadVisible.value = true
     if (setStore.getDownloadDir == "") {
         ElMessage({

@@ -26,8 +26,8 @@ export function CourseCategory() {
   return window['go']['backend']['App']['CourseCategory']();
 }
 
-export function CourseDownload(arg1, arg2, arg3) {
-  return window['go']['backend']['App']['CourseDownload'](arg1, arg2, arg3);
+export function CourseDownload(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['CourseDownload'](arg1, arg2, arg3, arg4);
 }
 
 export function CourseInfo(arg1) {
@@ -42,8 +42,8 @@ export function EbookCommentList(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EbookCommentList'](arg1, arg2, arg3);
 }
 
-export function EbookDownload(arg1, arg2) {
-  return window['go']['backend']['App']['EbookDownload'](arg1, arg2);
+export function EbookDownload(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EbookDownload'](arg1, arg2, arg3);
 }
 
 export function EbookInfo(arg1) {
@@ -82,8 +82,8 @@ export function NotesTimeline(arg1) {
   return window['go']['backend']['App']['NotesTimeline'](arg1);
 }
 
-export function OdobDownload(arg1, arg2) {
-  return window['go']['backend']['App']['OdobDownload'](arg1, arg2);
+export function OdobDownload(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['OdobDownload'](arg1, arg2, arg3);
 }
 
 export function OdobUserInfo() {

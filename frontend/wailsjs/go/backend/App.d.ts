@@ -15,7 +15,7 @@ export function CheckLogin(arg1:string,arg2:string):Promise<backend.LoginResult>
 
 export function CourseCategory():Promise<Array<services.CourseCategory>>;
 
-export function CourseDownload(arg1:number,arg2:number,arg3:number):Promise<void>;
+export function CourseDownload(arg1:number,arg2:number,arg3:number,arg4:string):Promise<void>;
 
 export function CourseInfo(arg1:string):Promise<any>;
 
@@ -23,7 +23,7 @@ export function CourseList(arg1:string,arg2:string,arg3:number,arg4:number):Prom
 
 export function EbookCommentList(arg1:string,arg2:number,arg3:number):Promise<any>;
 
-export function EbookDownload(arg1:number,arg2:number):Promise<void>;
+export function EbookDownload(arg1:number,arg2:number,arg3:string):Promise<void>;
 
 export function EbookInfo(arg1:string):Promise<any>;
 
@@ -43,7 +43,7 @@ export function Logout():Promise<void>;
 
 export function NotesTimeline(arg1:string):Promise<any>;
 
-export function OdobDownload(arg1:number,arg2:number):Promise<void>;
+export function OdobDownload(arg1:number,arg2:number,arg3:any):Promise<void>;
 
 export function OdobUserInfo():Promise<any>;
 

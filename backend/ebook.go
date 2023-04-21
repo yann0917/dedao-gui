@@ -6,7 +6,7 @@ import (
 )
 
 func (a *App) EbookInfo(enid string) (info *services.EbookDetail, err error) {
-	return app.EbookDetailByEnid(enid)
+	return app.EbookDetail(enid)
 }
 
 func (a *App) EbookCommentList(enid string, page, limit int) (list *services.EbookCommentList, err error) {

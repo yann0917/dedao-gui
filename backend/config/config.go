@@ -319,31 +319,5 @@ func (c *ConfigsData) SwitchUser(u *User) error {
 			return err
 		}
 	}
-
 	return errors.New("用户不存在")
-}
-
-// SetIDMap set course id => enid map, or odob id => alias_id map
-func (c *ConfigsData) SetIDMap(category string, m CourseIDMap) error {
-	switch category {
-	case services.CateCourse:
-		c.CourseIDMap = m
-	case services.CateAudioBook:
-		c.OdobIDMap = m
-	case services.CateEbook:
-		c.EBookIDMap = m
-	}
-	return c.Save()
-}
-
-func (c *ConfigsData) GetIDMap(category string, id int) (info map[string]interface{}) {
-	switch category {
-	case services.CateCourse:
-		info = c.CourseIDMap[id]
-	case services.CateAudioBook:
-		info = c.OdobIDMap[id]
-	case services.CateEbook:
-		info = c.EBookIDMap[id]
-	}
-	return
 }

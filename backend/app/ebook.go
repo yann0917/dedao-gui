@@ -8,19 +8,7 @@ import (
 	"github.com/yann0917/dedao-gui/backend/utils"
 )
 
-// EbookDetail 电子书详情
-func EbookDetail(id int) (detail *services.EbookDetail, err error) {
-	courseDetail, err := CourseDetail(CateEbook, id)
-	if err != nil {
-		return
-	}
-	enID := courseDetail["enid"].(string)
-	detail, err = getService().EbookDetail(enID)
-
-	return
-}
-
-func EbookDetailByEnid(enID string) (detail *services.EbookDetail, err error) {
+func EbookDetail(enID string) (detail *services.EbookDetail, err error) {
 	detail, err = getService().EbookDetail(enID)
 	return
 }
@@ -60,10 +48,6 @@ func EbookPage(enID string) (info *services.EbookInfo, svgContent utils.SvgConte
 	if err != nil {
 		return
 	}
-	// fmt.Printf("%#v\n", info.BookInfo.Pages)
-	// fmt.Printf("%#v\n", info.BookInfo.EbookBlock)
-	// fmt.Printf("%#v\n", info.BookInfo.Toc)
-	// fmt.Printf("%#v\n", info.BookInfo.Orders)
 	wgp := utils.NewWaitGroupPool(10)
 	for i, order := range info.BookInfo.Orders {
 		wgp.Add()

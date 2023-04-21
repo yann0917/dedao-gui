@@ -39,11 +39,10 @@ const props = defineProps({
         required:true,
         default:0,
     },
-    // downloadType:{
-    //     type:Number,
-    //     required:true,
-    //     default:1,
-    // },
+    enId:{
+        type:String,
+        default:'',
+    },
     prodType:{
         type:Number,
         required:true,
@@ -84,7 +83,7 @@ const closeDialog = () => {
 const download = async () => {
     switch (props.prodType) {
         case 2:
-            await EbookDownload(props.downloadId, downloadType.value).then((info) => {
+            await EbookDownload(props.downloadId, downloadType.value, props.enId).then((info) => {
                 console.log(info)
             }).catch((error) => {
                 ElMessage({
@@ -94,7 +93,7 @@ const download = async () => {
             })
             break;
         case 66:
-            await CourseDownload(props.downloadId, props.articleId, downloadType.value).then((info) => {
+            await CourseDownload(props.downloadId, props.articleId, downloadType.value, props.enId).then((info) => {
                 console.log(info)
             }).catch((error) => {
                 ElMessage({
