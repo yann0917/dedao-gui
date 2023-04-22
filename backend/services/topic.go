@@ -203,9 +203,9 @@ func (s *Service) TopicDetail(id string) (detail *TopicDetail, err error) {
 }
 
 // TopicNotesList Topic NotesList
-func (s *Service) TopicNotesList(id string) (list *NotesList, err error) {
+func (s *Service) TopicNotesList(id string, page, limit int) (list *NotesList, err error) {
 
-	body, err := s.reqTopicNotesList(id)
+	body, err := s.reqTopicNotesList(id, page, limit)
 	if err != nil {
 		return
 	}

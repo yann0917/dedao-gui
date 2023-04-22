@@ -310,19 +310,19 @@ func (s *Service) reqTopicDetail(topicID string) (io.ReadCloser, error) {
 }
 
 // reqTopicNotesList 请求话题笔记列表
-func (s *Service) reqTopicNotesList(topicID string) (io.ReadCloser, error) {
+func (s *Service) reqTopicNotesList(topicID string, page, limit int) (io.ReadCloser, error) {
 	resp, err := s.client.R().
 		SetBody(map[string]interface{}{
-			"count":         40,
+			"count":         limit,
 			"is_elected":    true,
-			"page_id":       0,
+			"page_id":       page,
 			"version":       2,
 			"topic_id_hazy": topicID,
 		}).Post("/pc/ledgers/topic/notes/list")
 	return handleHTTPResponse(resp, err)
 }
 
-// reqTopicNotesList 请求话题笔记时间线列表
+// reqTopicNotesTimeline 请求话题笔记时间线列表
 func (s *Service) reqTopicNotesTimeline(maxID string) (io.ReadCloser, error) {
 	param := make(map[string]interface{})
 	if maxID != "" {

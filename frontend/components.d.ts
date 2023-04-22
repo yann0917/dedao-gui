@@ -48,10 +48,12 @@ declare module '@vue/runtime-core' {
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     Menu: typeof import('./src/components/Menu.vue')['default']
     MenuItem: typeof import('./src/components/MenuItem.vue')['default']
+    NotesItem: typeof import('./src/components/NotesItem.vue')['default']
     Pagination: typeof import('./src/components/Pagination.vue')['default']
     QrLogin: typeof import('./src/components/QrLogin.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TopicItem: typeof import('./src/components/TopicItem.vue')['default']
   }
   export interface ComponentCustomProperties {
     vInfiniteScroll: typeof import('element-plus/es')['ElInfiniteScroll']

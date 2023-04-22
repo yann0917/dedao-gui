@@ -125,14 +125,14 @@ const router = createRouter({
             ],
         },
         {
-            path: "/",
-            // name: "knowledge",
+            path: "/knowledge",
+            name: "knowledge",
             meta: { name: "知识城邦", icon:"Notebook", menuType: 2 },
-            redirect: "/knowledge",
+            redirect: "/knowledge/home",
             children: [
                 {
-                    path: 'knowledge',
-                    name: "knowledge",
+                    path: 'home',
+                    name: "knowledgeHome",
                     component: () => import("../views/Knowledge.vue"),
                     meta: {
                         name: "知识城邦", requiresAuth:false
@@ -142,7 +142,7 @@ const router = createRouter({
         },
         {
             path: "/",
-            // name: "ebook",
+            // name: "compass",
             meta: { name: "锦囊", icon:"Compass", menuType: 2 },
             redirect: "/compass",
             children: [

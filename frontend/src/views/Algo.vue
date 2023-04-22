@@ -216,6 +216,7 @@ onMounted(() => {
     param.tags_ids = [];
     param.page = 0;
 
+    param.nav_type = navType.value?Number.parseInt(navType.value):0;
     param.navigation_id = enid.value;
     param.classfc_name = name.value != "" ? name.value : "全部";
     param.label_id = labelId.value;
@@ -224,12 +225,12 @@ onMounted(() => {
     param.sort_strategy = "HOT";
     getAlgoFilter(param)
         .then(() => {
-            productTypes.options.forEach((item,index)=> {
+            productTypes.options?.forEach((item,index)=> {
                 if (item.value == productType.value) {
                     idxProd.value = index;
                 }
             })
-            navigations.options.forEach((item, index) => {
+            navigations.options?.forEach((item, index) => {
                 if (item.value == enid.value) {
                     idxLabel.value = index;
                     if (item.sub_options != undefined && item.sub_options?.length > 0) {
@@ -258,7 +259,6 @@ onMounted(() => {
   //     console.log(error);
   //   })
 });
-// let param = new services.AlgoFilterParam();
 const handleFilter = (item: services.Option, idx: number, nType: number) => {
     if (nType == 1) {
         productType.value = item.value;
@@ -294,7 +294,6 @@ const handleFilter = (item: services.Option, idx: number, nType: number) => {
     param.nav_type = 0;
     param.page_size = 18;
     param.sort_strategy = "HOT";
-    // console.log(param);
     product_list.product_list = [];
     getAlgoFilter(param);
     getAlgoProduct(param);
@@ -316,7 +315,6 @@ const getAlgoFilter = async (param: services.AlgoFilterParam) => {
 };
 
 const getAlgoProduct = async (param: services.AlgoFilterParam) => {
-    console.log(param)
   await AlgoProduct(param)
     .then((list) => {
       console.log(list);

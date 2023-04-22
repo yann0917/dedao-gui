@@ -548,12 +548,10 @@ const handleClose = (key: string, keyPath: string[]) => {
 };
 
 const gotoCategory = (item: any, label_id: string) => {
-  // services.Navigation
-  console.log(item);
   let product_type = "0";
-  if (item.nav_type == 2) {
+  if (item.navType == 2) {
     product_type = "2";
-  } else if (item.nav_type == 4) {
+  } else if (item.navType == 4) {
     product_type = "66";
   }
   router.push({
@@ -562,7 +560,7 @@ const gotoCategory = (item: any, label_id: string) => {
         id: item.id,
         enid: item.enid,
         name: item.name,
-        nav_type: item.nav_type,
+        nav_type: item.navType,
         label_id: label_id,
         product_type: product_type,
     },

@@ -24,7 +24,7 @@ func (a *App) TopicNoteDetail(id string) (list *services.TopicDetail, err error)
 }
 
 // TopicNotesList 话题笔记列表
-func (a *App) TopicNotesList(id string) (list *services.NotesList, err error) {
-	list, err = app.TopicNotesList(id)
+func (a *App) TopicNotesList(id string, page, limit int) (list *services.NotesList, err error) {
+	list, err = app.TopicNotesList(id, page, limit)
 	return
 }
