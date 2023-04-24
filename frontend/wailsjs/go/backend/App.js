@@ -122,8 +122,8 @@ export function TopicNoteDetail(arg1) {
   return window['go']['backend']['App']['TopicNoteDetail'](arg1);
 }
 
-export function TopicNotesList(arg1, arg2, arg3) {
-  return window['go']['backend']['App']['TopicNotesList'](arg1, arg2, arg3);
+export function TopicNotesList(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['TopicNotesList'](arg1, arg2, arg3, arg4);
 }
 
 export function UserInfo() {

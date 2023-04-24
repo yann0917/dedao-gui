@@ -63,6 +63,6 @@ export function TopicAll(arg1:number,arg2:number):Promise<any>;
 
 export function TopicNoteDetail(arg1:string):Promise<any>;
 
-export function TopicNotesList(arg1:string,arg2:number,arg3:number):Promise<any>;
+export function TopicNotesList(arg1:string,arg2:boolean,arg3:number,arg4:number):Promise<any>;
 
 export function UserInfo():Promise<any>;

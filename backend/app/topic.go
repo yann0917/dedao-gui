@@ -21,8 +21,8 @@ func TopicDetail(id string) (detail *services.TopicDetail, err error) {
 }
 
 // TopicNotesList Topic NotesList
-func TopicNotesList(id string, page, limit int) (list *services.NotesList, err error) {
-	list, err = getService().TopicNotesList(id, page, limit)
+func TopicNotesList(id string, isElected bool, page, limit int) (list *services.NotesList, err error) {
+	list, err = getService().TopicNotesList(id, isElected, page, limit)
 	if err != nil {
 		return
 	}

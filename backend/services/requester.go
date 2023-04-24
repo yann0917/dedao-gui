@@ -310,11 +310,11 @@ func (s *Service) reqTopicDetail(topicID string) (io.ReadCloser, error) {
 }
 
 // reqTopicNotesList 请求话题笔记列表
-func (s *Service) reqTopicNotesList(topicID string, page, limit int) (io.ReadCloser, error) {
+func (s *Service) reqTopicNotesList(topicID string, isElected bool, page, limit int) (io.ReadCloser, error) {
 	resp, err := s.client.R().
 		SetBody(map[string]interface{}{
 			"count":         limit,
-			"is_elected":    true,
+			"is_elected":    isElected,
 			"page_id":       page,
 			"version":       2,
 			"topic_id_hazy": topicID,

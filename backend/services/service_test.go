@@ -171,7 +171,7 @@ func TestTopicDetail(t *testing.T) {
 
 func TestTopicNotesList(t *testing.T) {
 	id := "4qpo7LxOynVXemeY6pALW1JXrlwG6E"
-	result, err := service.TopicNotesList(id)
+	result, err := service.TopicNotesList(id, true, 0, 20)
 	if err != nil {
 		fmt.Printf("err:=%#v \n", err)
 	}

@@ -59,21 +59,11 @@
           </div>
           <div class="data">
             <p class="time">
-              <span>今日学习</span
-              ><span
-                ><em style="font-size: 22px">{{
-                  (user.today_study_time / 60).toFixed(0)
-                }}</em>
-                分钟</span
-              >
+              <span>今日学习</span><span><em style="font-size: 22px">{{(user.today_study_time / 60).toFixed(0)}}</em>分钟</span>
             </p>
             <el-divider border-style="dotted" />
             <p class="time">
-              <span>连续学习</span
-              ><span
-                ><em style="font-size: 22px">{{ user.study_serial_days }}</em>
-                天</span
-              >
+              <span>连续学习</span><span><em style="font-size: 22px">{{user.study_serial_days}}</em>天</span>
             </p>
           </div>
           <!-- <el-button class="button" @click="logout()"> 退出 </el-button> -->

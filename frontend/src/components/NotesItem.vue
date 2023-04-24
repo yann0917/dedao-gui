@@ -12,6 +12,10 @@
         </div>
         <div class="intro">{{props.topicDetail.intro}}</div>
     </div>
+    <div class="topic-tab" v-if="JSON.stringify(props.topicDetail) !='{}'">
+        <el-button text :class="isElected?'topic-tab-active':''" @click="handleElected(true)">精选</el-button>
+        <el-button text :class="!isElected?'topic-tab-active':''" @click="handleElected(false)">最新</el-button>
+    </div>
   <div class="notes">
       <ul v-infinite-scroll="loadNotes"
           class="infinite-note-list"
@@ -162,6 +166,7 @@ import { NotesTimeline,TopicNotesList,TopicNoteDetail} from '../../wailsjs/go/ba
 import { services } from '../../wailsjs/go/models'
 import { useRoute, useRouter } from 'vue-router'
 import { userStore } from '../stores/user';
+import {is} from "@babel/types";
 
 const store = userStore()
 const router = useRouter()
@@ -181,7 +186,7 @@ let id = ref()
 let maxId= ref("")
 let enid = ref()
 let topic_id_hazy = ref("")
-
+let isElected = ref(true) // true-精选话题，false-最新话题
 const props = defineProps({
     topicDetail: {
         type: Object,
@@ -197,6 +202,7 @@ onMounted(() => {
         () => {
             console.log('cb', topic_id_hazy)
             noteList.notes = []
+            isElected.value=true
             page.value = 0
             getTableData()
         },
@@ -217,7 +223,7 @@ const loadNotes = () => {
 const getTableData = async () => {
     console.log(topic_id_hazy.value)
     if (topic_id_hazy.value != '') {
-        await TopicNotesList(props.topicDetail.topic_id_hazy, page.value, pageSize.value)
+        await TopicNotesList(props.topicDetail.topic_id_hazy, isElected.value, page.value, pageSize.value)
             .then((table)=>{
                 console.log(table)
                 let list = new services.NotesList
@@ -283,16 +289,12 @@ const getTableData = async () => {
     infLoadingNote.value = false
 }
 
-const getTopicNotesList =async () => {
-  await TopicNotesList(props.topicDetail.topic_id_hazy, page.value, pageSize.value)
-      .then((list)=>{
-          console.log(list)
-      })
-      .catch((error) => {
-          console.log(error)
-      })
+const handleElected = (isEle:boolean)=>{
+    isElected.value = isEle
+    noteList.notes = []
+    page.value = 0
+    getTableData()
 }
-
 const handleComb = (list: services.Comb[]) => {
     if (list.length<=2) {
         return list.map((v,i)=>{
@@ -416,5 +418,24 @@ ul {
     font-weight:normal;
     text-align: left;
     margin: 10px;
+}
+.topic-tab {
+    display: flex;
+    align-items: center;
+    margin: 20px 10px 5px;
+}
+.topic-tab .el-button {
+    font-size: 22px;
+    font-weight: bold;
+}
+.topic-tab .elected {
+    margin-right: 20px;
+    padding-bottom: 12px;
+    border-bottom: 4px solid #fff;
+    cursor: pointer;
+}
+
+.topic-tab .topic-tab-active {
+    border-bottom: 4px solid #ff6b00;
 }
 </style>
