@@ -78,9 +78,19 @@
     </el-dialog>
 
     <el-dialog v-model="dialogDownloadVisible" title="请选择下载格式" align-center center width="30%">
-        <el-select v-model="downloadType" placeholder="请选择下载格式">
-            <el-option v-for="item in downloadTypeOptions" :key="item.value" :label="item.label" :value="item.value"/>
-        </el-select>
+        <el-form >
+            <el-form-item label="下载格式" label-width="80px">
+                <el-select v-model="downloadType" placeholder="请选择下载格式">
+                    <el-option v-for="item in downloadTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+                </el-select>
+            </el-form-item>
+            <el-progress v-show="percentage"
+                :percentage="percentage"
+                status="success"
+                :indeterminate="true"
+                :duration="3"
+            ><span>{{content}}</span></el-progress>
+        </el-form>
         <template #footer>
       <span class="dialog-footer">
         <el-button @click="closeDownloadDialog">取消</el-button>
@@ -91,7 +101,6 @@
         </template>
 
     </el-dialog>
-
 
     <el-drawer direction="btt" :title="media?.title" v-model="videoVisible" size="30%" @close="closeVideo" @open="open"
                @opened="openVideo(media)">
@@ -139,6 +148,9 @@ let downloadData = reactive(new services.Course)
 const downloadTypeOptions = [
     {value: 1, label: "MP3"}, {value: 2, label: "PDF"}, {value: 3, label: "Markdown"}
 ]
+
+let percentage=ref(0)
+let content=ref('')
 
 const closeVideo = () => {
     // if (videoPlayer.value) {
@@ -289,9 +301,13 @@ const openDownloadDialog = (row: any) => {
 const closeDownloadDialog = () => {
     downloadType.value = 1
     dialogDownloadVisible.value = false
+    percentage.value = 0
+    content.value = ''
 }
 
 const download = async (id: number, dType: number) => {
+    percentage.value = 66
+    content.value = '下载中'
     await OdobDownload(id, dType, downloadData).then((info) => {
         console.log(info)
     }).catch((error) => {

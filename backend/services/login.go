@@ -1,9 +1,5 @@
 package services
 
-import (
-	"github.com/pkg/errors"
-)
-
 type QrCodeResp struct {
 	ErrCode int    `json:"errCode"`
 	ErrMsg  string `json:"errMsg"`
@@ -25,29 +21,23 @@ type CheckLoginResp struct {
 func (s *Service) LoginAccessToken() (token string, err error) {
 	token, err = s.reqGetLoginAccessToken(CsrfToken)
 	if err != nil {
-		err = errors.Wrap(err, "request login err")
 		return
 	}
-
 	return
 }
 
 func (s *Service) GetQrcode(token string) (resp *QrCodeResp, err error) {
 	resp, err = s.reqGetQrcode(token)
 	if err != nil {
-		err = errors.Wrap(err, "request login err")
 		return
 	}
-
 	return
 }
 
 func (s *Service) CheckLogin(token, qrcode string) (check *CheckLoginResp, cookie string, err error) {
 	check, cookie, err = s.reqCheckLogin(token, qrcode)
 	if err != nil {
-		err = errors.Wrap(err, "request login err")
 		return
 	}
-
 	return
 }

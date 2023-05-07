@@ -6,6 +6,12 @@
                     <el-option v-for="item in props.downloadTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
             </el-form-item>
+            <el-progress v-show="percentage"
+                    :percentage="percentage"
+                    status="success"
+                    :indeterminate="true"
+                    :duration="3"
+            ><span>{{content}}</span></el-progress>
         </el-form>
 
         <template #footer>
@@ -22,8 +28,11 @@
 
 <script lang="ts" setup>
 import {onMounted, ref} from "vue";
-import {EbookDownload,CourseDownload} from "../../wailsjs/go/backend/App";
+import {EbookDownload, CourseDownload} from "../../wailsjs/go/backend/App";
 import {ElMessage} from "element-plus";
+
+let percentage=ref(0)
+let content=ref('')
 
 const dialogVisible = ref(false)
 const downloadType = ref(1)
@@ -77,10 +86,14 @@ const closeDialog = () => {
     //   initForm()
     // downloadType.value = 1
     // dialogVisible.value = false
+    percentage.value = 0
+    content.value = ''
     emits("close")
 }
 
 const download = async () => {
+    percentage.value = 66
+    content.value = '下载中'
     switch (props.prodType) {
         case 2:
             await EbookDownload(props.downloadId, downloadType.value, props.enId).then((info) => {

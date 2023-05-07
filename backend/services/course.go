@@ -1,9 +1,8 @@
 package services
 
 import (
+	"errors"
 	"math"
-
-	"github.com/pkg/errors"
 )
 
 // Course metadata

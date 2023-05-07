@@ -34,22 +34,11 @@
 * 每天听本书可下载音频，文稿生成 Markdown 文档
 * 电子书可下载 pdf，html, epub 等格式
 
-注：
+### 注：
 
 1. 下载均在后台执行，下载完毕弹框会关闭，等待弹窗关闭或者点击确定下载后关闭，均会在后台执行下载程序。
 2. 如果遇到 `496 NoCertificate` 消息提示，请登录网页版进行图形验证码验证。
-
-### 功能截图如下：
-
-![](image/Snipaste_2023-04-16_21-11-23.png)
-![](image/Snipaste_2023-04-17_00-01-03.png)
-![](image/Snipaste_2023-04-16_21-09-18.png)
-![](image/Snipaste_2023-02-21_19-13-26.png)
-![](image/Snipaste_2023-02-21_19-14-14.png)
-![](image/Snipaste_2023-02-21_19-14-27.png)
-![](image/Snipaste_2023-02-21_19-15-12.png)
-![](image/Snipaste_2023-02-21_19-15-44.png)
-![](image/Snipaste_2023-02-21_19-25-03.png)
+3. 本应用上登录后再登录官方网页版会导致保存的 cookie 失效，使用 `rm -rf ~/.config/dedao/config.json` 删除配置信息后重新登陆本应用即可。
 
 ## 安装
 
@@ -77,6 +66,17 @@ wails 构建需要安装以下依赖：
 * ffmpeg
   > 音频需要借助 [ffmpeg](https://ffmpeg.org/) 合成
 
+### 功能截图如下：
+
+![](image/Snipaste_2023-04-16_21-11-23.png)
+![](image/Snipaste_2023-04-17_00-01-03.png)
+![](image/Snipaste_2023-04-16_21-09-18.png)
+![](image/Snipaste_2023-02-21_19-13-26.png)
+![](image/Snipaste_2023-02-21_19-14-14.png)
+![](image/Snipaste_2023-02-21_19-14-27.png)
+![](image/Snipaste_2023-02-21_19-15-12.png)
+![](image/Snipaste_2023-02-21_19-15-44.png)
+![](image/Snipaste_2023-02-21_19-25-03.png)
 
 ## Stargazers over time
 
@@ -85,6 +85,5 @@ wails 构建需要安装以下依赖：
 ## License
 
 [MIT](./LICENSE) © yann0917
-
 
 ---

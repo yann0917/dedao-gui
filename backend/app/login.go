@@ -1,10 +1,10 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
 	"github.com/yann0917/dedao-gui/backend/config"
 	"github.com/yann0917/dedao-gui/backend/services"
 )

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"io"
 	"log"
 	"os"
@@ -8,7 +9,6 @@ import (
 	"sync"
 
 	jsoniter "github.com/json-iterator/go"
-	"github.com/pkg/errors"
 	"github.com/yann0917/dedao-gui/backend/services"
 )
 
