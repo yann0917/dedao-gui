@@ -36,7 +36,6 @@ func init() {
 
 // DedaoUsers user
 type DedaoUsers []*Dedao
-type CourseIDMap map[int]map[string]interface{}
 
 // ConfigsData Configs data
 type ConfigsData struct {
@@ -48,17 +47,11 @@ type ConfigsData struct {
 	configFile     *os.File
 	fileMu         sync.Mutex
 	service        *services.Service
-	CourseIDMap    CourseIDMap
-	OdobIDMap      CourseIDMap
-	EBookIDMap     CourseIDMap
 }
 
 type configJSONExport struct {
-	AcitveUID   string
-	Users       DedaoUsers
-	CourseIDMap CourseIDMap
-	OdobIDMap   CourseIDMap
-	EBookIDMap  CourseIDMap
+	AcitveUID string
+	Users     DedaoUsers
 }
 
 // Init 初始化配置
@@ -129,11 +122,8 @@ func (c *ConfigsData) Save() error {
 
 	// 保存配置的数据
 	conf := configJSONExport{
-		AcitveUID:   c.AcitveUID,
-		Users:       c.Users,
-		CourseIDMap: c.CourseIDMap,
-		OdobIDMap:   c.OdobIDMap,
-		EBookIDMap:  c.EBookIDMap,
+		AcitveUID: c.AcitveUID,
+		Users:     c.Users,
 	}
 
 	data, err := jsoniter.MarshalIndent(conf, "", " ")
@@ -194,9 +184,6 @@ func (c *ConfigsData) loadConfigFromFile() error {
 
 	c.AcitveUID = conf.AcitveUID
 	c.Users = conf.Users
-	c.CourseIDMap = conf.CourseIDMap
-	c.OdobIDMap = conf.OdobIDMap
-	c.EBookIDMap = conf.EBookIDMap
 	return nil
 }
 
