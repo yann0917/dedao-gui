@@ -2,7 +2,7 @@
     <el-table stripe :data="tableData.list" v-loading="loading" height="97%" style="width: 100%"
         :cell-style="{ textAlign: 'left' }" :header-cell-style="{ textAlign: 'left' }" :row-style="{ height: '30px' }"
         table-layout="auto">
-        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column prop="class_id" label="ID" width="80" />
         <el-table-column prop="title" label="标题" width="280" />
         <el-table-column prop="icon" label="封面" width="80">
             <template #default="scope">
@@ -149,7 +149,7 @@ const closeDialog = () => {
 }
 
 const openDownloadDialog = (row: any) => {
-    downloadId.value = row.id
+    downloadId.value = row.class_id
     downloadEnId.value = row.enid
     dialogDownloadVisible.value = true
     if (setStore.getDownloadDir == "") {
