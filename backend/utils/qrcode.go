@@ -115,14 +115,12 @@ func (v *qrcodeTerminal) getQRCodeString(data [][]bool) (result *QRCodeString) {
 	str := ""
 	for ir, row := range data {
 		lr := len(row)
-		if ir == 0 || ir == 1 || ir == 2 ||
-			ir == lr-1 || ir == lr-2 || ir == lr-3 {
+		if ir <= 2 || ir >= lr-3 {
 			continue
 		}
 		for ic, col := range row {
 			lc := len(data)
-			if ic == 0 || ic == 1 || ic == 2 ||
-				ic == lc-1 || ic == lc-2 || ic == lc-3 {
+			if ic <= 2 || ic >= lc-3 {
 				continue
 			}
 			if col {
