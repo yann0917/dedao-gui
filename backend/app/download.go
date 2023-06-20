@@ -56,7 +56,7 @@ func (d *CourseDownload) Download() error {
 	switch d.DownloadType {
 	case 1: // mp3
 		downloadData := extractDownloadData(course, articles, d.AID, 1)
-		errors := make([]error, 0)
+		errs := make([]error, 0)
 
 		path, err := utils.Mkdir(OutputDir, utils.FileName(course.ClassInfo.Name, ""), "MP3")
 		if err != nil {
@@ -69,16 +69,16 @@ func (d *CourseDownload) Download() error {
 			}
 			stream := datum.Enid
 			if err := downloader.Download(datum, stream, path); err != nil {
-				errors = append(errors, err)
+				errs = append(errs, err)
 			}
 		}
-		if len(errors) > 0 {
-			return errors[0]
+		if len(errs) > 0 {
+			return errs[0]
 		}
 	case 2:
 		// 下载 PDF
 		downloadData := extractDownloadData(course, articles, d.AID, 2)
-		errors := make([]error, 0)
+		errs := make([]error, 0)
 
 		path, err := utils.Mkdir(OutputDir, utils.FileName(course.ClassInfo.Name, ""), "PDF")
 		if err != nil {
@@ -88,11 +88,11 @@ func (d *CourseDownload) Download() error {
 		cookies := LoginedCookies()
 		for _, datum := range downloadData.Data {
 			if err := downloader.PrintToPDF(datum, cookies, path); err != nil {
-				errors = append(errors, err)
+				errs = append(errs, err)
 			}
 		}
-		if len(errors) > 0 {
-			return errors[0]
+		if len(errs) > 0 {
+			return errs[0]
 		}
 	case 3:
 		// 下载 Markdown
@@ -100,9 +100,7 @@ func (d *CourseDownload) Download() error {
 		if err != nil {
 			return err
 		}
-		if err := DownloadMarkdown(articles, d.AID, path); err != nil {
-			return err
-		}
+		return DownloadMarkdown(articles, d.AID, path)
 	}
 	return nil
 
@@ -374,59 +372,17 @@ func ContentsToMarkdown(contents []services.Content) (res string) {
 			res = strings.TrimRight(res, "> \r\n")
 			res += "\r\n\r\n"
 		case "paragraph":
-			// map 转结构体
-			tmpJson, err := jsoniter.Marshal(content.Contents)
+			resP, err := paragraphToMarkDown(content.Contents)
 			if err != nil {
 				return
 			}
-			cont := services.Contents{}
-			err = jsoniter.Unmarshal(tmpJson, &cont)
-			if err != nil {
-				return ""
-			}
-			for _, item := range cont {
-				subContent := strings.Trim(item.Text.Content, " ")
-				switch item.Type {
-				case "text":
-					if item.Text.Bold {
-						res += " **" + subContent + "** "
-					} else if item.Text.Highlight {
-						res += " *" + subContent + "* "
-					} else {
-						res += subContent
-					}
-				}
-			}
-			res = strings.Trim(res, " ")
-			res = strings.Trim(res, "\r\n")
-			res += "\r\n\r\n"
+			res += resP
 		case "list":
-			tmpJson, err := jsoniter.Marshal(content.Contents)
+			resL, err := listToMarkdown(content.Contents)
 			if err != nil {
 				return
 			}
-			var cont []services.Contents
-			err = jsoniter.Unmarshal(tmpJson, &cont)
-			if err != nil {
-				return ""
-			}
-
-			for _, item := range cont {
-				for _, item := range item {
-					subContent := strings.Trim(item.Text.Content, " ")
-					switch item.Type {
-					case "text":
-						if item.Text.Bold {
-							res += "* **" + subContent + "** "
-						} else if item.Text.Highlight {
-							res += "* *" + subContent + "* "
-						} else {
-							res += "* " + subContent
-						}
-					}
-				}
-				res += "\r\n\r\n"
-			}
+			res += resL
 		case "elite": // 划重点
 			temp := strings.ReplaceAll(content.Text, "\n", "\r\n\r\n")
 			res += getMdHeader(2) + "划重点\r\n\r\n" + temp + "\r\n\r\n"
@@ -439,6 +395,65 @@ func ContentsToMarkdown(contents []services.Content) (res string) {
 	}
 
 	res += "---\r\n"
+	return
+}
+
+func paragraphToMarkDown(content interface{}) (res string, err error) {
+	tmpJson, err := jsoniter.Marshal(content)
+	if err != nil {
+		return
+	}
+	cont := services.Contents{}
+	err = jsoniter.Unmarshal(tmpJson, &cont)
+	if err != nil {
+		return
+	}
+	for _, item := range cont {
+		subContent := strings.Trim(item.Text.Content, " ")
+		switch item.Type {
+		case "text":
+			if item.Text.Bold {
+				res += " **" + subContent + "** "
+			} else if item.Text.Highlight {
+				res += " *" + subContent + "* "
+			} else {
+				res += subContent
+			}
+		}
+	}
+	res = strings.Trim(res, " ")
+	res = strings.Trim(res, "\r\n")
+	res += "\r\n\r\n"
+	return
+}
+
+func listToMarkdown(content interface{}) (res string, err error) {
+	tmpJson, err := jsoniter.Marshal(content)
+	if err != nil {
+		return
+	}
+	var cont []services.Contents
+	err = jsoniter.Unmarshal(tmpJson, &cont)
+	if err != nil {
+		return
+	}
+
+	for _, item := range cont {
+		for _, item := range item {
+			subContent := strings.Trim(item.Text.Content, " ")
+			switch item.Type {
+			case "text":
+				if item.Text.Bold {
+					res += "* **" + subContent + "** "
+				} else if item.Text.Highlight {
+					res += "* *" + subContent + "* "
+				} else {
+					res += "* " + subContent
+				}
+			}
+		}
+		res += "\r\n\r\n"
+	}
 	return
 }
 
