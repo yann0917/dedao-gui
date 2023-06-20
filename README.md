@@ -12,6 +12,7 @@
 > 7. [pinia](https://pinia.vuejs.org/zh/) 
 
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/yann0917/dedao-gui)
+[![Go Report Card](https://goreportcard.com/badge/github.com/yann0917/dedao-gui)](https://goreportcard.com/report/github.com/yann0917/dedao-gui)
 
 ## 特别声明
 
