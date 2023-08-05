@@ -32,6 +32,7 @@ type HtmlEle struct {
 	Class    string `json:"class"`
 	Alt      string `json:"alt"`
 	Len      string `json:"len"`
+	Newline  bool   `json:"newline"`
 	IsBold   bool   `json:"is_bold"`
 	IsItalic bool   `json:"is_italic"`
 	IsFn     bool   `json:"is_fn"`  // footnote: sup tag
@@ -591,7 +592,7 @@ func GenTocLevelHtml(level int, startTag bool) (result string) {
 func GenLineContentByElement(element *svgparser.Element) (lineContent map[float64][]HtmlEle) {
 	lineContent = make(map[float64][]HtmlEle)
 	offset := ""
-	lastY, lastTop, lastH := "", "", ""
+	lastY, lastTop, lastH, lastNewLine := "", "", "", false
 
 	fnA, fnB := parseFootNoteDelimiter(element)
 
@@ -635,6 +636,7 @@ func GenLineContentByElement(element *svgparser.Element) (lineContent map[float6
 						ele.Content = "&nbsp;"
 					}
 				}
+				ele.Newline = parseAttrNewline(attr)
 				if _, ok := attr["top"]; ok {
 					topInt, _ := strconv.ParseFloat(attr["top"], 64)
 					heightInt, _ := strconv.ParseFloat(attr["height"], 64)
@@ -643,7 +645,7 @@ func GenLineContentByElement(element *svgparser.Element) (lineContent map[float6
 					lastHInt, _ := strconv.ParseFloat(lastH, 64)
 
 					// 中文字符 len=3, FIXME: 英文字符无法根据 len 区分是否是下标
-					if heightInt < lastHInt && heightInt < 20 && lenInt < 3 {
+					if !lastNewLine && heightInt < lastHInt && heightInt < 20 && lenInt < 3 {
 						if topInt < lastTopInt {
 							ele.IsFn = true
 						} else {
@@ -704,26 +706,39 @@ func GenLineContentByElement(element *svgparser.Element) (lineContent map[float6
 				}
 			}
 			ele.Offset = offset
-
-			if _, ok := attr["href"]; ok && children.Name == "image" {
-				ele.Href = attr["href"]
-			} else {
-				ele.Href = ""
-			}
-			if _, ok := attr["alt"]; ok && children.Name == "image" {
-				ele.Alt = strings.ReplaceAll(attr["alt"], "\"", "&quot;")
-			} else {
-				ele.Alt = ""
-			}
+			ele.Href = parseAttrHref(attr)
+			ele.Alt = parseAttrAlt(attr)
 			ele.Name = children.Name
 
 			if (children.Name == "text") ||
 				children.Name == "image" {
 				lineContent[yInt] = append(lineContent[yInt], ele)
 			}
+			lastNewLine = ele.Newline
 		}
 	}
 	return
+}
+
+func parseAttrHref(attr map[string]string) string {
+	if href, ok := attr["href"]; ok {
+		return href
+	}
+	return ""
+}
+
+func parseAttrAlt(attr map[string]string) string {
+	if alt, ok := attr["alt"]; ok {
+		return strings.ReplaceAll(alt, "\"", "&quot;")
+	}
+	return ""
+}
+
+func parseAttrNewline(attr map[string]string) bool {
+	if newline, ok := attr["newline"]; ok && newline == "true" {
+		return true
+	}
+	return false
 }
 
 func parseFootNoteDelimiter(element *svgparser.Element) (a, b string) {
