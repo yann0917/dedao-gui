@@ -189,6 +189,7 @@ func Svg2Epub(outputDir, title string, svgContents []*SvgContent, opt EpubOption
 	h2e.HTML = htmlAll
 	h2e.Output = fileName
 	if err = h2e.Run(); err != nil {
+		return err
 	}
 
 	return err

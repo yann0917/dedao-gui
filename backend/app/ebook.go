@@ -110,6 +110,6 @@ func generateEbookPages(chapterID, token string, index, count, offset int) (svgL
 		svgList = append(svgList, list...)
 	}
 	// FIXME: debug
-	// err = utils.SaveFile(chapterID, "", strings.Join(svgList, "\n"))
+	// err = utils.SaveFile(OutputDir, chapterID, "", strings.Join(svgList, "\n"))
 	return
 }
