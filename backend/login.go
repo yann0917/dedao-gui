@@ -30,6 +30,15 @@ func (a *App) GetQrcode() (qrCode QrCodeResp, err error) {
 	if err != nil {
 		return
 	}
+	if token == `{"message":"invalid csrf token"}` {
+		app.Logout()
+		services.CsrfToken = ""
+		_, _ = Instance.GetHomeInitialState()
+		token, err = Instance.LoginAccessToken()
+		if err != nil {
+			return
+		}
+	}
 	code, err := Instance.GetQrcode(token)
 	if err != nil {
 		return

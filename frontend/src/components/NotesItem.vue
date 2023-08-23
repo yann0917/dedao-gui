@@ -99,8 +99,8 @@
                           <div class="box" v-if="item.s_part.images?.length>0">
                               <div class="imageBox">
                                   <el-image v-for="i in item.s_part.images" :src="i" :preview-src-list="item.s_part.images.map((v,i)=>{
-                  return v
-                })" :initial-index="0"  fit="cover"  :style="item.s_part.images?.length>1?'height:245px;width: 32%;':'width: 32%;'"/>
+                                        return v
+                                    })" :initial-index="0" fit="cover" :style="item.s_part.images?.length>1?'height:245px;width: 32%;':'width: 32%;'"/>
                               </div>
                           </div>
                           <div class="note-line" v-if="item.s_part.base_source.title !=''">
@@ -162,15 +162,9 @@
 <script  setup lang="ts">
 import {ref, reactive, onMounted, defineProps, watch} from 'vue'
 import { ElMessage } from 'element-plus'
-import { NotesTimeline,TopicNotesList,TopicNoteDetail} from '../../wailsjs/go/backend/App'
+import { NotesTimeline,TopicNotesList} from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
-import { useRoute, useRouter } from 'vue-router'
-import { userStore } from '../stores/user';
-import {is} from "@babel/types";
-
-const store = userStore()
-const router = useRouter()
-const route = useRoute()
+import { arrayExpression } from '@babel/types'
 
 const page = ref(0)
 const total = ref(0)
@@ -197,16 +191,16 @@ const props = defineProps({
 onMounted(() => {
     watch(() => {
             topic_id_hazy.value = props.topicDetail?.topic_id_hazy ? props.topicDetail.topic_id_hazy : ''
-            console.log('change', topic_id_hazy)
         },
         () => {
-            console.log('cb', topic_id_hazy)
-            noteList.notes = []
-            isElected.value=true
+            if (topic_id_hazy.value !='') {
+                noteList.notes = []
+            }
+            isElected.value = true
             page.value = 0
             getTableData()
         },
-        {immediate: true,deep:true}
+        {immediate: true, deep: true}
     )
 })
 
@@ -221,7 +215,6 @@ const loadNotes = () => {
 }
 
 const getTableData = async () => {
-    console.log(topic_id_hazy.value)
     if (topic_id_hazy.value != '') {
         await TopicNotesList(props.topicDetail.topic_id_hazy, isElected.value, page.value, pageSize.value)
             .then((table)=>{
@@ -254,7 +247,6 @@ const getTableData = async () => {
                 })
             })
     } else {
-        console.log(maxId.value)
         await NotesTimeline(maxId.value).then((table) => {
             console.log(table)
             Object.assign(tableData, table)

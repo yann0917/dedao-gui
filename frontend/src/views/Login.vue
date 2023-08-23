@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import QrLogin from "../components/QrLogin.vue";
 
 const dialogVisible = ref(false);

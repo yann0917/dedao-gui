@@ -45,8 +45,8 @@
       </el-carousel>
     </el-col>
     <el-col :span="4" class="user">
-      <div :class="!initial.isLogin ? 'not-login' : 'logged'">
-        <div v-if="!initial.isLogin">
+      <div :class="Local.get('cookies')==null ?'not-login' : 'logged'">
+        <div v-if="Local.get('cookies')==null">
           <div class="receive"></div>
           <el-button class="login-btn" @click="openLoginDialog()">
             登录
@@ -59,11 +59,11 @@
           </div>
           <div class="data">
             <p class="time">
-              <span>今日学习</span><span><em style="font-size: 22px">{{(user.today_study_time / 60).toFixed(0)}}</em>分钟</span>
+              <span>今日学习</span><em style="font-size: 22px;color:#333;">{{user.today_study_time > 0 ? (user.today_study_time / 60).toFixed(0):''}}</em><span>分钟</span>
             </p>
             <el-divider border-style="dotted" />
             <p class="time">
-              <span>连续学习</span><span><em style="font-size: 22px">{{user.study_serial_days}}</em>天</span>
+              <span>连续学习</span><em style="font-size: 22px;color: #333;">{{user.study_serial_days}}</em><span>天</span>
             </p>
           </div>
           <!-- <el-button class="button" @click="logout()"> 退出 </el-button> -->
@@ -298,6 +298,7 @@ import QrLogin from "../components/QrLogin.vue";
 import EbookInfo from "../components/EbookInfo.vue";
 import CourseInfo from "../components/CourseInfo.vue";
 import { useRouter } from "vue-router";
+import { Local } from "../utils/storage";
 
 const router = useRouter();
 
@@ -418,6 +419,7 @@ const logout = async () => {
     .then((result) => {
       console.log(result);
       WindowReloadApp();
+      Local.remove("cookies")
       router.push("/home");
     })
     .catch((error) => {

@@ -29,7 +29,6 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 app.config.errorHandler = (err, vm, info) => {
   console.log('❌ 提示:', err);
-  console.log('====== 有报错了!!! ======');
   if (err instanceof Error) {
     let routers = useRouter()
     console.log('❌ 提示:', err.message);

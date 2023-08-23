@@ -20,7 +20,6 @@ const activeIndex = computed(() => {
     return route.path
 })
 const handleSelect = (key: string, keyPath: string[]) => {
-    // this.activeIndex = this.$route.path
     // console.log(key, keyPath)
 }
 </script>

@@ -3,7 +3,6 @@
         <el-form-item label="文件保存目录">
             <el-input v-model="form.downloadDir"
                       :prefix-icon="Folder"
-                      @blur="openDialogDir('')"
                       clearable @clear="clearDir "/>
         </el-form-item>
         <el-tooltip
