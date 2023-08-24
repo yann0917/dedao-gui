@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"errors"
 	"os"
 	"path/filepath"
@@ -9,6 +10,7 @@ import (
 	"strings"
 
 	jsoniter "github.com/json-iterator/go"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/yann0917/dedao-gui/backend/downloader"
 	"github.com/yann0917/dedao-gui/backend/services"
 	"github.com/yann0917/dedao-gui/backend/utils"
@@ -16,11 +18,12 @@ import (
 
 var OutputDir = ""
 
-type DeDaoDownloader interface {
-	Download() error
-}
+// type DeDaoDownloader interface {
+// 	Download() error
+// }
 
 type CourseDownload struct {
+	Ctx          context.Context
 	DownloadType int    // 1:mp3, 2:PDF文档, 3:markdown文档
 	ID           int    // 课程 id
 	AID          int    // 文章 id
@@ -28,15 +31,25 @@ type CourseDownload struct {
 }
 
 type OdobDownload struct {
+	Ctx          context.Context
 	DownloadType int // 1:mp3, 2:PDF文档, 3:markdown文档
 	ID           int
 	Data         *services.Course
 }
 
 type EBookDownload struct {
+	Ctx          context.Context
 	DownloadType int // 1:html, 2:PDF文档, 3:epub
 	ID           int
 	EnID         string
+}
+
+type Progress struct {
+	Total   int    `json:"total"`
+	Current int    `json:"current"`
+	Pct     int    `json:"pct"`
+	Value   string `json:"value"`
+	ID      int    `json:"id"` // 课程 id
 }
 
 func SetOutputDir(dir string) {
@@ -63,7 +76,16 @@ func (d *CourseDownload) Download() error {
 			return err
 		}
 
+		total, curr := len(downloadData.Data), 0
 		for _, datum := range downloadData.Data {
+			var progress Progress
+			progress.ID = d.ID
+			progress.Total = total
+			curr++
+			progress.Current = curr
+			progress.Pct = curr * 100 / progress.Total
+			progress.Value = datum.Title
+			runtime.EventsEmit(d.Ctx, "courseDownload", progress)
 			if !datum.IsCanDL {
 				continue
 			}
@@ -84,9 +106,17 @@ func (d *CourseDownload) Download() error {
 		if err != nil {
 			return err
 		}
-
+		total, curr := len(downloadData.Data), 0
 		cookies := LoginedCookies()
 		for _, datum := range downloadData.Data {
+			var progress Progress
+			progress.ID = d.ID
+			progress.Total = total
+			curr++
+			progress.Current = curr
+			progress.Pct = curr * 100 / progress.Total
+			progress.Value = datum.Title
+			runtime.EventsEmit(d.Ctx, "courseDownload", progress)
 			if err := downloader.PrintToPDF(datum, cookies, path); err != nil {
 				errs = append(errs, err)
 			}
@@ -100,7 +130,7 @@ func (d *CourseDownload) Download() error {
 		if err != nil {
 			return err
 		}
-		return DownloadMarkdown(articles, d.AID, path)
+		return DownloadMarkdown(articles, d.AID, path, d.Ctx)
 	}
 	return nil
 
@@ -120,7 +150,16 @@ func (d *OdobDownload) Download() error {
 		if err != nil {
 			return err
 		}
+		total, curr := len(downloadData.Data), 0
 		for _, datum := range downloadData.Data {
+			var progress Progress
+			progress.ID = d.ID
+			progress.Total = total
+			curr++
+			progress.Current = curr
+			progress.Pct = curr * 100 / progress.Total
+			progress.Value = datum.Title
+			runtime.EventsEmit(d.Ctx, "odobDownload", progress)
 			if !datum.IsCanDL {
 				continue
 			}
@@ -205,9 +244,9 @@ func (d *EBookDownload) Download() error {
 	return nil
 }
 
-func Download(downloader DeDaoDownloader) error {
-	return downloader.Download()
-}
+// func Download(downloader DeDaoDownloader) error {
+// 	return downloader.Download()
+// }
 
 // 生成下载数据
 func extractDownloadData(course *services.CourseInfo, articles *services.ArticleList, aid int, flag int) downloader.Data {
@@ -484,8 +523,18 @@ func getMdHeader(level int) string {
 	return ""
 }
 
-func DownloadMarkdown(list *services.ArticleList, aid int, path string) error {
+func DownloadMarkdown(list *services.ArticleList, aid int, path string, ctx context.Context) error {
+	total, curr := len(list.List), 0
 	for _, v := range list.List {
+		var progress Progress
+		progress.ID = aid
+		progress.Total = total
+		curr++
+		progress.Current = curr
+		progress.Pct = curr * 100 / progress.Total
+		progress.Value = v.Title
+		runtime.EventsEmit(ctx, "courseDownload", progress)
+
 		if aid > 0 && v.ID != aid {
 			continue
 		}

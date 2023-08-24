@@ -41,6 +41,7 @@ func main() {
 		BackgroundColour:   &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		OnStartup:          app.Startup,
 		OnShutdown:         app.Shutdown,
+		OnDomReady:         app.DomReady,
 		LogLevel:           logger.DEBUG,
 		LogLevelProduction: logger.ERROR,
 		WindowStartState:   options.Normal,
@@ -80,7 +81,7 @@ func main() {
 			WindowIsTranslucent:  true,
 			About: &mac.AboutInfo{
 				Title:   "dedao gui downloader",
-				Message: "https://github.com/yann0917/dedao-dl",
+				Message: "https://github.com/yann0917/dedao-gui",
 				Icon:    icon,
 			},
 		},

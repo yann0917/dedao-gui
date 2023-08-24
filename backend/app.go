@@ -23,3 +23,8 @@ func (a *App) Startup(ctx context.Context) {
 func (a *App) Shutdown(ctx context.Context) {
 	// fmt.Println(a.Ctx)
 }
+
+func (a *App) DomReady(ctx context.Context) {
+	// fmt.Println(a.Ctx)
+	// fmt.Println("dom ready")
+}

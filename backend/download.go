@@ -32,6 +32,7 @@ func (a *App) SetDir(dir []string) {
 
 func (a *App) CourseDownload(id, aid, dType int, enid string) (err error) {
 	var d app.CourseDownload
+	d.Ctx = a.Ctx
 	d.ID = id
 	d.AID = aid
 	d.EnId = enid
@@ -42,6 +43,7 @@ func (a *App) CourseDownload(id, aid, dType int, enid string) (err error) {
 
 func (a *App) OdobDownload(id, dType int, data *services.Course) (err error) {
 	var d app.OdobDownload
+	d.Ctx = a.Ctx
 	d.ID = id
 	d.DownloadType = dType
 	d.Data = data
@@ -51,6 +53,7 @@ func (a *App) OdobDownload(id, dType int, data *services.Course) (err error) {
 
 func (a *App) EbookDownload(id, dType int, enid string) (err error) {
 	var d app.EBookDownload
+	d.Ctx = a.Ctx
 	d.ID = id
 	d.DownloadType = dType
 	d.EnID = enid

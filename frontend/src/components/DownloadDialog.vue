@@ -9,8 +9,8 @@
             <el-progress v-show="percentage"
                     :percentage="percentage"
                     status="success"
-                    :indeterminate="true"
-                    :duration="3"
+                    :stroke-width="20"
+                    :text-inside="true"
             ><span>{{content}}</span></el-progress>
         </el-form>
 
@@ -30,6 +30,7 @@
 import {onMounted, ref} from "vue";
 import {EbookDownload, CourseDownload} from "../../wailsjs/go/backend/App";
 import {ElMessage} from "element-plus";
+import { EventsOn, EventsOff} from "../../wailsjs/runtime/runtime";
 
 let percentage=ref(0)
 let content=ref('')
@@ -86,16 +87,24 @@ const closeDialog = () => {
     //   initForm()
     // downloadType.value = 1
     // dialogVisible.value = false
+    EventsOff("courseDownload", "ebookDownload")
     percentage.value = 0
     content.value = ''
     emits("close")
 }
 
 const download = async () => {
-    percentage.value = 66
+    // percentage.value = 66
     content.value = '下载中'
     switch (props.prodType) {
         case 2:
+        EventsOn("ebookDownload",  data=>{
+                if (data) {
+                    console.log(data)
+                    percentage.value = data.pct
+                    content.value = data.value + '下载中...'
+                }
+            })
             await EbookDownload(props.downloadId, downloadType.value, props.enId).then((info) => {
                 console.log(info)
             }).catch((error) => {
@@ -106,6 +115,13 @@ const download = async () => {
             })
             break;
         case 66:
+            EventsOn("courseDownload",  data=>{
+                if (data) {
+                    console.log(data)
+                    percentage.value = data.pct
+                    content.value = data.value + '下载中...'
+                }
+            })
             await CourseDownload(props.downloadId, props.articleId, downloadType.value, props.enId).then((info) => {
                 console.log(info)
             }).catch((error) => {

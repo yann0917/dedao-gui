@@ -87,8 +87,8 @@
             <el-progress v-show="percentage"
                 :percentage="percentage"
                 status="success"
-                :indeterminate="true"
-                :duration="3"
+                :stroke-width="20"
+                :text-inside="true"
             ><span>{{content}}</span></el-progress>
         </el-form>
         <template #footer>
@@ -125,6 +125,7 @@ import {Local} from '../utils/storage';
 import {secondToHour} from '../utils/utils'
 import videojs from 'video.js'
 import "video.js/dist/video-js.css"
+import { EventsOff, EventsOn } from '../../wailsjs/runtime/runtime'
 
 const videoPlayer = ref()
 let media = ref()
@@ -303,11 +304,19 @@ const closeDownloadDialog = () => {
     dialogDownloadVisible.value = false
     percentage.value = 0
     content.value = ''
+    EventsOff("odobDownload")
 }
 
 const download = async (id: number, dType: number) => {
-    percentage.value = 66
-    content.value = '下载中'
+    content.value = '下载中...'
+    EventsOn("odobDownload",  data=>{
+        if (data) {
+            console.log(data)
+            percentage.value = data.pct
+            content.value = data.value + '下载中...'
+        }
+    })
+
     await OdobDownload(id, dType, downloadData).then((info) => {
         console.log(info)
     }).catch((error) => {
