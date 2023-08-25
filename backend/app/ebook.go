@@ -1,9 +1,12 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"strings"
+	"sync"
 
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/yann0917/dedao-gui/backend/services"
 	"github.com/yann0917/dedao-gui/backend/utils"
 )
@@ -26,6 +29,12 @@ func EbookShelfAdd(enIDs []string) (resp *services.EbookShelfAddResp, err error)
 	return
 }
 
+// EbookShelfRemove 移出书架
+func EbookShelfRemove(enIDs []string) (resp *services.EbookShelfAddResp, err error) {
+	resp, err = getService().EbookShelfRemove(enIDs)
+	return
+}
+
 func EbookInfo(enID string) (info *services.EbookInfo, err error) {
 	token, err1 := getService().EbookReadToken(enID)
 	if err1 != nil {
@@ -37,7 +46,7 @@ func EbookInfo(enID string) (info *services.EbookInfo, err error) {
 	return
 }
 
-func EbookPage(enID string) (info *services.EbookInfo, svgContent utils.SvgContents, err error) {
+func EbookPage(ctx context.Context, enID string) (info *services.EbookInfo, svgContent utils.SvgContents, err error) {
 	token, err1 := getService().EbookReadToken(enID)
 	if err1 != nil {
 		err = err1
@@ -49,7 +58,27 @@ func EbookPage(enID string) (info *services.EbookInfo, svgContent utils.SvgConte
 		return
 	}
 	wgp := utils.NewWaitGroupPool(10)
+	total, curr := len(info.BookInfo.Orders), 0
+	var chapterMap sync.Map
+	for _, ebookToc := range info.BookInfo.Toc {
+		key := ebookToc.Href
+		href := strings.Split(ebookToc.Href, "#")
+		if len(href) > 1 {
+			key = href[0]
+		}
+		chapterMap.Store(key, ebookToc)
+	}
 	for i, order := range info.BookInfo.Orders {
+		var progress Progress
+		progress.Total = total
+		curr++
+		progress.Current = curr
+		progress.Pct = curr * 100 / progress.Total
+		value, ok := chapterMap.Load(order.ChapterID)
+		if ok {
+			progress.Value = value.(services.EbookToc).Text
+		}
+		runtime.EventsEmit(ctx, "ebookDownload", progress)
 		wgp.Add()
 		go func(i int, order services.EbookOrders) {
 			defer func() {
@@ -63,13 +92,14 @@ func EbookPage(enID string) (info *services.EbookInfo, svgContent utils.SvgConte
 			}
 
 			href, text, level := "", "", 0
-			for _, ebookToc := range info.BookInfo.Toc {
-				if strings.Contains(ebookToc.Href, order.ChapterID) {
-					href = ebookToc.Href
-					level = ebookToc.Level
-					text = ebookToc.Text
-					break
+			if value, ok := chapterMap.Load(order.ChapterID); ok {
+				if toc, ok := value.(services.EbookToc); ok {
+					href = toc.Href
+					level = toc.Level
+					text = toc.Text
 				}
+				progress.Value = value.(services.EbookToc).Text
+				chapterMap.Delete(order.ChapterID)
 			}
 
 			svgContent = append(svgContent, &utils.SvgContent{

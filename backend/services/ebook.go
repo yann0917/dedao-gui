@@ -259,3 +259,17 @@ func (s *Service) EbookShelfAdd(ids []string) (resp *EbookShelfAddResp, err erro
 	}
 	return
 }
+
+// EbookShelfRemove remove from ebook shelf
+func (s *Service) EbookShelfRemove(ids []string) (resp *EbookShelfAddResp, err error) {
+
+	body, err := s.reqEbookShelfRemove(ids)
+	if err != nil {
+		return
+	}
+	defer body.Close()
+	if err = handleJSONParse(body, &resp); err != nil {
+		return
+	}
+	return
+}

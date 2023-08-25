@@ -39,6 +39,12 @@ let htmlStr = ref()
 let aType = 0
 let parentPath = reactive({path:"",query:{}})
 
+
+const PDFFile = {
+    A4:[592.28, 841.89],
+};
+
+
 onMounted(() => {
     watch(() => {
         from.value = route.query.from
@@ -76,9 +82,23 @@ const articleDetail = async (aType: number, enid: string) => {
 }
 
 </script>
-<style scoped>
+<style scoped lang="scss">
 .markdown-body {
+    color: #333;
     text-align: left;
-    line-height: 1.6;
+    line-height: 1.8;
+    
 }
+
+:deep(#content h2>code){
+    background-color: rgb(255, 96, 2);
+    padding: 0.5%;
+    border-radius: 10%;
+    color: white;
+}
+
+:deep(#content p>em){
+    color: rgb(255, 96, 2);
+}
+
 </style>

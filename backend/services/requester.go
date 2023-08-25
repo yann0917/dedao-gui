@@ -280,6 +280,18 @@ func (s *Service) reqEbookShelfAdd(enIds []string) (io.ReadCloser, error) {
 	return handleHTTPResponse(resp, err)
 }
 
+// reqEbookDetail 请求电子书移出书架
+func (s *Service) reqEbookShelfRemove(ids []string) (io.ReadCloser, error) {
+	resp, err := s.client.R().
+		SetBody(map[string]interface{}{
+			"pids":  ids,
+			"ptype": 2,
+		}).
+		Post("/api/pc/hades/v1/product/remove")
+
+	return handleHTTPResponse(resp, err)
+}
+
 // reqOdobVIPInfo 请求每天听本书书 vip info
 func (s *Service) reqOdobVIPInfo() (io.ReadCloser, error) {
 	resp, err := s.client.R().

@@ -29,7 +29,6 @@
         </el-table-column>
         <el-table-column prop="progress" label="已读%" width="100">
         </el-table-column>
-
         <el-table-column fixed="right" label="操作" width="200">
             <template #default="scope">
                 <el-button icon="ChatDotRound" size="small" type="primary" link @click="gotoCommentList(scope.row)">书评

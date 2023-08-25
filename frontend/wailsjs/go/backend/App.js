@@ -54,6 +54,10 @@ export function EbookShelfAdd(arg1) {
   return window['go']['backend']['App']['EbookShelfAdd'](arg1);
 }
 
+export function EbookShelfRemove(arg1) {
+  return window['go']['backend']['App']['EbookShelfRemove'](arg1);
+}
+
 export function EbookUserInfo() {
   return window['go']['backend']['App']['EbookUserInfo']();
 }

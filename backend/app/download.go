@@ -18,10 +18,6 @@ import (
 
 var OutputDir = ""
 
-// type DeDaoDownloader interface {
-// 	Download() error
-// }
-
 type CourseDownload struct {
 	Ctx          context.Context
 	DownloadType int    // 1:mp3, 2:PDF文档, 3:markdown文档
@@ -158,7 +154,7 @@ func (d *OdobDownload) Download() error {
 			curr++
 			progress.Current = curr
 			progress.Pct = curr * 100 / progress.Total
-			progress.Value = datum.Title
+			progress.Value = datum.Title + ".mp3"
 			runtime.EventsEmit(d.Ctx, "odobDownload", progress)
 			if !datum.IsCanDL {
 				continue
@@ -201,12 +197,21 @@ func (d *EBookDownload) Download() error {
 	}
 
 	title += "_" + detail.BookAuthor
-	info, svgContent, err := EbookPage(detail.Enid)
+	info, svgContent, err := EbookPage(d.Ctx, detail.Enid)
 	if err != nil {
 		return err
 	}
 	sort.Sort(svgContent)
 
+	dType := map[int]string{
+		1: "HTML",
+		2: "PDF",
+		3: "EPUB",
+	}
+	var progress Progress
+	progress.Pct = 100
+	progress.Value = "正在生成" + dType[d.DownloadType] + "文件"
+	runtime.EventsEmit(d.Ctx, "ebookDownload", progress)
 	switch d.DownloadType {
 	case 1:
 		var toc []*utils.EbookToc
@@ -243,10 +248,6 @@ func (d *EBookDownload) Download() error {
 
 	return nil
 }
-
-// func Download(downloader DeDaoDownloader) error {
-// 	return downloader.Download()
-// }
 
 // 生成下载数据
 func extractDownloadData(course *services.CourseInfo, articles *services.ArticleList, aid int, flag int) downloader.Data {

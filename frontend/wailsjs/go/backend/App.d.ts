@@ -29,6 +29,8 @@ export function EbookInfo(arg1:string):Promise<services.EbookDetail>;
 
 export function EbookShelfAdd(arg1:Array<string>):Promise<services.EbookShelfAddResp>;
 
+export function EbookShelfRemove(arg1:Array<string>):Promise<services.EbookShelfAddResp>;
+
 export function EbookUserInfo():Promise<services.EbookVIPInfo>;
 
 export function GetHomeInitialState():Promise<services.HomeInitState>;

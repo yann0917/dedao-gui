@@ -18,3 +18,8 @@ func (a *App) EbookShelfAdd(enids []string) (resp *services.EbookShelfAddResp, e
 	resp, err = app.EbookShelfAdd(enids)
 	return
 }
+
+func (a *App) EbookShelfRemove(enids []string) (resp *services.EbookShelfAddResp, err error) {
+	resp, err = app.EbookShelfRemove(enids)
+	return
+}

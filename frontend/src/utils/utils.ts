@@ -6,7 +6,7 @@ export const secondToHour = function (msd:number) {
     let minute = 0; // 分  
     let hour = 0; // 小时  
     if (msd > 0) {
-      minute = Number((msd/ 60).toFixed(0));
+      minute = Number(Math.floor(msd / 60).toFixed(0));
       second = msd % 60;
       if (minute > 60) {
         hour = Number(Math.floor(minute / 60).toFixed(0));
@@ -14,11 +14,11 @@ export const secondToHour = function (msd:number) {
       }
     }
     var result = ""
-    if (second > 0) {
-      result += second + "秒";
+    if (second > 0) { 
+      result += second >=10 ? second + "秒": '0'+second + "秒";
     }
     if (minute > 0) {
-      result = "" + minute + "分钟" + result;
+      result = "" + minute + "分" + result;
     }
     if (hour > 0) {
       result = "" + hour + "小时" + result;
@@ -36,6 +36,15 @@ export const secondToHour = function (msd:number) {
     var s = date.getSeconds();
     return Y+M+D+h+m+s;
 }
+
+export const  timestampToDate = (timestamp:number)=> {
+  var date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+  var Y = date.getFullYear() + '-';
+  var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+  var D = date.getDate() + ' ';
+  return Y+M+D;
+}
+
 
 export function setThemeColor(color:any) {
   const el = document.documentElement;
