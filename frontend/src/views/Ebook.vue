@@ -11,33 +11,42 @@
             </template>
         </el-table-column>
         <el-table-column prop="price" label="价格" width="100"/>
-        <el-table-column prop="intro" label="简介" width="320">
+        <el-table-column prop="intro" label="简介" width="400">
             <template #default="scope">
                 <el-popover title="简介" trigger="hover" placement="left" :width="480"
-                            :disabled="scope.row.intro.length <= 30">
+                            :disabled="scope.row.intro.length <= 40">
                     <p v-html="scope.row.intro?.replaceAll('\n','<br/>')"></p>
                     <template #reference>
                         <span slot="reference"
-                              v-if="scope.row.intro && scope.row.intro.length <= 30">{{ scope.row.intro }}</span>
-                        <span slot="reference" v-if="scope.row.intro && scope.row.intro.length > 30">{{
-                            scope.row.intro.substring(0, 30)
+                              v-if="scope.row.intro && scope.row.intro.length <= 40">{{ scope.row.intro }}</span>
+                        <span slot="reference" v-if="scope.row.intro && scope.row.intro.length > 40">{{
+                            scope.row.intro.substring(0, 40)
                             + "..."
                             }}</span>
                     </template>
                 </el-popover>
             </template>
         </el-table-column>
-        <el-table-column prop="progress" label="已读%" width="100">
+        <el-table-column prop="progress" label="已读%" width="100" align="center">
         </el-table-column>
-        <el-table-column fixed="right" label="操作" width="200">
+        <el-table-column fixed="right" label="操作" width="180">
             <template #default="scope">
-                <el-button icon="ChatDotRound" size="small" type="primary" link @click="gotoCommentList(scope.row)">书评
+              <el-tooltip content="书评">
+                <el-button icon="ChatDotRound" size="small" type="primary" link @click="gotoCommentList(scope.row)">
                 </el-button>
-                <el-button icon="view" size="small" type="primary" link @click="handleProd(scope.row.enid)">详情
+              </el-tooltip>
+              <el-tooltip content="详情">
+                <el-button icon="view" size="small" type="primary" link @click="handleProd(scope.row.enid)">
                 </el-button>
-                <el-button icon="download" size="small" type="primary" link @click="openDownloadDialog(scope.row)">下载
+              </el-tooltip>
+              <el-tooltip content="下载">
+                <el-button icon="download" size="small" type="primary" link @click="openDownloadDialog(scope.row)">
                 </el-button>
-
+              </el-tooltip>
+              <el-tooltip content="移出书架">
+                <el-button icon="delete" size="small" type="primary" link @click="ebookShelfRemove(scope.row.enid)">
+                </el-button>
+              </el-tooltip>
             </template>
         </el-table-column>
     </el-table>
@@ -57,8 +66,13 @@
 
 <script lang="ts" setup>
 import {onMounted, reactive, ref} from 'vue'
-import {ElMessage, ElTable} from 'element-plus'
-import {CourseCategory, CourseList, OpenDirectoryDialog, SetDir} from '../../wailsjs/go/backend/App'
+import {ElMessage, ElTable, ElMessageBox} from 'element-plus'
+import {
+  CourseCategory,
+  CourseList,
+  EbookShelfRemove,
+  SetDir
+} from '../../wailsjs/go/backend/App'
 import {services} from '../../wailsjs/go/models'
 import Pagination from '../components/Pagination.vue'
 import EbookInfo from '../components/EbookInfo.vue'
@@ -141,7 +155,6 @@ function handleChange() {
 
 getTableData()
 
-const dialogTitle = ref('detail')
 const openDialog = () => {
     dialogVisible.value = true
 }
@@ -150,9 +163,37 @@ const closeDialog = () => {
     dialogVisible.value = false
 }
 
+const ebookShelfRemove = async (enid: string) => {
+  ElMessageBox.confirm(
+      '是否移出书架?',
+      '',
+      {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+  )
+      .then(() => {
+        EbookShelfRemove([enid]).then((info) => {
+          console.log(info)
+          getTableData()
+        }).catch((error) => {
+          ElMessage({
+            message: error,
+            type: 'warning'
+          })
+        })
+      })
+      .catch(() => {
+        ElMessage({
+          type: 'info',
+          message: '取消',
+        })
+      })
+  return
+}
 
 const openDownloadDialog = (row: any) => {
-    // openDialogDir("Select download directory")
     downloadId.value = row.id
     downloadEnId.value = row.enid
     dialogDownloadVisible.value = true
@@ -180,14 +221,6 @@ const closeDownloadDialog = () => {
     dialogDownloadVisible.value = false
 }
 
-const openDialogDir = async (title: string) => {
-    await OpenDirectoryDialog(title).then((result) => {
-        console.log(result)
-    }).catch((error) => {
-        console.log(error)
-    })
-}
-
 const gotoCommentList = (row: any) => {
     router.push({
         path: `/ebook/comment`,
@@ -204,7 +237,7 @@ const gotoCommentList = (row: any) => {
 
 
 <style scoped>
-.card-header.el-row {
+.card-header .el-row {
     height: 100%;
 }
 

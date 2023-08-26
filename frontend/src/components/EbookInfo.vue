@@ -45,7 +45,7 @@
             <span class="info-text">语音朗读</span>
           </div>
           <div class="item-content">
-            <span class="info-value">{{Math.ceil(ebookInfo.count/1000)}}千字</span>
+            <span class="info-value">{{Math.floor(ebookInfo.count/1000)}}千字</span>
             <span class="info-text">字数</span>
           </div>
           <div class="item-content" v-if="ebookInfo.rank_num !=0">
@@ -71,7 +71,8 @@
         <div class="catalog">
           <el-scrollbar height="320px" align="left">
             <span v-for="item in ebookInfo.catalog_list" :key="item.playOrder" class="scrollbar-catalog-item">
-            {{repeat("&nbsp;&nbsp;", item.level)+ item.text }}<br/></span>
+              <span :style="[item.level == 0 ? 'font-size:large;font-weight:bold':'']">{{repeat("&nbsp;&nbsp;", item.level)+ item.text }}<br/></span>
+            </span>
           </el-scrollbar>
         </div>
       </el-card>
@@ -81,7 +82,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted, defineProps } from 'vue'
-import { ElTable, ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { EbookInfo,EbookShelfAdd } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import { repeat } from 'lodash'

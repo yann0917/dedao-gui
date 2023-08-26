@@ -35,8 +35,7 @@ func main() {
 		MaxWidth:  2560,
 		MaxHeight: 1440,
 		AssetServer: &assetserver.Options{
-			Assets:  assets,
-			Handler: backend.NewFileLoader(),
+			Assets: assets,
 		},
 		BackgroundColour:   &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		OnStartup:          app.Startup,

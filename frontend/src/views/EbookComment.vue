@@ -4,7 +4,7 @@
     <el-breadcrumb-item>{{ breadcrumbTitle }}</el-breadcrumb-item>
   </el-breadcrumb>
  
-  <el-space wrap alignment="flex-start">
+  <el-space wrap alignment="flex-start" class="card">
     <el-card v-for="item in tableData.list" :key="item.note_id" class="box-card" shadow="hover" style="width: 400px;">
       <template #header>
         <div class="card-header">
@@ -168,12 +168,22 @@ const handleStyleNote = (style_note_line: string) => {
   .card-header,
   .card-content {
     text-align: left ;
-}
+  }
 }
 
 .el-tag {
   margin-right: 5px;
-    // height: auto;
   text-align: center;
 }
+
+.card {
+  display:flex;
+  margin: 15px;
+  column-gap: 10px;
+}
+
+.card .box-card {
+  margin-bottom: 10px;
+}
+
 </style>
