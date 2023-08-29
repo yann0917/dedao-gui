@@ -178,8 +178,7 @@ const handleStyleNote = (style_note_line: string) => {
 
 .card {
   display:flex;
-  margin: 15px;
-  column-gap: 10px;
+  column-gap: 5px;
 }
 
 .card .box-card {

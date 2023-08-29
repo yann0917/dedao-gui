@@ -227,9 +227,9 @@ func (s *Service) ArticlePoint(id, pType string) (detail *ArticleDetail, err err
 }
 
 // ArticleCommentList get article comment list
-func (s *Service) ArticleCommentList(id, sort string, page, limit int) (list *ArticleCommentList, err error) {
+func (s *Service) ArticleCommentList(id, sort string, page, limit, sType int) (list *ArticleCommentList, err error) {
 
-	body, err := s.reqArticleCommentList(id, sort, page, limit)
+	body, err := s.reqArticleCommentList(id, sort, page, limit, sType)
 	if err != nil {
 		return
 	}

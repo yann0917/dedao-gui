@@ -58,8 +58,8 @@ func ArticleDetail(enid string) (detail *services.ArticleDetail, err error) {
 }
 
 // ArticleCommentList article comment list
-func ArticleCommentList(enId, sort string, page, limit int) (list *services.ArticleCommentList, err error) {
-	list, err = getService().ArticleCommentList(enId, sort, page, limit)
+func ArticleCommentList(enId, sort string, page, limit, sType int) (list *services.ArticleCommentList, err error) {
+	list, err = getService().ArticleCommentList(enId, sort, page, limit, sType)
 	if err != nil {
 		return
 	}

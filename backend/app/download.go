@@ -564,7 +564,7 @@ func DownloadMarkdown(list *services.ArticleList, aid int, path string, ctx cont
 
 		res := ContentsToMarkdown(content)
 		// 添加留言
-		commentList, err := ArticleCommentList(v.Enid, "like", 1, 20)
+		commentList, err := ArticleCommentList(v.Enid, "like", 1, 20, 65)
 		if err == nil {
 			res += articleCommentsToMarkdown(commentList.List)
 		}

@@ -127,7 +127,8 @@ func (s *Service) reqArticleList(ID, chapterID string, count, maxID int) (io.Rea
 // reqArticleCommentList 请求文章热门留言列表
 // enId 文章 ID
 // sort like-最热 create-最新
-func (s *Service) reqArticleCommentList(enId, sort string, page, limit int) (io.ReadCloser, error) {
+// source_type 65-课程文章 create-最新
+func (s *Service) reqArticleCommentList(enId, sort string, page, limit, sType int) (io.ReadCloser, error) {
 	resp, err := s.client.R().
 		SetBody(map[string]interface{}{
 			"detail_enid":  enId,
@@ -136,7 +137,7 @@ func (s *Service) reqArticleCommentList(enId, sort string, page, limit int) (io.
 			"page":         page,
 			"page_count":   limit,
 			"sort_by":      sort,
-			"source_type":  65,
+			"source_type":  sType,
 		}).Post("/pc/ledgers/notes/article_comment_list")
 	return handleHTTPResponse(resp, err)
 }
