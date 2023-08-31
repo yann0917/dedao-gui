@@ -792,7 +792,7 @@ outer:
 						hrefArr := strings.Split(href, "/")
 						href = hrefArr[len(hrefArr)-1:][0]
 						tagArr := strings.Split(href, "#")
-						reg := regexp.MustCompile(`([a-zA-Z]+)`)
+						reg := regexp.MustCompile(`([a-zA-Z_-]+)`)
 						var params []string
 						if len(tagArr) > 1 {
 							params = reg.FindStringSubmatch(tagArr[1])
