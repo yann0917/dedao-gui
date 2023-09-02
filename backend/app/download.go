@@ -214,22 +214,12 @@ func (d *EBookDownload) Download() error {
 	runtime.EventsEmit(d.Ctx, "ebookDownload", progress)
 	switch d.DownloadType {
 	case 1:
-		var toc []*utils.EbookToc
-		for _, ebookToc := range info.BookInfo.Toc {
-			toc = append(toc, &utils.EbookToc{
-				Href:      ebookToc.Href,
-				Level:     ebookToc.Level,
-				PlayOrder: ebookToc.PlayOrder,
-				Offset:    ebookToc.Offset,
-				Text:      ebookToc.Text,
-			})
-		}
-		if err = utils.Svg2Html(OutputDir, title, svgContent, toc); err != nil {
+		if err = utils.Svg2Html(OutputDir, title, svgContent, info.BookInfo.Toc); err != nil {
 			return err
 		}
 
 	case 2:
-		if err = utils.Svg2Pdf(OutputDir, title, svgContent); err != nil {
+		if err = utils.Svg2Pdf(OutputDir, title, svgContent, info.BookInfo.Toc); err != nil {
 			return err
 		}
 
@@ -238,6 +228,7 @@ func (d *EBookDownload) Download() error {
 		opts.Title = title
 		opts.Author = detail.BookAuthor
 		opts.Description = detail.BookIntro
+		opts.Toc = info.BookInfo.Toc
 
 		if err = utils.Svg2Epub(OutputDir, title, svgContent, opts); err != nil {
 			return err

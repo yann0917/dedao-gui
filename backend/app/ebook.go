@@ -76,7 +76,8 @@ func EbookPage(ctx context.Context, enID string) (info *services.EbookInfo, svgC
 		progress.Pct = curr * 100 / progress.Total
 		value, ok := chapterMap.Load(order.ChapterID)
 		if ok {
-			progress.Value = value.(services.EbookToc).Text
+			progress.Value = value.(utils.EbookToc).Text
+			chapterMap.Delete(order.ChapterID)
 		}
 		runtime.EventsEmit(ctx, "ebookDownload", progress)
 		wgp.Add()
@@ -91,24 +92,10 @@ func EbookPage(ctx context.Context, enID string) (info *services.EbookInfo, svgC
 				return
 			}
 
-			href, text, level := "", "", 0
-			if value, ok := chapterMap.Load(order.ChapterID); ok {
-				if toc, ok := value.(services.EbookToc); ok {
-					href = toc.Href
-					level = toc.Level
-					text = toc.Text
-				}
-				progress.Value = value.(services.EbookToc).Text
-				chapterMap.Delete(order.ChapterID)
-			}
-
 			svgContent = append(svgContent, &utils.SvgContent{
 				Contents:   svgList,
 				ChapterID:  order.ChapterID,
 				PathInEpub: order.PathInEpub,
-				TocLevel:   level,
-				TocHref:    href,
-				TocText:    text,
 				OrderIndex: i,
 			})
 		}(i, order)
