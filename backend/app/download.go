@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"errors"
 	"os"
 	"path/filepath"
 	"sort"
@@ -168,14 +167,43 @@ func (d *OdobDownload) Download() error {
 			return errors[0]
 		}
 	case 2:
-		err := errors.New("得到 Web 端暂未开放每天听本书，PDF 无法下载。")
-		return err
+		path, err := utils.Mkdir(OutputDir, utils.FileName(fileName, ""), "PDF")
+		if err != nil {
+			return err
+		}
+		aliasID := d.Data.AudioDetail.AliasID
+		detail, err := OdobArticleDetail(aliasID)
+		if err != nil {
+			return err
+		}
+
+		var content []services.Content
+		err = jsoniter.UnmarshalFromString(detail.Content, &content)
+		if err != nil {
+			return err
+		}
+		res := ContentsToMarkdown(content)
+		var progress Progress
+		progress.ID = d.ID
+		progress.Total = 100
+		progress.Current = 100
+		progress.Pct = 100 * 100 / progress.Total
+		progress.Value = d.Data.Title + ".pdf"
+		runtime.EventsEmit(d.Ctx, "odobDownload", progress)
+		return utils.Md2Pdf(path, d.Data.Title, []byte(res))
 	case 3:
 		// 下载 Markdown
 		path, err := utils.Mkdir(OutputDir, utils.FileName(fileName, ""), "MD")
 		if err != nil {
 			return err
 		}
+		var progress Progress
+		progress.ID = d.ID
+		progress.Total = 100
+		progress.Current = 100
+		progress.Pct = 100 * 100 / progress.Total
+		progress.Value = d.Data.Title + ".md"
+		runtime.EventsEmit(d.Ctx, "odobDownload", progress)
 		if err := DownloadOdobMarkdown(d.Data, path); err != nil {
 			return err
 		}

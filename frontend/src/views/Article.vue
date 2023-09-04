@@ -98,6 +98,7 @@ const articleDetail = async (aType: number, enid: string) => {
 }
 
 :deep(#content p>em){
+    font-style: normal;
     color: rgb(255, 96, 2);
 }
 

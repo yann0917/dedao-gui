@@ -2,17 +2,13 @@ package utils
 
 import (
 	"bytes"
-	"fmt"
-	"os"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/JoshVarga/svgparser"
-	"github.com/SebastiaanKlippert/go-wkhtmltopdf"
 	"github.com/yann0917/dedao-gui/backend/request"
 )
 
@@ -144,8 +140,13 @@ func Svg2Pdf(outputDir, title string, svgContents []*SvgContent, toc []EbookToc)
 	if err = WriteFileWithTrunc(coverPath, cover); err != nil {
 		return
 	}
-
-	err = genPdf(buf, fileName, coverPath)
+	pdf := PdfOption{
+		FileName:  fileName,
+		CoverPath: coverPath,
+		PageSize:  "A4",
+		Toc:       true,
+	}
+	err = pdf.GenPdf(buf)
 	return
 }
 
@@ -208,57 +209,6 @@ func Svg2Epub(outputDir, title string, svgContents []*SvgContent, opt EpubOption
 	}
 
 	return err
-}
-
-func genPdf(buf *bytes.Buffer, fileName, coverPath string) (err error) {
-	wkhtmltopdf.SetPath(WkToPdfDir)
-	pdfg, _ := wkhtmltopdf.NewPDFGenerator()
-	page := wkhtmltopdf.NewPageReader(buf)
-	page.FooterFontSize.Set(10)
-	page.FooterRight.Set("[page]")
-	page.DisableSmartShrinking.Set(true)
-
-	page.EnableLocalFileAccess.Set(true)
-	pdfg.AddPage(page)
-
-	pdfg.Cover.EnableLocalFileAccess.Set(true)
-
-	if runtime.GOOS == "windows" {
-		pdfg.Cover.Input = coverPath
-	} else {
-		pdfg.Cover.Input = "file://" + coverPath
-	}
-
-	pdfg.Dpi.Set(300)
-
-	pdfg.TOC.Include = true
-	pdfg.TOC.TocHeaderText.Set("目 录")
-	pdfg.TOC.HeaderFontSize.Set(18)
-
-	pdfg.TOC.TocLevelIndentation.Set(15)
-	pdfg.TOC.TocTextSizeShrink.Set(0.9)
-	pdfg.TOC.DisableDottedLines.Set(false)
-	pdfg.TOC.EnableTocBackLinks.Set(true)
-
-	pdfg.PageSize.Set(wkhtmltopdf.PageSizeA4)
-
-	pdfg.MarginTop.Set(15)
-	pdfg.MarginBottom.Set(15)
-	pdfg.MarginLeft.Set(15)
-	pdfg.MarginRight.Set(15)
-	err = pdfg.Create()
-	if err != nil {
-		fmt.Printf("pdfg create err: %#v\n", err)
-		return
-	}
-
-	// Write buffer contents to file on disk
-	err = pdfg.WriteFile(fileName)
-	if err != nil {
-		return
-	}
-	err = os.Remove(coverPath)
-	return
 }
 
 func SaveFile(outputDir, title, ext, content string) (err error) {

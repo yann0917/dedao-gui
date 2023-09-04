@@ -11,6 +11,7 @@ require (
 	github.com/chromedp/chromedp v0.9.2
 	github.com/gabriel-vasile/mimetype v1.4.2
 	github.com/go-resty/resty/v2 v2.7.0
+	github.com/gomarkdown/markdown v0.0.0-20230716120725-531d2d74bc12
 	github.com/json-iterator/go v1.1.12
 	github.com/mattn/go-colorable v0.1.13
 	github.com/mitchellh/mapstructure v1.5.0
