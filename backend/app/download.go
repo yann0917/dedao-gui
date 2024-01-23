@@ -360,13 +360,17 @@ func extOdobDownloadData(info *services.Course) []downloader.Datum {
 	if !info.HasPlayAuth {
 		isCanDL = false
 	}
+	detail, err := getService().AudioDetailAlias(aliasID)
+	if err != nil {
+		return nil
+	}
 	datum := &downloader.Datum{
 		ID:      info.ID,
 		Enid:    info.Enid,
 		ClassID: info.ClassID,
 		Title:   info.Title,
 		IsCanDL: isCanDL,
-		M3U8URL: info.AudioDetail.Mp3PlayURL,
+		M3U8URL: detail.Mp3PlayURL,
 		Streams: streams,
 		Type:    "audio",
 	}

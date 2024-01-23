@@ -2,9 +2,9 @@ import {settingStore} from "../stores/setting";
 import {OpenDirectoryDialog} from "../../wailsjs/go/backend/App";
 const store = settingStore()
 export const secondToHour = function (msd:number) {
-    let second = 0; // 秒  
-    let minute = 0; // 分  
-    let hour = 0; // 小时  
+    let second = 0; // 秒
+    let minute = 0; // 分
+    let hour = 0; // 小时
     if (msd > 0) {
       minute = Number(Math.floor(msd / 60).toFixed(0));
       second = msd % 60;
@@ -14,7 +14,7 @@ export const secondToHour = function (msd:number) {
       }
     }
     var result = ""
-    if (second > 0) { 
+    if (second > 0) {
       result += second >=10 ? second + "秒": '0'+second + "秒";
     }
     if (minute > 0) {

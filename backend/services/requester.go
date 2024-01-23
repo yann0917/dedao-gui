@@ -190,6 +190,37 @@ func (s *Service) reqAudioByAlias(ids string) (io.ReadCloser, error) {
 	return handleHTTPResponse(resp, err)
 }
 
+// reqAudioDetail 每天听本书书简介
+func (s *Service) reqAudioDetail(topicID string) (io.ReadCloser, error) {
+	resp, err := s.client.R().SetQueryParams(map[string]string{
+		"topic_id_str": topicID,
+	}).
+		Get("pc/odob/pc/audio/detail")
+	return handleHTTPResponse(resp, err)
+}
+
+// reqOdobAudioDetail 请求每天听本书书 音频 info
+func (s *Service) reqOdobAudioDetail(aliasID string) (io.ReadCloser, error) {
+	resp, err := s.client.R().
+		SetBody(map[string]interface{}{
+			"alias_id": aliasID,
+		}).
+		Post("pc/odob/pc/audio/detail/alias")
+
+	return handleHTTPResponse(resp, err)
+}
+
+// reqOdobShelfAdd 请求听书加入书架
+func (s *Service) reqOdobShelfAdd(enIds []string) (io.ReadCloser, error) {
+	resp, err := s.client.R().
+		SetBody(map[string]interface{}{
+			"book_enids": enIds,
+		}).
+		Post("pc/odob/v2/bookrack/pc/add")
+
+	return handleHTTPResponse(resp, err)
+}
+
 // reqEbookDetail 请求电子书详情
 func (s *Service) reqEbookDetail(enid string) (io.ReadCloser, error) {
 	resp, err := s.client.R().

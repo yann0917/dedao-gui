@@ -11,6 +11,8 @@ export function ArticleDetail(arg1:number,arg2:string):Promise<string>;
 
 export function ArticleList(arg1:string,arg2:string,arg3:number,arg4:number):Promise<services.ArticleList>;
 
+export function AudioDetail(arg1:string):Promise<services.AudioInfoResp>;
+
 export function CheckLogin(arg1:string,arg2:string):Promise<backend.LoginResult>;
 
 export function CourseCategory():Promise<Array<services.CourseCategory>>;
@@ -46,6 +48,8 @@ export function Logout():Promise<void>;
 export function NotesTimeline(arg1:string):Promise<services.NotesTimeline>;
 
 export function OdobDownload(arg1:number,arg2:number,arg3:services.Course):Promise<void>;
+
+export function OdobShelfAdd(arg1:Array<string>):Promise<services.EbookShelfAddResp>;
 
 export function OdobUserInfo():Promise<services.OdobVip>;
 

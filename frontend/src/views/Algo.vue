@@ -157,6 +157,7 @@
   </div>
     <EbookInfo v-if="ebookVisible" :enid= "prodEnid" :dialog-visible="ebookVisible" @close="closeDialog"></EbookInfo>
     <CourseInfo v-if="courseVisible" :enid= "prodEnid" :dialog-visible="courseVisible" @close="closeDialog"></CourseInfo>
+    <AudioInfo v-if="audioVisible" :enid= "prodEnid" :dialog-visible="audioVisible" @close="closeDialog"></AudioInfo>
 </template>
 
 <script lang="ts" setup>
@@ -169,8 +170,9 @@ import {
 } from "../../wailsjs/go/backend/App";
 import { services } from "../../wailsjs/go/models";
 import { useRoute, useRouter } from "vue-router";
-import  EbookInfo  from '../components/EbookInfo.vue';
+import EbookInfo  from '../components/EbookInfo.vue';
 import CourseInfo from "../components/CourseInfo.vue";
+import AudioInfo from "../components/AudioInfo.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -182,6 +184,7 @@ const pageSize = ref(4);
 
 const ebookVisible = ref(false);
 const courseVisible = ref(false);
+const audioVisible = ref(false);
 const prodEnid = ref("");
 
 const idxProd = ref(0);
@@ -368,6 +371,8 @@ const handleProd = (enid:string, iType:number)=>{
     ebookVisible.value = true
   } else if(iType == 66) {
     courseVisible.value = true
+  } else if(iType == 13) {
+    audioVisible.value = true
   }
 }
 
@@ -377,6 +382,7 @@ const openDialog = () => {
 const closeDialog = () => {
   ebookVisible.value = false
   courseVisible.value = false
+  audioVisible.value = false
 }
 
 </script>

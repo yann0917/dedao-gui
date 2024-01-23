@@ -32,7 +32,6 @@ const router = createRouter({
                     meta: {
                         name: "首页", requiresAuth:false
                     },
-                   
                 },{
                     path: 'category',
                     name: "category",
@@ -91,7 +90,6 @@ const router = createRouter({
                     meta: {
                         name: "听书书架", requiresAuth:true
                     },
-                   
                 },{
                     path: 'odob/:id',
                     component: () => import("../views/Article.vue"),

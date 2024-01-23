@@ -55,6 +55,36 @@ export namespace backend {
 
 export namespace services {
 	
+	export class AgencyDetail {
+	    id: number;
+	    id_str: string;
+	    name: string;
+	    intro: string;
+	    qcg_id: number;
+	    qcg_member_name: string;
+	    qcg_member_avatar: string;
+	    book_count: number;
+	    uv: number;
+	    status: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new AgencyDetail(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.id_str = source["id_str"];
+	        this.name = source["name"];
+	        this.intro = source["intro"];
+	        this.qcg_id = source["qcg_id"];
+	        this.qcg_member_name = source["qcg_member_name"];
+	        this.qcg_member_avatar = source["qcg_member_avatar"];
+	        this.book_count = source["book_count"];
+	        this.uv = source["uv"];
+	        this.status = source["status"];
+	    }
+	}
 	export class Option {
 	    name: string;
 	    value: string;
@@ -651,6 +681,7 @@ export namespace services {
 	    index_img: string;
 	    reader: string;
 	    reader_name: string;
+	    odob_group_enid: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Audio(source);
@@ -697,6 +728,7 @@ export namespace services {
 	        this.index_img = source["index_img"];
 	        this.reader = source["reader"];
 	        this.reader_name = source["reader_name"];
+	        this.odob_group_enid = source["odob_group_enid"];
 	    }
 	}
 	export class MediaBaseInfo {
@@ -891,6 +923,242 @@ export namespace services {
 	}
 	
 	
+	export class Rank {
+	    rank_number: number;
+	    rank_name: string;
+	    rank_type: number;
+	    rank_desc: string;
+	    dd_url: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Rank(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.rank_number = source["rank_number"];
+	        this.rank_name = source["rank_name"];
+	        this.rank_type = source["rank_type"];
+	        this.rank_desc = source["rank_desc"];
+	        this.dd_url = source["dd_url"];
+	    }
+	}
+	export class LimitFree {
+	    limit_free_expire: boolean;
+	    is_limit_free: boolean;
+	    is_red_packet: boolean;
+	    free_begin_time: number;
+	    free_end_time: number;
+	    free_maximum: number;
+	    consume_num: number;
+	    vip_end_time: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new LimitFree(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.limit_free_expire = source["limit_free_expire"];
+	        this.is_limit_free = source["is_limit_free"];
+	        this.is_red_packet = source["is_red_packet"];
+	        this.free_begin_time = source["free_begin_time"];
+	        this.free_end_time = source["free_end_time"];
+	        this.free_maximum = source["free_maximum"];
+	        this.consume_num = source["consume_num"];
+	        this.vip_end_time = source["vip_end_time"];
+	    }
+	}
+	export class TopicSummary {
+	    id: number;
+	    topic_id: number;
+	    title: string;
+	    sub_title: string;
+	    created_at: string;
+	    updated_at: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TopicSummary(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.topic_id = source["topic_id"];
+	        this.title = source["title"];
+	        this.sub_title = source["sub_title"];
+	        this.created_at = source["created_at"];
+	        this.updated_at = source["updated_at"];
+	    }
+	}
+	export class AudioInfo {
+	    id: number;
+	    audio_id: string;
+	    title: string;
+	    icon: string;
+	    duration: number;
+	    audio_price: string;
+	    audio_summary: string;
+	    publish_time: number;
+	    is_vip_gived: boolean;
+	    is_vip: boolean;
+	    agency_detail: AgencyDetail;
+	    log_id: number;
+	    is_buy: boolean;
+	    in_bookrack: boolean;
+	    progress: number;
+	    tag: string[];
+	    topic_summary: TopicSummary[];
+	    is_limit_free: boolean;
+	    topic_encode_id: string;
+	    h5_share_url: string;
+	    can_share: boolean;
+	    limit_free: LimitFree;
+	    vip_end_time: number;
+	    button_type: number;
+	    has_play_auth: boolean;
+	    rank: Rank;
+	    learn_count: number;
+	    learn_count_desc: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new AudioInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.audio_id = source["audio_id"];
+	        this.title = source["title"];
+	        this.icon = source["icon"];
+	        this.duration = source["duration"];
+	        this.audio_price = source["audio_price"];
+	        this.audio_summary = source["audio_summary"];
+	        this.publish_time = source["publish_time"];
+	        this.is_vip_gived = source["is_vip_gived"];
+	        this.is_vip = source["is_vip"];
+	        this.agency_detail = this.convertValues(source["agency_detail"], AgencyDetail);
+	        this.log_id = source["log_id"];
+	        this.is_buy = source["is_buy"];
+	        this.in_bookrack = source["in_bookrack"];
+	        this.progress = source["progress"];
+	        this.tag = source["tag"];
+	        this.topic_summary = this.convertValues(source["topic_summary"], TopicSummary);
+	        this.is_limit_free = source["is_limit_free"];
+	        this.topic_encode_id = source["topic_encode_id"];
+	        this.h5_share_url = source["h5_share_url"];
+	        this.can_share = source["can_share"];
+	        this.limit_free = this.convertValues(source["limit_free"], LimitFree);
+	        this.vip_end_time = source["vip_end_time"];
+	        this.button_type = source["button_type"];
+	        this.has_play_auth = source["has_play_auth"];
+	        this.rank = this.convertValues(source["rank"], Rank);
+	        this.learn_count = source["learn_count"];
+	        this.learn_count_desc = source["learn_count_desc"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class QualityUser {
+	    avatar: string;
+	    id: string;
+	    name: string;
+	    title: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new QualityUser(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.avatar = source["avatar"];
+	        this.id = source["id"];
+	        this.name = source["name"];
+	        this.title = source["title"];
+	    }
+	}
+	export class Quality {
+	    desc: string;
+	    list: QualityUser[];
+	    paytime: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Quality(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.desc = source["desc"];
+	        this.list = this.convertValues(source["list"], QualityUser);
+	        this.paytime = source["paytime"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class AudioInfoResp {
+	    detail: AudioInfo;
+	    quality: Quality;
+	
+	    static createFrom(source: any = {}) {
+	        return new AudioInfoResp(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.detail = this.convertValues(source["detail"], AudioInfo);
+	        this.quality = this.convertValues(source["quality"], Quality);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class Banner {
 	    beginTime: number;
 	    endTime: number;
@@ -2218,7 +2486,7 @@ export namespace services {
 	}
 	
 	export class EbookShelfAddResp {
-	    // Go type: struct { N int "json:\"n\"" }
+	    // Go type: struct { N int "json:\"n\""; Count int "json:\"count\"" }
 	    data: any;
 	
 	    static createFrom(source: any = {}) {
@@ -2563,6 +2831,7 @@ export namespace services {
 		    return a;
 		}
 	}
+	
 	
 	
 	
@@ -3267,6 +3536,8 @@ export namespace services {
 	        this.log_type = source["log_type"];
 	    }
 	}
+	
+	
 	export class RTab {
 	    id: number;
 	    idstr: string;
@@ -3303,6 +3574,7 @@ export namespace services {
 	        this.search_key = source["search_key"];
 	    }
 	}
+	
 	export class Recommend {
 	    ptype_scene_name: string;
 	    type: number;
@@ -3709,6 +3981,7 @@ export namespace services {
 		    return a;
 		}
 	}
+	
 	
 	
 	

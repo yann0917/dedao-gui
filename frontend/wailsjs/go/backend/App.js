@@ -18,6 +18,10 @@ export function ArticleList(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['ArticleList'](arg1, arg2, arg3, arg4);
 }
 
+export function AudioDetail(arg1) {
+  return window['go']['backend']['App']['AudioDetail'](arg1);
+}
+
 export function CheckLogin(arg1, arg2) {
   return window['go']['backend']['App']['CheckLogin'](arg1, arg2);
 }
@@ -88,6 +92,10 @@ export function NotesTimeline(arg1) {
 
 export function OdobDownload(arg1, arg2, arg3) {
   return window['go']['backend']['App']['OdobDownload'](arg1, arg2, arg3);
+}
+
+export function OdobShelfAdd(arg1) {
+  return window['go']['backend']['App']['OdobShelfAdd'](arg1);
 }
 
 export function OdobUserInfo() {

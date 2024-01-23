@@ -7,6 +7,7 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    AudioInfo: typeof import('./src/components/AudioInfo.vue')['default']
     CourseInfo: typeof import('./src/components/CourseInfo.vue')['default']
     DownloadDialog: typeof import('./src/components/DownloadDialog.vue')['default']
     EbookInfo: typeof import('./src/components/EbookInfo.vue')['default']

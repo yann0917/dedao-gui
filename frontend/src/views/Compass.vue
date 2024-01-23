@@ -1,7 +1,7 @@
 <template>
     <el-table stripe :data="tableData.list" v-loading="loading" height="97%" style="width: 100%"
-        :cell-style="{ textAlign: 'left' }" 
-        :header-cell-style="{ textAlign: 'left' }" 
+        :cell-style="{ textAlign: 'left' }"
+        :header-cell-style="{ textAlign: 'left' }"
         :row-style="{ height: '30px' }"
         table-layout="auto">
         <el-table-column prop="id" label="ID" width="100" />
@@ -32,34 +32,11 @@
                 </el-popover>
             </template>
         </el-table-column>
-
-<!--        <el-table-column fixed="right" label="操作" width="200">-->
-<!--            <template #default="scope">-->
-<!--                <el-button icon="view" size="small" type="primary" link @click="getCourseInfo(scope.row.enid)">详情-->
-<!--                </el-button> -->
-<!--                <el-button icon="download" size="small" type="primary" link @click="openDownloadDialog(scope.row)">下载-->
-<!--                </el-button>-->
-<!--            </template>-->
-<!--        </el-table-column>-->
     </el-table>
     <Pagination :total="total" @pageChange="handleChangePage"></Pagination>
 
-
-<!--    <el-dialog v-model="dialogDownloadVisible" title="请选择下载格式" align-center center width="30%">-->
-<!--        <el-select v-model="downloadType" placeholder="请选择下载格式">-->
-<!--            <el-option v-for="item in downloadTypeOptions" :key="item.value" :label="item.label" :value="item.value" />-->
-<!--        </el-select>-->
-<!--        <template #footer>-->
-<!--            <span class="dialog-footer">-->
-<!--                <el-button @click="closeDownloadDialog">取消</el-button>-->
-<!--                <el-button type="primary" @click="download(downloadId, downloadType)">-->
-<!--                    确认-->
-<!--                </el-button>-->
-<!--            </span>-->
-<!--        </template>-->
-<!--    </el-dialog>-->
 </template>
-  
+
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'

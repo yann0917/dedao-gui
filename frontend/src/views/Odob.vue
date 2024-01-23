@@ -40,6 +40,10 @@
                 </el-button>
                 <el-button icon="Memo" size="small" type="primary" link @click="gotoArticleDetail(scope.row)">文稿
                 </el-button>
+                <el-tooltip content="详情">
+                <el-button icon="view" size="small" type="primary" link @click="handleProd(scope.row.enid)">
+                </el-button>
+              </el-tooltip>
                 <el-button icon="download" size="small" type="primary" link @click="openDownloadDialog(scope.row)">下载
                 </el-button>
 
@@ -47,6 +51,7 @@
         </el-table-column>
     </el-table>
     <Pagination :total="total" @pageChange="handleChangePage"></Pagination>
+    <audio-info v-if="dialogVisible" :enid="prodEnid" :dialog-visible="dialogVisible" @close="closeDialog"></audio-info>
 
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="60%" :before-close="closeDialog">
         <el-space wrap>
@@ -117,6 +122,7 @@ import {ElMessage, ElTable} from 'element-plus'
 import {CourseCategory, CourseList, OdobDownload, SetDir} from '../../wailsjs/go/backend/App'
 import {services} from '../../wailsjs/go/models'
 import Pagination from '../components/Pagination.vue'
+import AudioInfo from '../components/AudioInfo.vue'
 import {useRouter} from 'vue-router'
 import {userStore} from '../stores/user';
 import {settingStore} from "../stores/setting";
@@ -141,6 +147,7 @@ const total = ref(0)
 const pageSize = ref(15)
 const searchInfo = ref({})
 const dialogVisible = ref(false)
+const prodEnid = ref("")
 
 const dialogDownloadVisible = ref(false)
 const downloadType = ref(1)
@@ -333,6 +340,11 @@ const download = async (id: number, dType: number) => {
 const gotoArticleDetail = (row: any) => {
     let id = row.audio_detail.alias_id
     router.push({path: `/odob/${id}`, query: {from: "odob"}})
+}
+
+const handleProd = (enid: string) => {
+    prodEnid.value = enid
+    dialogVisible.value = true
 }
 
 </script>

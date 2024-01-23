@@ -176,7 +176,8 @@ type EbookScore struct {
 
 type EbookShelfAddResp struct {
 	Data struct {
-		N int `json:"n"`
+		N     int `json:"n"`
+		Count int `json:"count"`
 	} `json:"data"`
 }
 
