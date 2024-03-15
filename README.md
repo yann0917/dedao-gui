@@ -1,15 +1,16 @@
 # 得到课程下载桌面端
 
-> wails + go + vue 构建的《得到》APP 课程下载桌面客户端 
+> wails + go + vue 构建的《得到》APP 课程下载桌面客户端
 
 技术栈如下：
+
 > 1. [wails快速入门](https://wails.io/zh-Hans/)
 > 2. [Vue3.x](https://cn.vuejs.org/guide/introduction.html)
 > 3. [Vue Router 4.x](https://router.vuejs.org/zh/introduction.html)
 > 4. [vue3 element-plus](https://element-plus.gitee.io/zh-CN/)
 > 5. [typeScript](https://www.typescriptlang.org/zh/docs/)
 > 6. [Vite](https://cn.vitejs.dev/)
-> 7. [pinia](https://pinia.vuejs.org/zh/) 
+> 7. [pinia](https://pinia.vuejs.org/zh/)
 
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/yann0917/dedao-gui)
 [![Go Report Card](https://goreportcard.com/badge/github.com/yann0917/dedao-gui)](https://goreportcard.com/report/github.com/yann0917/dedao-gui)
@@ -29,7 +30,7 @@
 * 可查看**购买**的课程，课程详情，课程文章列表，可播放课程音频
 * 可查看听书书架列表，听书文稿，可播放每天听本书音频
 * 可查看电子书架列表，电子书详情，书评，可加入书架
-* 可查看已购买的锦囊  
+* 可查看已购买的锦囊
 * 可查看知识城邦
 * 课程可生成PDF，文稿生成 Markdown 文档，也可生成 mp3 文件
 * 每天听本书可下载音频，文稿生成 pdf、 Markdown 文档
@@ -47,7 +48,7 @@
 
 1. `运行 go install github.com/wailsapp/wails/v2/cmd/wails@latest` 安装 Wails CLI。
 2. clone 该项目，从项目目录，执行 `wails build`，即可构建二进制文件
-   
+
 ### 安装依赖
 
 wails 构建需要安装以下依赖：
@@ -58,12 +59,14 @@ wails 构建需要安装以下依赖：
 如果需要下载相应格式的内容，请按照下载需求，安装下列依赖：
 
 #### pdf下载
+
 * google chrome
   > 课程生成 PDF 需要借助 [Google-Chrome](https://www.google.cn/intl/zh-CN/chrome/)的渲染引擎
 * wkhtmltopdf
   > 电子书转 PDF 需要借助[wkhtmltopdf](https://wkhtmltopdf.org/downloads.html)
 
 #### 音频下载
+
 * ffmpeg
   > 音频需要借助 [ffmpeg](https://ffmpeg.org/) 合成
 

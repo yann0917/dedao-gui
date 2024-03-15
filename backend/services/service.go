@@ -145,7 +145,7 @@ func NewService(co *CookieOptions) *Service {
 	}
 
 	client := resty.New()
-	client.SetDebug(true)
+	client.SetDebug(false)
 	client.SetBaseURL(baseURL).
 		SetCookies(cookies).
 		SetHeaderVerbatim("User-Agent", UserAgent).
