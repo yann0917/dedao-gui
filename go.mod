@@ -1,25 +1,23 @@
 module github.com/yann0917/dedao-gui
 
-go 1.21
-
-toolchain go1.21.4
+go 1.20
 
 require (
 	github.com/JoshVarga/svgparser v0.0.0-20200804023048-5eaba627a7d1
 	github.com/PuerkitoBio/goquery v1.9.2
-	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.9.2
+	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.9.3
 	github.com/bmaupin/go-epub v1.1.0
-	github.com/chromedp/cdproto v0.0.0-20240524221637-55927c2a4565
-	github.com/chromedp/chromedp v0.9.5
-	github.com/gabriel-vasile/mimetype v1.4.4
-	github.com/go-resty/resty/v2 v2.13.1
-	github.com/gomarkdown/markdown v0.0.0-20240419095408-642f0ee99ae2
+	github.com/chromedp/cdproto v0.0.0-20240810084448-b931b754e476
+	github.com/chromedp/chromedp v0.10.0
+	github.com/gabriel-vasile/mimetype v1.4.5
+	github.com/go-resty/resty/v2 v2.14.0
+	github.com/gomarkdown/markdown v0.0.0-20240730141124-034f12af3bf6
 	github.com/json-iterator/go v1.1.12
 	github.com/mattn/go-colorable v0.1.13
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
-	github.com/wailsapp/wails/v2 v2.8.2
-	golang.org/x/sync v0.7.0
+	github.com/wailsapp/wails/v2 v2.9.1
+	golang.org/x/sync v0.8.0
 )
 
 require (
@@ -55,9 +53,9 @@ require (
 	github.com/vincent-petithory/dataurl v1.0.0 // indirect
 	github.com/wailsapp/go-webview2 v1.0.10 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
-	golang.org/x/crypto v0.23.0 // indirect
+	golang.org/x/crypto v0.25.0 // indirect
 	golang.org/x/exp v0.0.0-20240525044651-4c93da0ed11d // indirect
-	golang.org/x/net v0.25.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
-	golang.org/x/text v0.15.0 // indirect
+	golang.org/x/net v0.27.0 // indirect
+	golang.org/x/sys v0.22.0 // indirect
+	golang.org/x/text v0.16.0 // indirect
 )

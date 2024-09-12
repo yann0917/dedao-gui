@@ -2,6 +2,8 @@ package utils
 
 import (
 	"bytes"
+	"fmt"
+	"html"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -272,7 +274,6 @@ func OneByOneHtml(eType string, index int, svgContent *SvgContent, toc []EbookTo
 		vaild.Read(vaildReader)
 
 		element, err1 := svgparser.Parse(bytes.NewReader(vaildReader), false)
-
 		if err1 != nil {
 			err = err1
 			return
@@ -339,7 +340,7 @@ func OneByOneHtml(eType string, index int, svgContent *SvgContent, toc []EbookTo
 							`" alt="` + item.Alt +
 							`" title="` + item.Alt + `"/>`
 						if len(style) > 0 {
-							img = `<div style=">` + style + `">` + img + `</div>`
+							img = `<div style="` + style + `">` + img + `</div>`
 						}
 						if (w < footNoteImgW || h < footNoteImgH) && len(item.Class) > 0 {
 							img = `
@@ -356,18 +357,21 @@ func OneByOneHtml(eType string, index int, svgContent *SvgContent, toc []EbookTo
 							`" src="` + item.Href +
 							`" alt="` + item.Alt + `"/>`
 						if len(style) > 0 {
-							img = `<div style=">` + style + `">` + img + `</div>`
+							img = `<div style="` + style + `">` + img + `</div>`
 						}
 						if w < footNoteImgW {
 							// epub popup comment
 							if len(item.Class) > 0 {
 								footnoteId := "footnote-" + strconv.Itoa(index) + "-" + strconv.Itoa(i)
 								img = `
-	<sup><a epub:type="noteref" href="#` + footnoteId + `"> <img width="` + strconv.FormatFloat(w, 'f', 0, 64) +
+	<sup><a class="duokan-footnote" epub:type="noteref" href="#` + footnoteId + `"> <img width="` + strconv.FormatFloat(w, 'f', 0, 64) +
 									`" src="` + item.Href +
 									`" alt="` + item.Alt +
-									`" class="` + item.Class + `"/></a></sup>`
-								result += `<aside epub:type="footnote" id="` + footnoteId + `">` + item.Alt + `</aside>`
+									`" zy-footnote="` + item.Alt +
+									`" class="` + item.Class + ` zhangyue-footnote qqreader-footnote"/></a></sup>`
+								result += `<aside epub:type="footnote" id="` + footnoteId +
+									`"><ol class="duokan-footnote-content" style="list-style:none;padding:0px;margin:0px;"><li class="duokan-footnote-item" id="` +
+									footnoteId + `"></a>` + item.Alt + `</li></ol></aside>`
 							}
 						}
 					}
@@ -401,63 +405,61 @@ func OneByOneHtml(eType string, index int, svgContent *SvgContent, toc []EbookTo
 
 				case "text":
 					if hasUncloseSpan && item.Style != currentSpanStyle {
-						cont += `</span>`
+						cont += "</span>"
 						hasUncloseSpan = false
 					}
 
-					keepStyle := item.Style != lineStyle
-					if keepStyle && !hasUncloseSpan {
-						cont += `<span style="` + item.Style + `">`
+					if item.Style != lineStyle && !hasUncloseSpan {
+						cont += fmt.Sprintf(`<span style="%s">`, item.Style)
 						currentSpanStyle = item.Style
 						hasUncloseSpan = true
 					}
 
 					if firstX >= centerL && firstX <= centerH {
-						style = style + "display: block;text-align:center;"
+						style += "display: block;text-align:center;"
 					} else if firstX >= rightL {
-						style = style + "display: block;text-align:right;"
+						style += "display: block;text-align:right;"
 					}
-					if item.Content == "<" {
-						item.Content = "&lt;"
+
+					item.Content = html.EscapeString(item.Content)
+
+					tags := []struct {
+						condition bool
+						open      string
+						close     string
+					}{
+						{item.IsBold, "<b>", "</b>"},
+						{item.IsItalic, "<i>", "</i>"},
+						{item.IsFn, "<sup>", "</sup>"},
+						{item.IsSub, "<sub>", "</sub>"},
 					}
-					if item.Content == ">" {
-						item.Content = "&gt;"
-					}
-					if item.IsBold {
-						cont += `<b>`
-					}
-					if item.IsItalic {
-						cont += `<i>`
-					}
-					if item.IsFn {
-						cont += `<sup>`
-					}
-					if item.IsSub {
-						cont += `<sub>`
-					}
-					if item.Fn.Href != "" {
-						cont += `<a id=` + item.ID + ` href=` + item.Fn.Href
-						if item.Fn.Style != "" {
-							cont += ` style="` + item.Fn.Style + `"`
+
+					for _, tag := range tags {
+						if tag.condition {
+							cont += tag.open
 						}
-						cont += `>`
 					}
-					cont += item.Content
+
 					if item.Fn.Href != "" {
-						cont += `</a>`
+						cont += fmt.Sprintf(`<a id=%s href=%s`, item.ID, item.Fn.Href)
+						if item.Fn.Style != "" {
+							cont += fmt.Sprintf(` style="%s"`, item.Fn.Style)
+						}
+						cont += ">"
 					}
-					if item.IsFn {
-						cont += `</sup>`
+
+					cont += item.Content
+
+					if item.Fn.Href != "" {
+						cont += "</a>"
 					}
-					if item.IsSub {
-						cont += `</sub>`
+
+					for i := len(tags) - 1; i >= 0; i-- {
+						if tags[i].condition {
+							cont += tags[i].close
+						}
 					}
-					if item.IsItalic {
-						cont += `</i>`
-					}
-					if item.IsBold {
-						cont += `</b>`
-					}
+
 					contWOTag += item.Content
 				}
 				if i == len(lineContent[v])-1 {
@@ -521,7 +523,7 @@ func OneByOneHtml(eType string, index int, svgContent *SvgContent, toc []EbookTo
 
 func GenHeadHtml() (result string) {
 	result = `<!DOCTYPE html>
-<html>
+<html xml:lang="zh-CN" xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops>
 <head>
 	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -535,7 +537,7 @@ func GenHeadHtml() (result string) {
 		@font-face { font-family: "Source Code Pro"; src:local("Source Code Pro"), url("https://imgcdn.umiwi.com/ttf/0315911806889993935644188722660020367983.ttf"); }
 		table, tr, td, th, tbody, thead, tfoot {page-break-inside: avoid !important;}
 		img { page-break-inside: avoid; max-width: 100% !important;}
-		img.epub-footnote { padding-right:5px;}
+		img.epub-footnote { margin-right:5px;display: inline;font-size: 12px;}
 	</style>
 </head>
 <body>`
