@@ -244,6 +244,7 @@ func AllInOneHtml(svgContents []*SvgContent, toc []EbookToc) (result string, err
 	result += `
 </body>
 </html>`
+	result = html.UnescapeString(result)
 	return
 }
 
@@ -269,11 +270,11 @@ func OneByOneHtml(eType string, index int, svgContent *SvgContent, toc []EbookTo
 <div id="` + svgContent.ChapterID + `">`
 		reader := strings.NewReader(content)
 
-		vaild := NewValidUTF8Reader(reader)
-		vaildReader := []byte(content)
-		vaild.Read(vaildReader)
+		valid := NewValidUTF8Reader(reader)
+		validReader := []byte(content)
+		_, _ = valid.Read(validReader)
 
-		element, err1 := svgparser.Parse(bytes.NewReader(vaildReader), false)
+		element, err1 := svgparser.Parse(bytes.NewReader(validReader), false)
 		if err1 != nil {
 			err = err1
 			return
@@ -464,11 +465,13 @@ func OneByOneHtml(eType string, index int, svgContent *SvgContent, toc []EbookTo
 				}
 				if i == len(lineContent[v])-1 {
 					matchH := false
+					contWOTag = html.UnescapeString(contWOTag)
 					contWOTag = strings.ReplaceAll(contWOTag, "&nbsp;", "")
 
 					level := 0
 					for k, v := range tocLevel {
-						if strings.Contains(strings.ReplaceAll(k, " ", ""), contWOTag) {
+						contWOTagMatch := strings.ReplaceAll(contWOTag, "&nbsp;", "")
+						if strings.Contains(strings.ReplaceAll(k, " ", ""), contWOTagMatch) {
 							matchH, level = true, v
 							break
 						}
@@ -518,12 +521,13 @@ func OneByOneHtml(eType string, index int, svgContent *SvgContent, toc []EbookTo
 </html>`
 		}
 	}
+	result = html.UnescapeString(result)
 	return
 }
 
 func GenHeadHtml() (result string) {
 	result = `<!DOCTYPE html>
-<html xml:lang="zh-CN" xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops>
+<html lang="zh-CN" xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
 <head>
 	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
