@@ -106,7 +106,7 @@ const download = async () => {
                 }
             })
             await EbookDownload(props.downloadId, downloadType.value, props.enId).then((info) => {
-                console.log(info)
+                // console.log(info)
             }).catch((error) => {
                 ElMessage({
                     message: error,

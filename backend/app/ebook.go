@@ -2,6 +2,9 @@ package app
 
 import (
 	"context"
+	"crypto/aes"
+	"crypto/cipher"
+	"encoding/base64"
 	"fmt"
 	"strings"
 	"sync"
@@ -57,7 +60,7 @@ func EbookPage(ctx context.Context, enID string) (info *services.EbookInfo, svgC
 	if err != nil {
 		return
 	}
-	wgp := utils.NewWaitGroupPool(10)
+	wgp := utils.NewWaitGroupPool(5)
 	total, curr := len(info.BookInfo.Orders), 0
 	var chapterMap sync.Map
 	for _, ebookToc := range info.BookInfo.Toc {
@@ -112,7 +115,8 @@ func generateEbookPages(chapterID, token string, index, count, offset int) (svgL
 	}
 
 	for _, item := range pageList.Pages {
-		svgList = append(svgList, item.Svg)
+		desContents := DecryptAES(item.Svg)
+		svgList = append(svgList, desContents)
 	}
 	// fmt.Printf("IsEnd:%#v\n", pageList.IsEnd)
 	if !pageList.IsEnd {
@@ -129,4 +133,36 @@ func generateEbookPages(chapterID, token string, index, count, offset int) (svgL
 	// FIXME: debug
 	// err = utils.SaveFile(OutputDir, chapterID, "", strings.Join(svgList, "\n"))
 	return
+}
+
+// PKCS7Unpad 实现PKCS7去填充
+func PKCS7Unpad(data []byte) []byte {
+	length := len(data)
+	unpadding := int(data[length-1])
+	return data[:(length - unpadding)]
+}
+
+// DecryptAES 实现AES - CBC解密
+func DecryptAES(contents string) string {
+	ciphertext, err := base64.StdEncoding.DecodeString(contents)
+	if err != nil {
+		fmt.Println("Base64解码错误:", err)
+		return ""
+	}
+
+	key := []byte("3e4r06tjkpjcevlbslr3d96gdb5ahbmo")
+	iv := []byte("6fd89a1b3a7f48fb")
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return ""
+	}
+
+	blockSize := block.BlockSize()
+	mode := cipher.NewCBCDecrypter(block, iv[:blockSize])
+	plaintext := make([]byte, len(ciphertext))
+	mode.CryptBlocks(plaintext, ciphertext)
+
+	plaintext = PKCS7Unpad(plaintext)
+	return string(plaintext)
 }
