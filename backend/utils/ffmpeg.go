@@ -5,13 +5,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"regexp"
 	"runtime"
 	"strconv"
-	"strings"
 	"syscall"
 )
 
@@ -37,8 +35,8 @@ func runMergeCmd(ctx context.Context, cmd *exec.Cmd, paths []string, mergeFilePa
 		return fmt.Errorf("create stderr pipe: %v", err)
 	}
 	
-	// 同时将输出存储到buffer以便错误处理
-	cmd.Stderr = io.MultiWriter(&stderr, stderrPipe)
+	// 设置错误输出到stderr buffer
+	cmd.Stderr = &stderr
 	
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("start command: %v", err)
@@ -55,6 +53,9 @@ func runMergeCmd(ctx context.Context, cmd *exec.Cmd, paths []string, mergeFilePa
 		
 		for scanner.Scan() {
 			line := scanner.Text()
+			
+			// 同时复制到stderr buffer用于错误处理
+			stderr.WriteString(line + "\n")
 			
 			// 解析总时长
 			if totalSeconds == 0 {
@@ -108,8 +109,8 @@ func runMergeCmd(ctx context.Context, cmd *exec.Cmd, paths []string, mergeFilePa
 	return nil
 }
 
-// MergeAudio 合并音频文件，支持进度回调
-func MergeAudio(ctx context.Context, paths []string, mergedFilePath string, callback ProgressCallback) error {
+// MergeAudioWithProgress 合并音频文件，支持进度回调
+func MergeAudioWithProgress(ctx context.Context, paths []string, mergedFilePath string, callback ProgressCallback) error {
 	cmds := []string{
 		"-y",
 	}
@@ -120,8 +121,8 @@ func MergeAudio(ctx context.Context, paths []string, mergedFilePath string, call
 	return runMergeCmd(ctx, exec.Command(FfmpegDir, cmds...), paths, "", callback)
 }
 
-// MergeAudioAndVideo 合并音频和视频文件，支持进度回调
-func MergeAudioAndVideo(ctx context.Context, paths []string, mergedFilePath string, callback ProgressCallback) error {
+// MergeAudioAndVideoWithProgress 合并音频和视频文件，支持进度回调
+func MergeAudioAndVideoWithProgress(ctx context.Context, paths []string, mergedFilePath string, callback ProgressCallback) error {
 	cmds := []string{
 		"-y",
 	}
@@ -132,8 +133,8 @@ func MergeAudioAndVideo(ctx context.Context, paths []string, mergedFilePath stri
 	return runMergeCmd(ctx, exec.Command(FfmpegDir, cmds...), paths, "", callback)
 }
 
-// MergeToMP4 将视频片段合并为MP4文件，支持进度回调
-func MergeToMP4(ctx context.Context, paths []string, mergedFilePath string, filename string, callback ProgressCallback) error {
+// MergeToMP4WithProgress 将视频片段合并为MP4文件，支持进度回调
+func MergeToMP4WithProgress(ctx context.Context, paths []string, mergedFilePath string, filename string, callback ProgressCallback) error {
 	mergeFilePath := filename + ".txt" // merge list file should be in the current directory
 	// write ffmpeg input file list
 	mergeFile, _ := os.Create(mergeFilePath)
@@ -153,27 +154,14 @@ func MergeToMP4(ctx context.Context, paths []string, mergedFilePath string, file
 }
 
 // 为了向后兼容，提供不带进度回调的旧API
-func MergeAudioLegacy(paths []string, mergedFilePath string) error {
-	return MergeAudio(context.Background(), paths, mergedFilePath, nil)
-}
-
-func MergeAudioAndVideoLegacy(paths []string, mergedFilePath string) error {
-	return MergeAudioAndVideo(context.Background(), paths, mergedFilePath, nil)
-}
-
-func MergeToMP4Legacy(paths []string, mergedFilePath string, filename string) error {
-	return MergeToMP4(context.Background(), paths, mergedFilePath, filename, nil)
-}
-
-// 向后兼容的API覆盖
 func MergeAudio(paths []string, mergedFilePath string) error {
-	return MergeAudioLegacy(paths, mergedFilePath)
+	return MergeAudioWithProgress(context.Background(), paths, mergedFilePath, nil)
 }
 
 func MergeAudioAndVideo(paths []string, mergedFilePath string) error {
-	return MergeAudioAndVideoLegacy(paths, mergedFilePath)
+	return MergeAudioAndVideoWithProgress(context.Background(), paths, mergedFilePath, nil)
 }
 
 func MergeToMP4(paths []string, mergedFilePath string, filename string) error {
-	return MergeToMP4Legacy(paths, mergedFilePath, filename)
+	return MergeToMP4WithProgress(context.Background(), paths, mergedFilePath, filename, nil)
 }

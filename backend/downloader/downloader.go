@@ -113,13 +113,13 @@ func Download(ctx context.Context, v Datum, stream, path string, progressCallbac
 
 	switch v.Type {
 	case "audio":
-		err = utils.MergeAudio(ctx, parts, fileName, func(percentage int, status string) {
+		err = utils.MergeAudioWithProgress(ctx, parts, fileName, func(percentage int, status string) {
 			if progressCallback != nil {
 				progressCallback(title, percentage, status)
 			}
 		})
 	case "video":
-		err = utils.MergeAudioAndVideo(ctx, parts, fileName, func(percentage int, status string) {
+		err = utils.MergeAudioAndVideoWithProgress(ctx, parts, fileName, func(percentage int, status string) {
 			if progressCallback != nil {
 				progressCallback(title, percentage, status)
 			}
@@ -134,7 +134,7 @@ func Download(ctx context.Context, v Datum, stream, path string, progressCallbac
 }
 
 func downloadAudio(ctx context.Context, m3u8 string, fname string, progressCallback utils.ProgressCallback) (err error) {
-	err = utils.MergeAudio(ctx, []string{m3u8}, fname, progressCallback)
+	err = utils.MergeAudioWithProgress(ctx, []string{m3u8}, fname, progressCallback)
 	return
 }
 
@@ -294,9 +294,4 @@ func PrintToPDF(v Datum, cookies map[string]string, path string) error {
 // 为了向后兼容，保留旧的下载接口
 func DownloadLegacy(v Datum, stream, path string) error {
 	return Download(context.Background(), v, stream, path, nil)
-}
-
-// 用于保持向后兼容的辅助函数
-func Download(v Datum, stream, path string) error {
-	return DownloadLegacy(v, stream, path)
 }
