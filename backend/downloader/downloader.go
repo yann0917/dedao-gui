@@ -1,6 +1,7 @@
 package downloader
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -12,8 +13,11 @@ import (
 	"github.com/yann0917/dedao-gui/backend/utils"
 )
 
-// Download download data
-func Download(v Datum, stream, path string) error {
+// ProgressCallback 进度回调函数类型
+type ProgressCallback func(filename string, percentage int, status string)
+
+// Download download data with progress callback
+func Download(ctx context.Context, v Datum, stream, path string, progressCallback ProgressCallback) error {
 	// 按大到小排序
 	v.genSortedStreams()
 
@@ -40,7 +44,11 @@ func Download(v Datum, stream, path string) error {
 
 	if v.Type == "audio" {
 		fmt.Println(fileName)
-		err = downloadAudio(v.M3U8URL, fileName)
+		err = downloadAudio(ctx, v.M3U8URL, fileName, func(percentage int, status string) {
+			if progressCallback != nil {
+				progressCallback(title, percentage, status)
+			}
+		})
 		if err != nil {
 			fmt.Println(err)
 			return err
@@ -105,9 +113,17 @@ func Download(v Datum, stream, path string) error {
 
 	switch v.Type {
 	case "audio":
-		err = utils.MergeAudio(parts, fileName)
+		err = utils.MergeAudio(ctx, parts, fileName, func(percentage int, status string) {
+			if progressCallback != nil {
+				progressCallback(title, percentage, status)
+			}
+		})
 	case "video":
-		err = utils.MergeAudioAndVideo(parts, fileName)
+		err = utils.MergeAudioAndVideo(ctx, parts, fileName, func(percentage int, status string) {
+			if progressCallback != nil {
+				progressCallback(title, percentage, status)
+			}
+		})
 	}
 
 	if v.Type != "audio" && v.Type != "video" {
@@ -117,8 +133,8 @@ func Download(v Datum, stream, path string) error {
 	return err
 }
 
-func downloadAudio(m3u8 string, fname string) (err error) {
-	err = utils.MergeAudio([]string{m3u8}, fname)
+func downloadAudio(ctx context.Context, m3u8 string, fname string, progressCallback utils.ProgressCallback) (err error) {
+	err = utils.MergeAudio(ctx, []string{m3u8}, fname, progressCallback)
 	return
 }
 
@@ -273,4 +289,14 @@ func PrintToPDF(v Datum, cookies map[string]string, path string) error {
 	fmt.Printf("\033[32;1m%s\033[0m\n", "完成")
 
 	return nil
+}
+
+// 为了向后兼容，保留旧的下载接口
+func DownloadLegacy(v Datum, stream, path string) error {
+	return Download(context.Background(), v, stream, path, nil)
+}
+
+// 用于保持向后兼容的辅助函数
+func Download(v Datum, stream, path string) error {
+	return DownloadLegacy(v, stream, path)
 }
