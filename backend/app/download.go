@@ -73,22 +73,43 @@ func (d *CourseDownload) Download() error {
 
 		total, curr := len(downloadData.Data), 0
 		for _, datum := range downloadData.Data {
+			// 初始进度报告
 			var progress Progress
 			progress.ID = d.ID
 			progress.Total = total
 			curr++
 			progress.Current = curr
-			progress.Pct = curr * 100 / progress.Total
+			progress.Pct = 0 // 开始为0%
 			progress.Value = datum.Title
 			runtime.EventsEmit(d.Ctx, "courseDownload", progress)
+			
 			if !datum.IsCanDL {
 				continue
 			}
+			
 			stream := datum.Enid
-			if err := downloader.Download(datum, stream, path); err != nil {
+			
+			// 使用带进度回调的下载方法
+			ctx := d.Ctx
+			if err := downloader.Download(ctx, datum, stream, path, func(filename string, percentage int, status string) {
+				// 更新进度信息
+				progress.Pct = percentage
+				progress.Value = filename
+				runtime.EventsEmit(ctx, "courseDownload", progress)
+			}); err != nil {
 				errs = append(errs, err)
 			}
 		}
+		
+		// 下载完成后，发送100%进度信息
+		var finalProgress Progress
+		finalProgress.ID = d.ID
+		finalProgress.Total = total
+		finalProgress.Current = total
+		finalProgress.Pct = 100
+		finalProgress.Value = "下载完成"
+		runtime.EventsEmit(d.Ctx, "courseDownload", finalProgress)
+		
 		if len(errs) > 0 {
 			return errs[0]
 		}
@@ -128,7 +149,6 @@ func (d *CourseDownload) Download() error {
 		return DownloadMarkdown(articles, d.AID, path, d.Ctx)
 	}
 	return nil
-
 }
 
 func (d *OdobDownload) Download() error {
@@ -147,22 +167,43 @@ func (d *OdobDownload) Download() error {
 		}
 		total, curr := len(downloadData.Data), 0
 		for _, datum := range downloadData.Data {
+			// 初始进度报告
 			var progress Progress
 			progress.ID = d.ID
 			progress.Total = total
 			curr++
 			progress.Current = curr
-			progress.Pct = curr * 100 / progress.Total
+			progress.Pct = 0 // 开始为0%
 			progress.Value = datum.Title + ".mp3"
 			runtime.EventsEmit(d.Ctx, "odobDownload", progress)
+			
 			if !datum.IsCanDL {
 				continue
 			}
+			
 			stream := datum.Enid
-			if err := downloader.Download(datum, stream, path); err != nil {
+			
+			// 使用带进度回调的下载方法
+			ctx := d.Ctx
+			if err := downloader.Download(ctx, datum, stream, path, func(filename string, percentage int, status string) {
+				// 更新进度信息
+				progress.Pct = percentage
+				progress.Value = filename
+				runtime.EventsEmit(ctx, "odobDownload", progress)
+			}); err != nil {
 				errors = append(errors, err)
 			}
 		}
+		
+		// 下载完成后，发送100%进度信息
+		var finalProgress Progress
+		finalProgress.ID = d.ID
+		finalProgress.Total = total
+		finalProgress.Current = total
+		finalProgress.Pct = 100
+		finalProgress.Value = "下载完成"
+		runtime.EventsEmit(d.Ctx, "odobDownload", finalProgress)
+		
 		if len(errors) > 0 {
 			return errors[0]
 		}

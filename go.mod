@@ -1,6 +1,8 @@
 module github.com/yann0917/dedao-gui
 
-go 1.20
+go 1.23.0
+
+toolchain go1.24.1
 
 require (
 	github.com/JoshVarga/svgparser v0.0.0-20200804023048-5eaba627a7d1
