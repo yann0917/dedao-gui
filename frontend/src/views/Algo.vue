@@ -1,163 +1,148 @@
 <template>
   <div class="category">
     <div class="filters">
-      <div class="filter-container filter-section-dash">
-        <el-row :gutter="10">
-          <el-col :span="2" style="font-size: larger">
-            {{ productTypes.title }}</el-col
-          >
-          <el-button
-            text
-            style="font-size: small"
-            v-for="(item, index) in productTypes.options"
-            @click="handleFilter(item, index, 1)"
-            :class="idxProd == index ? 'active-btn' : ''"
-            >{{ item.name }}</el-button
-          >
+      <div class="filter-container">
+        <el-row class="filter-row" :gutter="24">
+          <el-col :span="2" class="filter-label">
+            {{ productTypes.title }}
+          </el-col>
+          <el-col :span="22" class="filter-options">
+            <el-button
+              v-for="(item, index) in productTypes.options"
+              :key="index"
+              :class="['filter-btn', idxProd === index ? 'active-btn' : '']"
+              text
+              @click="handleFilter(item, index, 1)"
+            >
+              {{ item.name }}
+            </el-button>
+          </el-col>
         </el-row>
-        <el-divider border-style="dashed" />
-        <el-row :gutter="20">
-          <el-col :span="2" style="font-size: larger">
-            {{ navigations.title }}</el-col
-          >
-          <el-button
-            text
-            style="font-size: small"
-            v-for="(item, index) in navigations.options"
-            :class="idxLabel == index ? 'active-btn' : ''"
-            @click="handleFilter(item, index, 2)"
-            >{{ item.name }}</el-button
-          >
+
+        <el-divider class="filter-divider" />
+
+        <el-row class="filter-row" :gutter="24">
+          <el-col :span="2" class="filter-label">
+            {{ navigations.title }}
+          </el-col>
+          <el-col :span="22" class="filter-options">
+            <el-button
+              v-for="(item, index) in navigations.options"
+              :key="index"
+              :class="['filter-btn', idxLabel === index ? 'active-btn' : '']"
+              text
+              @click="handleFilter(item, index, 2)"
+            >
+              {{ item.name }}
+            </el-button>
+          </el-col>
         </el-row>
-        <el-row :gutter="20">
-          <el-col :span="2" style="font-size: larger">{{}}</el-col>
+
+        <el-row v-if="subOptions.length > 0" class="filter-row" :gutter="24">
+          <el-col :span="2" class="filter-label"></el-col>
           <el-col :span="22">
-            <div style="background-color: #f7f7f7; text-align: left">
+            <div class="sub-options">
               <el-button
-                text
-                style="font-size: small; padding: 7px"
                 v-for="(item, index) in subOptions"
-                :class="idxSubLabel == index? 'active-btn': ''"
+                :key="index"
+                :class="['filter-btn', idxSubLabel === index ? 'active-btn' : '']"
+                text
                 @click="handleFilter(item, index, 3)"
-                >{{ item.name }}</el-button
               >
+                {{ item.name }}
+              </el-button>
             </div>
           </el-col>
         </el-row>
       </div>
-      <div class="filter-container"></div>
     </div>
 
-    <div class="category-source-container">
-      <p style="text-align: left">已为你找到 <span style="color:#ff6b00">{{ filter.total }}</span> 个内容</p>
-      <div class="sort-filter">
-        <el-row>
-          <el-col :span="1" v-for="item in sort.options">
-            {{ item.name }}</el-col>
-        </el-row>
+    <div class="content-container">
+      <div class="result-header">
+        <div class="result-count">
+          已为你找到 <span class="highlight">{{ filter.total }}</span> 个内容
+        </div>
+        <div class="sort-options">
+          <el-button
+            v-for="item in sort.options"
+            :key="item.value"
+            text
+            class="sort-btn"
+            :class="{ 'active-sort': param.sort_strategy === item.value }"
+            @click="handleSort(item)"
+          >
+            {{ item.name }}
+          </el-button>
+        </div>
       </div>
-      <el-divider />
 
-      <div class="category-source-list">
-            <ul
-              v-infinite-scroll="loadProduction"
-              class="infinite-list"
-              style="overflow-y: auto; max-height: 900px"
-              :infinite-scroll-disabled="infLoadingProd"
-              infinite-scroll-distance="10"
+      <el-divider class="content-divider" />
+
+      <div class="content-list">
+        <ul
+          v-infinite-scroll="loadProduction"
+          class="infinite-list"
+          :infinite-scroll-disabled="infLoadingProd"
+          infinite-scroll-distance="10"
+        >
+          <li
+            v-for="(item, index) in product_list.product_list"
+            :key="index"
+            class="content-item"
+          >
+            <el-card
+              class="content-card"
+              shadow="hover"
+              @click="handleProd(item.id_out, item.item_type)"
             >
-            <el-space wrap>
-              <li
-                class="infinite-list-item"
-                v-for="(item, index) in product_list.product_list"
-              >
-                <el-card
-                  class="box-card"
-                  shadow="hover"
-                  :body-style="{ display: 'flex' }"
-                  style="width: 400px"
-                  @click="handleProd(item.id_out, item.item_type)"
-                >
-                  <img
-                    :src="ossProcess(item.index_img)"
-                    class="source-container-cover"
-                  />
-                  <div>
-                    <div style="width: 290px; height: 120px; text-align: left">
-                      <span style="display: block">{{
-                        productTitle(item.name, 16)
-                      }}</span>
-                      <span style="font-size: small">
-                        {{ productTitle(item.intro, item.item_type == 66? 20:40) }}
-                      </span>
-                      <span
-                        style="font-size: small; display: block; color: gray"
-                        v-if="item.item_type == 66"
-                      >
-                        {{ productTitle(item.lecturer_name_and_title, 20) }}
-                      </span>
-                      <span
-                        style="font-size: small; display: block; color: gray"
-                        v-if="item.item_type == 2"
-                      >
-                        {{ authorList(item.author_list) }}
-                      </span>
-                      <p
-                        v-if="item.item_type == 66"
-                        style="font-size: small; line-height: 0; color: gray"
-                      >
-                        共{{ item.phase_num }}{{ item.price_desc }}
-                      </p>
-                      <el-row>
-                        <el-col :span="14">
-                          <span
-                            v-if="item.score == ''"
-                            style="
-                              text-align: left;
-                              font-size: small;
-                              color: gray;
-                           "
-                          >
-                            暂无评分
-                          </span>
-
-                          <el-rate
-                            v-else
-                            :model-value="handleScore(item.score)"
-                            disabled
-                            show-score
-                            allow-half
-                            size="small"
-                            text-color="#ff6b00"
-                            style="display: block"
-                          />
-                        </el-col>
-                        <el-col :span="1"></el-col>
-                        <el-col :span="9">
-                          <span
-                            v-if="item.learn_user_count > 0"
-                            style="font-weight: 200;
-                            font-size:70%;
-                            text-align: right;
-                            color: gray;
-                            "
-                          >
-                            {{ item.learn_user_count }}人加入学习
-                          </span>
-                        </el-col>
-                      </el-row>
-                    </div>
+              <div class="card-content">
+                <img
+                  :src="ossProcess(item.index_img)"
+                  class="content-cover"
+                  :alt="item.name"
+                />
+                <div class="content-info">
+                  <h3 class="content-title">{{ productTitle(item.name, 16) }}</h3>
+                  <p class="content-intro">{{ productTitle(item.intro, item.item_type === 66 ? 20 : 40) }}</p>
+                  
+                  <div v-if="item.item_type === 66" class="meta-info">
+                    <span class="lecturer">{{ productTitle(item.lecturer_name_and_title, 20) }}</span>
+                    <span class="episode-count">共{{ item.phase_num }}{{ item.price_desc }}</span>
                   </div>
-                </el-card>
-              </li>
-            </el-space>
-            </ul>
+                  
+                  <div v-if="item.item_type === 2" class="meta-info">
+                    <span class="author">{{ authorList(item.author_list) }}</span>
+                  </div>
+
+                  <div class="rating-container">
+                    <div class="rating">
+                      <el-rate
+                        v-if="item.score !== ''"
+                        :model-value="handleScore(item.score)"
+                        disabled
+                        show-score
+                        allow-half
+                        size="small"
+                        text-color="#ff6b00"
+                      />
+                      <span v-else class="no-rating">暂无评分</span>
+                    </div>
+                    <span v-if="item.learn_user_count > 0" class="learner-count">
+                      {{ item.learn_user_count }}人加入学习
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </el-card>
+          </li>
+        </ul>
       </div>
     </div>
+
+    <EbookInfo v-if="ebookVisible" :enid="prodEnid" :dialog-visible="ebookVisible" @close="closeDialog" />
+    <CourseInfo v-if="courseVisible" :enid="prodEnid" :dialog-visible="courseVisible" @close="closeDialog" />
+    <AudioInfo v-if="audioVisible" :enid="prodEnid" :dialog-visible="audioVisible" @close="closeDialog" />
   </div>
-    <EbookInfo v-if="ebookVisible" :enid= "prodEnid" :dialog-visible="ebookVisible" @close="closeDialog"></EbookInfo>
-    <CourseInfo v-if="courseVisible" :enid= "prodEnid" :dialog-visible="courseVisible" @close="closeDialog"></CourseInfo>
-    <AudioInfo v-if="audioVisible" :enid= "prodEnid" :dialog-visible="audioVisible" @close="closeDialog"></AudioInfo>
 </template>
 
 <script lang="ts" setup>
@@ -311,6 +296,7 @@ const getAlgoFilter = async (param: services.AlgoFilterParam) => {
       Object.assign(productTypes, filter.filter.product_types);
       Object.assign(navigations, filter.filter.navigations);
       Object.assign(sort, filter.filter.sort_strategy)
+      console.log(productTypes, navigations, sort);
     })
     .catch((error) => {
       console.log(error);
@@ -318,18 +304,23 @@ const getAlgoFilter = async (param: services.AlgoFilterParam) => {
 };
 
 const getAlgoProduct = async (param: services.AlgoFilterParam) => {
-  await AlgoProduct(param)
-    .then((list) => {
-      console.log(list);
-      Object.assign(product, list);
-      product_list.is_more = product.is_more;
-      product_list.total = product.total;
-      product_list.product_list.push(...product.product_list);
-    })
-    .catch((error) => {
-      console.log(error);
+  loading.value = true;
+  try {
+    const list = await AlgoProduct(param);
+    Object.assign(product, list);
+    product_list.is_more = product.is_more;
+    product_list.total = product.total;
+    product_list.product_list.push(...product.product_list);
+  } catch (error) {
+    console.log(error);
+    ElMessage({
+      message: '获取数据失败',
+      type: 'error'
     });
-  infLoadingProd.value = false;
+  } finally {
+    loading.value = false;
+    infLoadingProd.value = false;
+  }
 };
 
 const ossProcess = (url: string) => {
@@ -385,52 +376,253 @@ const closeDialog = () => {
   audioVisible.value = false
 }
 
+const handleSort = (item: services.Option) => {
+  param.sort_strategy = item.value;
+  param.page = 0;
+  page.value = 0;
+  product_list.product_list = [];
+  getAlgoProduct(param);
+};
+
 </script>
 
 <style scoped lang="scss">
-.category-source-container .source-container-cover {
-  height: 112px;
-  min-width: 84px;
-  width: 84px;
-  position: relative;
-  margin-right: 10px;
-  background: var(--default-background);
-  background-size: contain;
-}
-.active-btn {
-  font-weight: 500;
-  color: #ff6b00;
+.category {
+  padding: 24px;
+  background: #f5f7fa;
+  min-height: calc(100vh - 60px);
 }
 
-ul {
-  padding: 0;
-  margin: 0;
-  text-align: left;
-  list-style: none;
+.filters {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.filter-container {
+  .filter-row {
+    margin-bottom: 16px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .filter-label {
+    color: #333;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 32px;
+  }
+
+  .filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .filter-btn {
+    font-size: 14px;
+    padding: 6px 16px;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: #ff6b00;
+      background: rgba(255, 107, 0, 0.05);
+    }
+  }
+
+  .active-btn {
+    color: #ff6b00;
+    font-weight: 500;
+    background: rgba(255, 107, 0, 0.1);
+  }
+}
+
+.sub-options {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.filter-divider {
+  margin: 16px 0;
+  border-color: #eee;
+}
+
+.content-container {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.result-header {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+
+  .result-count {
+    font-size: 16px;
+    color: #333;
+
+    .highlight {
+      color: #ff6b00;
+      font-weight: 500;
+    }
+  }
+
+  .sort-options {
+    display: flex;
+    gap: 16px;
+
+    .sort-btn {
+      color: #666;
+      font-size: 14px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: #ff6b00;
+      }
+
+      &.active-sort {
+        color: #ff6b00;
+        font-weight: 500;
+      }
+    }
+  }
 }
-ul li {
-  flex-shrink: 0;
+
+.content-divider {
+  margin: 16px 0;
+  border-color: #eee;
 }
-.infinite-list {
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  margin: 0;
+
+.content-list {
+  .infinite-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 24px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+}
+
+.content-item {
+  .content-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+    }
+  }
+}
+
+.card-content {
+  display: flex;
+  gap: 16px;
+}
+
+.content-cover {
+  width: 112px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #f5f7fa;
+}
+
+.content-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   text-align: left;
-  list-style: none;
-  flex-wrap: wrap;
 }
 
-.infinite-list .infinite-list-item:last-child {
-  margin-bottom: 0;
+.content-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+  line-height: 1.4;
+  text-align: left;
 }
 
-.infinite-list .infinite-list-item + .list-item {
-  margin-top: 10px;
+.content-intro {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-align: left;
 }
 
-.el-card {
-  --el-card-padding: 10px;
+.meta-info {
+  font-size: 13px;
+  color: #999;
+  margin-top: auto;
+  text-align: left;
+
+  .lecturer, .author {
+    display: block;
+    margin-bottom: 4px;
+    text-align: left;
+  }
+
+  .episode-count {
+    color: #666;
+    text-align: left;
+  }
+}
+
+.rating-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  text-align: left;
+
+  .rating {
+    text-align: left;
+    .no-rating {
+      font-size: 13px;
+      color: #999;
+    }
+  }
+
+  .learner-count {
+    font-size: 12px;
+    color: #999;
+    text-align: right;
+  }
+}
+
+:deep(.el-card) {
+  border-radius: 12px;
+  border: none;
+  overflow: hidden;
+
+  .el-card__body {
+    padding: 16px;
+    text-align: left;
+  }
+}
+
+:deep(.el-rate) {
+  display: inline-flex;
+  align-items: center;
+  
+  .el-rate__text {
+    color: #ff6b00;
+  }
 }
 </style>

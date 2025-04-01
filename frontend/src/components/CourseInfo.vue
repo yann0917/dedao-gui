@@ -95,7 +95,7 @@
 
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, defineProps } from 'vue'
+import { ref, reactive, onMounted, defineProps, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { CourseInfo } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
@@ -108,49 +108,100 @@ let courseInfo = reactive(new services.CourseInfo)
 courseInfo.class_info = new services.ClassInfo
 courseInfo.intro_article = new services.ArticleIntro
 
-const emits  = defineEmits(['close']);
+const emits = defineEmits(['close']);
 
 const props = defineProps({
-        enid: {
-            type: String,
-            default: ""
-        },
-        dialogVisible:{
-            type: Boolean,
-            default:false
-        }
-    })
-
-onMounted(() => {
-    getCourseInfo(props.enid);
+  enid: {
+    type: String,
+    default: ""
+  },
+  dialogVisible: {
+    type: Boolean,
+    default: false
+  }
 })
 
+// 监听 props 变化
+watch(() => props.dialogVisible, (newVal) => {
+  dialogVisible.value = newVal;
+  if (newVal && props.enid) {
+    getCourseInfo(props.enid);
+  }
+}, { immediate: true })
 
-const openDialog = () => {
-    dialogVisible.value = props.dialogVisible
+// 监听 enid 变化
+watch(() => props.enid, (newVal) => {
+  if (newVal && props.dialogVisible) {
+    getCourseInfo(newVal);
+  }
+})
+
+const resetCourseInfo = () => {
+  courseInfo.class_info = new services.ClassInfo;
+  courseInfo.intro_article = new services.ArticleIntro;
+  averageScore.value = 0;
 }
+
 const closeDialog = () => {
-  courseInfo = reactive(new services.CourseInfo)
-  emits('close')
+  dialogVisible.value = false;
+  resetCourseInfo();
+  emits('close');
 }
-
 
 const getCourseInfo = async (enid: string) => {
-    await CourseInfo(enid).then((info) => {
-        console.log(info)
-        Object.assign(courseInfo, info)
-        averageScore.value = Number(courseInfo.class_comment_info.average_score)
-        openDialog()
-    }).catch((error) => {
-        ElMessage({
-            message: error,
-            type: 'warning'
-        })
-    })
-    return
+  try {
+    const info = await CourseInfo(enid);
+    Object.assign(courseInfo, info);
+    averageScore.value = Number(courseInfo.class_comment_info.average_score);
+    dialogVisible.value = true;
+  } catch (error) {
+    console.error('获取课程信息失败:', error);
+    ElMessage({
+      message: typeof error === 'string' ? error : '获取课程信息失败',
+      type: 'error'
+    });
+    closeDialog(); // 发生错误时关闭对话框并重置状态
+  }
 }
 
 </script>
 
 <style scoped>
+.my-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.my-header h4 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.book-tag {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.outline_img {
+  width: 100%;
+  overflow: hidden;
+  
+  .el-image {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+}
+
+:deep(.el-dialog__header) {
+  padding: 20px 20px 0;
+}
+
+:deep(.el-alert) {
+  margin-bottom: 8px;
+}
 </style>

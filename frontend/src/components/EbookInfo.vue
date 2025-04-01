@@ -83,7 +83,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, defineProps } from 'vue'
 import { ElMessage } from 'element-plus'
-import { EbookInfo,EbookShelfAdd } from '../../wailsjs/go/backend/App'
+import { EbookInfo, EbookShelfAdd } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import { repeat } from 'lodash'
 import { secondToHour } from '../utils/utils'
@@ -94,7 +94,7 @@ const dialogVisible = ref(false)
 
 let ebookInfo = reactive(new services.EbookDetail)
 
-const emits  = defineEmits(['close']);
+const emits = defineEmits(['close']);
 
 const props = defineProps({
         enid: {
@@ -157,7 +157,6 @@ const gotoCommentList = (row: any) => {
         }
     })
 }
-
 </script>
 
 <style scoped>
@@ -186,22 +185,30 @@ const gotoCommentList = (row: any) => {
 .book-intro {
   line-height: 1.6;
 }
+
 .el-tag {
   margin-right: 5px;
-    /* height: auto; */
   text-align: center;
 }
-.section-info{
+
+.section-info {
   display: flex;
   flex-wrap: wrap;
+  margin: 20px 0;
 }
+
 .section-info .item-content {
   position: relative;
   text-align: center;
   min-width: 24%;
   margin-bottom: 15px;
   border-left: 1px solid #d8d8d8;
+  
+  &:first-child {
+    border-left: none;
+  }
 }
+
 .item-content span {
   display: block;
 }
@@ -211,6 +218,7 @@ const gotoCommentList = (row: any) => {
   color: #333;
   letter-spacing: 0;
   line-height: 28px;
+  font-weight: 500;
 }
 
 .item-content .info-text {
@@ -228,11 +236,55 @@ const gotoCommentList = (row: any) => {
 }
 
 .card-header .el-button {
-    /* height: 32px; */
-    border-radius: 8px;
-    font-weight: bold;
-    border-color: #ff6b00;
-    background-color: #ff6b00;
-    color: #fff;
+  border-radius: 8px;
+  font-weight: bold;
+  border-color: #ff6b00;
+  background-color: #ff6b00;
+  color: #fff;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: #ff8533;
+    border-color: #ff8533;
+    transform: translateY(-2px);
+  }
+}
+
+.book-intro {
+  h1 {
+    font-size: 18px;
+    color: #333;
+    margin: 16px 0 8px;
+    
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+  
+  p {
+    color: #666;
+    margin: 0 0 16px;
+    line-height: 1.8;
+  }
+}
+
+:deep(.el-dialog__header) {
+  padding: 20px 20px 0;
+}
+
+:deep(.el-alert) {
+  margin: 16px 0;
+}
+
+:deep(.el-scrollbar) {
+  .scrollbar-catalog-item {
+    display: block;
+    padding: 4px 0;
+    color: #666;
+    
+    &:hover {
+      background-color: #f5f7fa;
+    }
+  }
 }
 </style>
