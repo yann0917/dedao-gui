@@ -1,61 +1,102 @@
 <template>
-    <el-space wrap>
-        <el-card v-for="i in 1" :key="i" class="box-card" width="100%" shadow="hover">
-            <template #header>
-                <div class="card-header">
-                    <el-row :gutter="5" align="middle">
-                        <el-col :span="6">
-                            <el-avatar :size="72" :src="user.avatar" fit="fill" />
-                            <el-button text>{{ user.nickname }}</el-button>
-                        </el-col>
-                        <el-col :span="18" style="text-align: left; line-height: 10px;">
-                            <p>{{ ebookUser.slogan }}</p>
-                            <el-tag class="ml-2" type="warning" v-if="odobUser.user?.is_vip" round>
-                                <el-icon>
-                                    <HotWater />
-                                </el-icon>听书会员
+    <div class="user-center">
+        <el-card class="user-card" shadow="hover">
+            <!-- 用户信息头部 -->
+            <div class="user-header">
+                <div class="user-info">
+                    <el-avatar :size="80" :src="user.avatar" fit="cover" class="user-avatar" />
+                    <div class="user-meta">
+                        <h2 class="nickname">{{ user.nickname }}</h2>
+                        <p class="slogan">{{ ebookUser.slogan }}</p>
+                        <div class="vip-tags">
+                            <el-tag v-if="odobUser.user?.is_vip" class="vip-tag" type="warning" effect="dark" round>
+                                <el-icon><HotWater /></el-icon>
+                                <span>听书会员</span>
                             </el-tag>
-                            <el-tag class="ml-2" type="danger" v-if="ebookUser.is_vip" round>
-                                <el-icon>
-                                    <HotWater />
-                                </el-icon>电子书会员
+                            <el-tag v-if="ebookUser.is_vip" class="vip-tag" type="danger" effect="dark" round>
+                                <el-icon><HotWater /></el-icon>
+                                <span>电子书会员</span>
                             </el-tag>
-                        </el-col>
-                    </el-row>
+                        </div>
+                    </div>
                 </div>
-            </template>
-            <div class="study">
-                <el-tag class="ml-2" type="success">今日学习{{ (user.today_study_time / 60).toFixed(0) }}分钟</el-tag>
-                <el-tag class="ml-2" type="warning">连续{{ user.study_serial_days }}天</el-tag>
-                <el-tag class="ml-2" type="info" v-if="user.is_teacher">教师</el-tag>
             </div>
 
-            <div v-if="odobUser.user.is_vip" style="text-align: left;">
-                <el-divider content-position="left">听书会员</el-divider>
-                <el-alert v-if="odobUser.user.err_tips" :title="odobUser.user.err_tips" type="warning"
-                    :closable="false" />
-                <el-tag class="ml-2" type="danger">听书VIP·{{ timestampToTime(odobUser.user.expire_time) }}到期</el-tag>
-                <el-tag class="ml-2" type="danger">距到期还有{{ odobUser.user.surplus_time }}天</el-tag><br />
-                <el-tag class="ml-2" type="success">本周听书{{ odobUser.user.week_count }}本 /
-                    累计听书{{ odobUser.user.total_count }}本</el-tag><br />
-                <el-tag class="ml-2" type="warning">累计为你节省了{{ odobUser.user.save_price }}{{ odobUser.user.price_desc }}
-                </el-tag>
-            </div>
-            <div v-if="ebookUser.is_vip" style="text-align: left;">
-                <el-divider content-position="left">电子书会员</el-divider>
-                <el-alert v-if="ebookUser.err_tips" :title="ebookUser.err_tips" type="warning" :closable="false" />
-                <el-tag class="ml-2" type="danger">电子书VIP·{{ timestampToTime(ebookUser.expire_time) }}到期</el-tag>
-                <el-tag class="ml-2" type="danger">距到期还有{{ ebookUser.surplus_time }}天</el-tag><br />
-                <el-tag class="ml-2" type="success">本月读书{{ ebookUser.month_count }}本 / 累计读书{{ ebookUser.total_count }}本
-                </el-tag><br />
-                <el-tag class="ml-2" type="warning">累计为你节省了{{ ebookUser.save_price }}{{ ebookUser.price_desc }}</el-tag>
+            <!-- 学习数据 -->
+            <div class="study-stats">
+                <div class="stat-item">
+                    <span class="stat-value">{{ (user.today_study_time / 60).toFixed(0) }}</span>
+                    <span class="stat-label">今日学习(分钟)</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">{{ user.study_serial_days }}</span>
+                    <span class="stat-label">连续学习(天)</span>
+                </div>
+                <el-tag v-if="user.is_teacher" class="teacher-tag" type="info">教师</el-tag>
             </div>
 
+            <!-- 听书会员信息 -->
+            <div v-if="odobUser.user.is_vip" class="membership-section">
+                <div class="section-header">
+                    <h3>听书会员</h3>
+                </div>
+                <el-alert
+                    v-if="odobUser.user.err_tips"
+                    :title="odobUser.user.err_tips"
+                    type="warning"
+                    :closable="false"
+                    class="membership-alert"
+                />
+                <div class="membership-info">
+                    <div class="info-row">
+                        <el-tag type="danger" effect="plain">听书VIP·{{ timestampToTime(odobUser.user.expire_time) }}到期</el-tag>
+                        <el-tag type="danger" effect="plain">距到期还有{{ odobUser.user.surplus_time }}天</el-tag>
+                    </div>
+                    <div class="info-row">
+                        <el-tag type="success" effect="plain">
+                            本周听书{{ odobUser.user.week_count }}本 / 累计听书{{ odobUser.user.total_count }}本
+                        </el-tag>
+                    </div>
+                    <div class="info-row">
+                        <el-tag type="warning" effect="plain">
+                            累计为你节省了{{ odobUser.user.save_price }}{{ odobUser.user.price_desc }}
+                        </el-tag>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 电子书会员信息 -->
+            <div v-if="ebookUser.is_vip" class="membership-section">
+                <div class="section-header">
+                    <h3>电子书会员</h3>
+                </div>
+                <el-alert
+                    v-if="ebookUser.err_tips"
+                    :title="ebookUser.err_tips"
+                    type="warning"
+                    :closable="false"
+                    class="membership-alert"
+                />
+                <div class="membership-info">
+                    <div class="info-row">
+                        <el-tag type="danger" effect="plain">电子书VIP·{{ timestampToTime(ebookUser.expire_time) }}到期</el-tag>
+                        <el-tag type="danger" effect="plain">距到期还有{{ ebookUser.surplus_time }}天</el-tag>
+                    </div>
+                    <div class="info-row">
+                        <el-tag type="success" effect="plain">
+                            本月读书{{ ebookUser.month_count }}本 / 累计读书{{ ebookUser.total_count }}本
+                        </el-tag>
+                    </div>
+                    <div class="info-row">
+                        <el-tag type="warning" effect="plain">
+                            累计为你节省了{{ ebookUser.save_price }}{{ ebookUser.price_desc }}
+                        </el-tag>
+                    </div>
+                </div>
+            </div>
         </el-card>
-    </el-space>
-
+    </div>
 </template>
-
 
 <script lang="ts" setup>
 import { reactive, onMounted } from 'vue'
@@ -113,8 +154,144 @@ getOdobUserInfo()
 
 </script>
 <style scoped>
-.el-tag{
-    margin-right: 5px;
-    margin-bottom: 5px;
+.user-center {
+    padding: 24px;
+    background: #f5f7fa;
+    min-height: calc(100vh - 60px);
+}
+
+.user-card {
+    max-width: 800px;
+    margin: 0 auto;
+    border-radius: 12px;
+}
+
+.user-header {
+    margin-bottom: 30px;
+}
+
+.user-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+}
+
+.user-avatar {
+    border: 4px solid rgba(255, 107, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.user-avatar:hover {
+    transform: scale(1.05);
+}
+
+.user-meta {
+    flex: 1;
+}
+
+.nickname {
+    font-size: 24px;
+    font-weight: 500;
+    color: #333;
+    margin: 0 0 8px;
+}
+
+.slogan {
+    color: #666;
+    font-size: 14px;
+    margin: 0 0 12px;
+}
+
+.vip-tags {
+    display: flex;
+    gap: 12px;
+}
+
+.vip-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+}
+
+.study-stats {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 500;
+    color: #ff6b00;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #666;
+}
+
+.teacher-tag {
+    margin-left: auto;
+    padding: 8px 16px;
+}
+
+.membership-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.section-header {
+    margin-bottom: 20px;
+}
+
+.section-header h3 {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+}
+
+.membership-alert {
+    margin-bottom: 16px;
+}
+
+.membership-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.el-tag {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 6px;
+}
+
+:deep(.el-alert) {
+    border-radius: 8px;
+    margin: 16px 0;
+}
+
+:deep(.el-tag .el-icon) {
+    margin-right: 4px;
 }
 </style>
