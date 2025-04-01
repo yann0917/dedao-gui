@@ -1580,6 +1580,22 @@ export namespace services {
 	    }
 	}
 	
+	export class Comb {
+	    uid: number;
+	    uid_hazy: string;
+	    name: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Comb(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.uid = source["uid"];
+	        this.uid_hazy = source["uid_hazy"];
+	        this.name = source["name"];
+	    }
+	}
 	export class CommentVideo {
 	    card_type: number;
 	    resource: string;
@@ -3139,22 +3155,6 @@ export namespace services {
 	        this.topic_name = source["topic_name"];
 	    }
 	}
-	export class Comb {
-	    uid: number;
-	    uid_hazy: string;
-	    name: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new Comb(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.uid = source["uid"];
-	        this.uid_hazy = source["uid_hazy"];
-	        this.name = source["name"];
-	    }
-	}
 	export class NoteDetail {
 	    detail_title: string;
 	    comb?: Comb[];
@@ -4004,6 +4004,7 @@ export namespace services {
 	    avatar: string;
 	    today_study_time: number;
 	    study_serial_days: number;
+	    IsV: number;
 	    vip_user: VIPUser;
 	    is_teacher: number;
 	    uid_hazy: string;
@@ -4018,6 +4019,7 @@ export namespace services {
 	        this.avatar = source["avatar"];
 	        this.today_study_time = source["today_study_time"];
 	        this.study_serial_days = source["study_serial_days"];
+	        this.IsV = source["IsV"];
 	        this.vip_user = this.convertValues(source["vip_user"], VIPUser);
 	        this.is_teacher = source["is_teacher"];
 	        this.uid_hazy = source["uid_hazy"];
@@ -4041,6 +4043,7 @@ export namespace services {
 		    return a;
 		}
 	}
+	
 	
 	
 	export class VodAdaptiveInfo {

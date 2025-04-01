@@ -1,12 +1,13 @@
 <template>
   <el-row :gutter="30" class="home-banner">
-    <el-col :span="4">
+    <el-col :span="3">
       <el-menu
         default-active=""
         class="classification"
         :collapse="true"
         :router="true"
         active-text-color="#ffd04b"
+        :popper-class="'menu-popper'"
         @open="handleOpen"
         @close="handleClose"
         @mouseleave="mouseleave"
@@ -15,6 +16,7 @@
           :index="item.enid"
           v-for="(item, index) in initial.homeData.categoryList"
           v-show="index < moreCategory"
+          popper-append-to-body
         >
           <template #title>{{ item.name }}</template>
           <el-menu-item
@@ -29,6 +31,7 @@
         <el-sub-menu
           index="more"
           @mouseenter="mouseenter"
+          popper-append-to-body
           v-show="9 == moreCategory"
         >
           <template #title>更多</template>
@@ -44,7 +47,7 @@
         </el-carousel-item>
       </el-carousel>
     </el-col>
-    <el-col :span="4" class="user">
+    <el-col :span="5" class="user">
       <div :class="Local.get('cookies')==null ?'not-login' : 'logged'">
         <div v-if="Local.get('cookies')==null">
           <div class="receive"></div>
@@ -511,7 +514,18 @@ const mouseenter = () => {
 };
 
 const mouseleave = () => {
-  moreCategory.value = 9;
+  // 添加一个小延时，避免菜单闪烁
+  setTimeout(() => {
+    moreCategory.value = 9;
+  }, 100);
+};
+
+const handleOpen = (key: string, keyPath: string[]) => {
+  // 不需要在这里处理 more 的展开
+};
+
+const handleClose = (key: string, keyPath: string[]) => {
+  // 不需要在这里处理 more 的收起
 };
 
 const handleScore = (score: string) => {
@@ -531,12 +545,6 @@ const closeDialog = () => {
   loginVisible.value = false;
   ebookVisible.value = false;
   courseVisible.value = false;
-};
-const handleOpen = (key: string, keyPath: string[]) => {
-  // console.log(key, keyPath);
-};
-const handleClose = (key: string, keyPath: string[]) => {
-  // console.log(key, keyPath);
 };
 
 const gotoCategory = (item: any, label_id: string) => {
@@ -572,34 +580,118 @@ h4 {
 }
 .el-menu {
   border-right: 0;
-}
-.classification {
-  width: 190px;
-  box-shadow: 0 5px 10px rgba(51, 51, 51, 0.06);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
+.classification {
+  width: 160px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  background: #fff;
+}
+
+/* 主菜单项样式 */
 .classification .el-sub-menu {
   position: relative;
   width: 100%;
-  height: 38px;
-  line-height: 38px;
+  height: 48px;
+  line-height: 48px;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-/* .el-menu .el-sub-menu:hover {
-  background-color: rgba(255, 107, 0, 0.06) !important;
-} */
+.classification .el-sub-menu:hover {
+  background-color: #fff5f0;
+}
+
+/* 子菜单项样式 */
 .el-menu .el-menu-item {
   position: relative;
   width: 100%;
-  height: 38px;
-  line-height: 38px;
+  height: 40px;
+  line-height: 40px;
   cursor: pointer;
+  padding: 0 20px;
+  color: #666;
+  transition: all 0.3s ease;
 }
 
-.el-menu-item:hover {
-  background-color: rgba(255, 107, 0, 0.06) !important;
+.el-menu .el-menu-item:hover {
+  background-color: #fff5f0 !important;
+  color: #ff6b00;
 }
+
+.el-menu .el-menu-item.is-active {
+  background-color: #ff6b00 !important;
+  color: #fff;
+}
+
+/* 子菜单弹出层样式 */
+.el-menu--popup {
+  min-width: 180px;
+  padding: 8px 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.el-menu--popup .el-menu-item {
+  height: 40px;
+  line-height: 40px;
+  padding: 0 20px;
+  margin: 0 8px;
+  border-radius: 4px;
+}
+
+/* 菜单标题样式 */
+.el-sub-menu__title {
+  position: relative;
+  padding-left: 20px !important;
+  color: #333;
+  font-weight: 500;
+}
+
+.el-sub-menu__title:hover {
+  background-color: #fff5f0 !important;
+  color: #ff6b00;
+}
+
+/* 菜单图标样式 */
+.el-sub-menu__icon-arrow {
+  color: #999;
+  transition: all 0.3s ease;
+}
+
+.el-sub-menu:hover .el-sub-menu__icon-arrow {
+  color: #ff6b00;
+}
+
+/* 更多菜单样式 */
+.el-sub-menu[index="more"] .el-sub-menu__title {
+  color: #666;
+  font-size: 14px;
+}
+
+/* 优化菜单展开/收起动画 */
+.el-menu-item,
+.el-sub-menu__title {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 菜单分割线 */
+.el-menu-item:not(:last-child) {
+  position: relative;
+}
+
+.el-menu-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 0;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.03);
+}
+
 .el-carousel {
   height: 380px;
 }
@@ -609,22 +701,77 @@ h4 {
 /* .el-scrollbar {
   height: 100px;
 } */
+.el-scrollbar__wrap {
+  overflow-x: hidden;
+}
+
+/* 隐藏水平滚动条 */
+.el-scrollbar__bar.is-horizontal {
+  display: none !important;
+}
+
 .scrollbar-flex-content {
   display: flex;
-  /* border-radius: 8px; */
-  /* background: var(--el-color-info-light-9); */
+  gap: 12px;
+  padding: 4px 0;  /* 只保留上下内边距，移除左右内边距 */
 }
 .cards-cover {
   display: flex;
-  /* border-radius: 8px; */
+  gap: 20px;
 }
 
 .cards-cover .el-card {
   flex-shrink: 0;
   width: 290px;
-  margin-right: 20px;
-  /* background: var(--el-color-info-light-9); */
-  /* color: var(--el-color-info); */
+  transition: all 0.3s ease;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.cards-cover .el-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.cards-cover .el-card img {
+  width: 100%;
+  height: 163px;
+  object-fit: cover;
+  display: block;
+}
+
+.cards-cover .el-card .el-card__body {
+  padding: 16px !important;
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cards-cover .el-card .bottom {
+  margin-top: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--el-border-color-lighter);
+  display: flex;
+  justify-content: center;
+}
+
+.cards-cover .el-card .button {
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+  width: 120px;
+  text-align: center;
+}
+
+.cards-cover .el-card .button:hover,
+.cards-cover .el-card .button:active,
+.cards-cover .el-card .button:focus {
+  padding: 8px 16px;
+  width: 120px;
+}
+
+.cards-cover .el-card:active {
+  transform: translateY(0);
 }
 
 .ebook-cards-cover {
@@ -640,17 +787,43 @@ h4 {
 }
 .scrollbar-item {
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100px;
-  height: 40px;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 32px;
+  color: #666;
+  background: #f5f5f5;
+  transition: all 0.2s ease;
+  min-width: 64px;
   text-align: center;
-  background: var(--el-color-info-light-9);
-  color: var(--el-color-info);
 }
-.el-scrollbar__wrap {
-  overflow-x: hidden;
+.scrollbar-item:hover {
+  color: #ff6b00;
+  background: #f7f7f7;
+}
+.active-btn {
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 32px;
+  background: #ff6b00;
+  color: #fff;
+  min-width: 64px;
+  text-align: center;
+}
+.active-btn:hover {
+  color: #fff !important;
+  background: #ff7b1a;
+}
+/* 覆盖 element-plus 的默认样式 */
+.el-button.is-text {
+  padding: 0 16px;
+  margin: 0;
+}
+.el-button.is-text:not(.is-disabled):hover {
+  background-color: var(--el-fill-color);
 }
 
 .module-title-wrap {
@@ -678,106 +851,203 @@ h4 {
 .el-col {
   border-radius: 4px;
 }
-.active-btn {
-  font-weight: 500;
-  height: 40px;
-  color: #fff;
-  border-radius: 8px;
-  background: #ff6b00;
-  box-shadow: 0px 6px 10px rgba(251, 72, 16, 0.2);
-}
-.el-button.is-text:not(.is-disabled):hover {
-  background-color: var(--el-fill-color);
+
+.home-banner {
+  margin-bottom: 30px;
 }
 
-.home-banner .user {
-  box-shadow: 0 5px 10px rgba(51, 51, 51, 0.06);
-  height: 380px;
-}
-
-.home-banner .user .not-login .receive {
-  width: 89%;
-  height: 0;
-  padding-bottom: calc(89% * (13 / 8));
-  margin: 36px auto 0;
-  background: url(https://piccdn2.umiwi.com/fe-oss/default/MTYzNTIzNTI3OTIw.png)
-    no-repeat;
-  background-size: contain;
-}
-
-.home-banner .user .not-login .login-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 148px;
-  margin: 14px auto 0;
-  border-radius: 8px;
-  line-height: 28px;
-  font-weight: bold;
-  border-color: #ff6b00;
-  background-color: #ff6b00;
-  color: #fff;
-}
-
-.home-banner .user .not-login .login-btn .line {
-  display: inline-block;
-  width: 1px;
-  height: 14px;
-  margin: 0 8px;
-}
-
-.home-banner .user .logged .personal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.home-banner .user .logged .personal .nickname {
-  width: 100%;
-  height: 24px;
-  margin-top: 4px;
-  line-height: 24px;
-  text-align: center;
+/* 左侧菜单样式 */
+.el-menu {
+  border-right: 0;
+  border-radius: 12px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  font-size: 16px;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
 }
 
-.home-banner .user .logged .data {
-  width: 148px;
-  height: 144px;
-  margin-top: 8px;
-  padding: 6px 12px 0;
-  border-radius: 10px;
-  background: url(https://piccdn2.umiwi.com/fe-oss/default/MTYzNTMwNDkxMjc1.png)
-    no-repeat center bottom / 148px 40px;
-  box-shadow: 0 5px 10px rgba(255, 107, 0, 0.1);
+.classification {
+  width: 160px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  background: #fff;
 }
 
-.home-banner .user .logged .data .time {
-  display: flex;
-  padding: 2px 0;
-  line-height: 22px;
-  justify-content: space-between;
+.classification .el-sub-menu {
+  position: relative;
+  width: 100%;
+  height: 48px;
+  line-height: 48px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.home-banner .user .logged .button {
-  height: 32px;
-  margin-top: 16px;
-  border-radius: 8px;
-  font-weight: bold;
-  border-color: #ff6b00;
-  background-color: #ff6b00;
-  color: #fff;
+.classification .el-sub-menu:hover {
+  background-color: #fff5f0;
 }
 
-.home-banner .banner .el-carousel {
-    box-shadow: 0 5px 10px rgba(51, 51, 51, 0.06);
-    /*height: 380px;*/
-    border-radius: 8px;
+/* 中间 banner 样式 */
+.banner {
+  .el-carousel {
+    height: 380px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .el-carousel__item {
+    height: 380px;
+    overflow: hidden;
+  }
+
+  .el-image {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.02);
+    }
+  }
+
+  .el-carousel__arrow {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    color: #666;
+    
+    &:hover {
+      background-color: #fff;
+      color: #ff6b00;
+    }
+  }
 }
 
+/* 右侧用户信息样式 */
+.user {
+  .not-login, .logged {
+    background: #fff;
+    border-radius: 12px;
+    height: 380px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .not-login {
+    .receive {
+      width: 85%;
+      height: 0;
+      padding-bottom: calc(85% * (13 / 8));
+      margin: 36px auto 0;
+      background: url(https://piccdn2.umiwi.com/fe-oss/default/MTYzNTIzNTI3OTIw.png) no-repeat;
+      background-size: contain;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: scale(1.02);
+      }
+    }
+
+    .login-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 160px;
+      height: 44px;
+      margin: 24px auto 0;
+      border-radius: 22px;
+      font-weight: 500;
+      border: none;
+      background-color: #ff6b00;
+      color: #fff;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: #ff7b1a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 107, 0, 0.2);
+      }
+    }
+  }
+
+  .logged {
+    padding: 30px 0;
+
+    .personal {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+
+      .el-avatar {
+        border: 4px solid rgba(255, 107, 0, 0.1);
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+
+      h3 {
+        margin: 16px 0 0;
+        font-size: 18px;
+        color: #333;
+        font-weight: 500;
+        text-align: center;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .data {
+      width: 180px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px 0;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+      background: url(https://piccdn2.umiwi.com/fe-oss/default/MTYzNTMwNDkxMjc1.png) no-repeat center bottom / 180px 40px;
+      
+      .time {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        flex-direction: column;
+        text-align: center;
+        
+        span {
+          color: #666;
+          font-size: 14px;
+          margin-bottom: 4px;
+        }
+        
+        em {
+          font-style: normal;
+          font-size: 28px;
+          color: #ff6b00;
+          font-weight: 500;
+          line-height: 1.2;
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      .el-divider {
+        margin: 20px 0;
+        border-color: rgba(0, 0, 0, 0.06);
+      }
+    }
+  }
+}
+
+/* 确保三列布局间距合适 */
+.el-row {
+  --el-row-gutter: 24px;
+}
+
+.el-col {
+  padding: 0 calc(var(--el-row-gutter) / 2);
+}
 </style>
