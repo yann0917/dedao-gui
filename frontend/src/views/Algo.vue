@@ -296,7 +296,6 @@ const getAlgoFilter = async (param: services.AlgoFilterParam) => {
       Object.assign(productTypes, filter.filter.product_types);
       Object.assign(navigations, filter.filter.navigations);
       Object.assign(sort, filter.filter.sort_strategy)
-      console.log(productTypes, navigations, sort);
     })
     .catch((error) => {
       console.log(error);

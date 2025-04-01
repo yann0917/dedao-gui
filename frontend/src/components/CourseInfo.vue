@@ -121,20 +121,24 @@ const props = defineProps({
   }
 })
 
-// 监听 props 变化
-watch(() => props.dialogVisible, (newVal) => {
-  dialogVisible.value = newVal;
-  if (newVal && props.enid) {
+onMounted(() => {
     getCourseInfo(props.enid);
-  }
-}, { immediate: true })
-
-// 监听 enid 变化
-watch(() => props.enid, (newVal) => {
-  if (newVal && props.dialogVisible) {
-    getCourseInfo(newVal);
-  }
 })
+
+// // 监听 props 变化
+// watch(() => props.dialogVisible, (newVal) => {
+//   dialogVisible.value = newVal;
+//   if (newVal && props.enid) {
+//     getCourseInfo(props.enid);
+//   }
+// }, { immediate: true })
+
+// // 监听 enid 变化
+// watch(() => props.enid, (newVal) => {
+//   if (newVal && props.dialogVisible) {
+//     getCourseInfo(newVal);
+//   }
+// })
 
 const resetCourseInfo = () => {
   courseInfo.class_info = new services.ClassInfo;
