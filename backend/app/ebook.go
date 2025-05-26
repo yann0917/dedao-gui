@@ -89,7 +89,7 @@ func EbookPage(ctx context.Context, enID string) (info *services.EbookInfo, svgC
 				wgp.Done()
 			}()
 			index, count, offset := 0, 20, 0
-			svgList, err1 := generateEbookPages(order.ChapterID, token.Token, index, count, offset)
+			svgList, err1 := generateEbookPages(enID, order.ChapterID, token.Token, index, count, offset)
 			if err1 != nil {
 				err = err1
 				return
@@ -107,8 +107,14 @@ func EbookPage(ctx context.Context, enID string) (info *services.EbookInfo, svgC
 	return
 }
 
-func generateEbookPages(chapterID, token string, index, count, offset int) (svgList []string, err error) {
-	fmt.Printf("chapterID:%#v\n", chapterID)
+func generateEbookPages(enid, chapterID, token string, index, count, offset int) (svgList []string, err error) {
+	// Try to load from cache first
+	if cachedPages, found := services.LoadFromCache(enid, chapterID); found {
+		fmt.Printf("使用缓存内容：%s\n", chapterID)
+		return cachedPages, nil
+	}
+
+	fmt.Printf("下载章节 %s\n", chapterID)
 	pageList, err := getService().EbookPages(chapterID, token, index, count, offset)
 	if err != nil {
 		return
@@ -118,20 +124,29 @@ func generateEbookPages(chapterID, token string, index, count, offset int) (svgL
 		desContents := DecryptAES(item.Svg)
 		svgList = append(svgList, desContents)
 	}
-	// fmt.Printf("IsEnd:%#v\n", pageList.IsEnd)
+
 	if !pageList.IsEnd {
-		index = count
-		count += 20
-		list, err1 := generateEbookPages(chapterID, token, index, count, offset)
+		index += count
+		count = 20
+		fmt.Printf("下载章节 %s 的更多页面 (索引: %d)\n", chapterID, index)
+		list, err1 := generateEbookPages(enid, chapterID, token, index, count, offset)
 		if err1 != nil {
 			err = err1
 			return
 		}
 
 		svgList = append(svgList, list...)
+	} else {
+		fmt.Printf("章节 %s 下载完成 (共 %d 页)\n", chapterID, len(svgList))
 	}
-	// FIXME: debug
-	// err = utils.SaveFile(OutputDir, chapterID, "", strings.Join(svgList, "\n"))
+
+	// Save to cache
+	if err := services.SaveToCache(enid, chapterID, svgList); err != nil {
+		fmt.Printf("警告: 无法缓存章节 %s: %v\n", chapterID, err)
+	} else {
+		fmt.Printf("已缓存章节 %s\n", chapterID)
+	}
+
 	return
 }
 

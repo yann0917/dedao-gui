@@ -24,3 +24,5 @@ coverage.txt
 
 .vscode
 .idea
+.cache
+.DS_Store
