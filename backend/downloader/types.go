@@ -29,6 +29,7 @@ type Datum struct {
 	Type      string `json:"type"`
 	IsCanDL   bool   `json:"is_can_dl"`
 	M3U8URL   string `json:"m3u8_url"`
+	OrderNum  int    `json:"order_num"`
 
 	Streams       map[string]Stream `json:"streams"`
 	sortedStreams []Stream

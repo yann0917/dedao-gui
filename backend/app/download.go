@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -95,30 +96,13 @@ func (d *CourseDownload) Download() error {
 	case 2:
 		// 下载 PDF
 		downloadData := extractDownloadData(course, articles, d.AID, 2)
-		errs := make([]error, 0)
 
 		path, err := utils.Mkdir(OutputDir, utils.FileName(course.ClassInfo.Name, ""), "PDF")
 		if err != nil {
 			return err
 		}
-		total, curr := len(downloadData.Data), 0
-		cookies := LoginedCookies()
-		for _, datum := range downloadData.Data {
-			var progress Progress
-			progress.ID = d.ID
-			progress.Total = total
-			curr++
-			progress.Current = curr
-			progress.Pct = curr * 100 / progress.Total
-			progress.Value = datum.Title
-			runtime.EventsEmit(d.Ctx, "courseDownload", progress)
-			if err := downloader.PrintToPDF(datum, cookies, path); err != nil {
-				errs = append(errs, err)
-			}
-		}
-		if len(errs) > 0 {
-			return errs[0]
-		}
+		return DownloadPdfCourse(downloadData.Data, path, d.Ctx)
+
 	case 3:
 		// 下载 Markdown
 		path, err := utils.Mkdir(OutputDir, utils.FileName(course.ClassInfo.Name, ""), "MD")
@@ -318,6 +302,7 @@ func extractCourseDownloadData(articles *services.ArticleList, aid int, flag int
 				Title:     article.Title,
 				IsCanDL:   isCanDL,
 				M3U8URL:   article.Audio.Mp3PlayURL,
+				OrderNum:  article.OrderNum,
 				Streams:   streams,
 				Type:      "audio",
 			}
@@ -547,6 +532,53 @@ func getMdHeader(level int) string {
 	return ""
 }
 
+func DownloadPdfCourse(list []downloader.Datum, path string, ctx context.Context) error {
+	name, fileName := "", ""
+
+	total, curr := len(list), 0
+	for _, v := range list {
+		var progress Progress
+		progress.ID = v.ID
+		progress.Total = total
+		curr++
+		progress.Current = curr
+		progress.Pct = curr * 100 / progress.Total
+		progress.Value = v.Title
+		runtime.EventsEmit(ctx, "courseDownload", progress)
+		detail, err := ArticleDetail(v.Enid)
+		if err != nil {
+			fmt.Println(err.Error())
+			return err
+		}
+
+		var content []services.Content
+		err = jsoniter.UnmarshalFromString(detail.Content, &content)
+		if err != nil {
+			return err
+		}
+
+		name = utils.FileName(v.Title, "pdf")
+		name = fmt.Sprintf("%03d.%s", v.OrderNum, name)
+		fileName = filepath.Join(path, name)
+		_, exist, err := utils.FileSize(fileName)
+		if err != nil {
+			return err
+		}
+
+		if exist {
+			continue
+		}
+
+		res := ContentsToMarkdown(content)
+
+		err = utils.Md2Pdf(path, name, []byte(res))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func DownloadMarkdown(list *services.ArticleList, aid int, path string, ctx context.Context) error {
 	total, curr := len(list.List), 0
 	for _, v := range list.List {
@@ -574,6 +606,7 @@ func DownloadMarkdown(list *services.ArticleList, aid int, path string, ctx cont
 		}
 
 		name := utils.FileName(v.Title, "md")
+		name = fmt.Sprintf("%03d.%s", v.OrderNum, name)
 		fileName := filepath.Join(path, name)
 		_, exist, err := utils.FileSize(fileName)
 
