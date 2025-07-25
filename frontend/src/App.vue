@@ -2,7 +2,7 @@
 import Menu from './components/Menu.vue'
 import { ElConfigProvider } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
-import zhCn from 'element-plus/lib/locale/lang/zh-cn'
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 </script>
 
 <template>
@@ -20,7 +20,6 @@ import zhCn from 'element-plus/lib/locale/lang/zh-cn'
 </template>
 
 <style lang="scss">
-// @import url("./assets/css/reset.css");
 @import url("./assets/css/font.css");
 
 body {

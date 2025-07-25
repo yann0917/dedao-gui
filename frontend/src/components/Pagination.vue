@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, defineProps } from 'vue';
+import { ref, reactive } from 'vue';
 
 const emits  = defineEmits(['pageChange']);
 const pageSizes = ref([10,15,20,30,50]);

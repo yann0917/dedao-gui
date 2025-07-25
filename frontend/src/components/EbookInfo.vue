@@ -81,7 +81,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, defineProps } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { EbookInfo, EbookShelfAdd } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'

@@ -1,7 +1,7 @@
 <template>
     <el-table :data="tableData.list" v-loading="loading" height="97%" width="100%" :cell-style="{ textAlign: 'left' }"
               :header-cell-style="{ textAlign: 'left' }" :row-style="{ height: '50px' }" table-layout="auto" stripe>
-        <el-table-column prop="id" label="ID" width="100"/>
+        <!-- <el-table-column prop="id" label="ID" width="100"/> -->
         <el-table-column prop="title" label="标题" width="280"/>
         <el-table-column prop="icon" label="封面" width="80">
             <template #default="scope">
@@ -34,7 +34,7 @@
         </el-table-column>
         <el-table-column prop="progress" label="已学%" width="100"/>
 
-        <el-table-column fixed="right" label="操作" width="200">
+        <el-table-column fixed="right" label="操作" width="240">
             <template #default="scope">
                 <el-button icon="VideoPlay" size="small" type="primary" link @click="handlePlay(scope.row)">播放
                 </el-button>

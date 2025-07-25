@@ -2,7 +2,7 @@
     <el-table :data="tableData.list" v-loading="loading" height="97%" width="100%" :cell-style="{ textAlign: 'left' }"
               :header-cell-style="{textAlign: 'left'}" :row-style="{height: '50px'}" table-layout="auto"
               @sort-change="handleChange">
-        <el-table-column prop="id" label="ID" width="100"/>
+        <!-- <el-table-column prop="id" label="ID" width="100"/> -->
         <el-table-column prop="title" label="标题" width="280"/>
         <el-table-column prop="icon" label="封面" width="80">
             <template #default="scope">
@@ -27,9 +27,9 @@
                 </el-popover>
             </template>
         </el-table-column>
-        <el-table-column prop="progress" label="已读%" width="100" align="center">
+        <el-table-column prop="progress" label="已读%" width="80" align="center">
         </el-table-column>
-        <el-table-column fixed="right" label="操作" width="180">
+        <el-table-column fixed="right" label="操作" width="220">
             <template #default="scope">
               <el-tooltip content="书评">
                 <el-button icon="ChatDotRound" size="small" type="primary" link @click="gotoCommentList(scope.row)">

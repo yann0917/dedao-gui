@@ -160,11 +160,10 @@
 </template>
 
 <script  setup lang="ts">
-import {ref, reactive, onMounted, defineProps, watch} from 'vue'
+import {ref, reactive, onMounted, watch} from 'vue'
 import { ElMessage } from 'element-plus'
 import { NotesTimeline,TopicNotesList} from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
-import { arrayExpression } from '@babel/types'
 
 const page = ref(0)
 const total = ref(0)

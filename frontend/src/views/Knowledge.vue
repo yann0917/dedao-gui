@@ -3,7 +3,7 @@
         <el-space wrap>
             <el-row :gutter="10">
                 <el-col :span="16">
-                    <notes-item :topic-detail="topicDetail" :key="timer"/>
+                    <notes-item :topic-detail="topicDetail" :key="timer()"/>
                 </el-col>
                 <el-col :span="8" justify="center">
                     <topic-item :topic-detail="topicDetail" @send-detail="getTopicDetail"/>

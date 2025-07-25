@@ -3,52 +3,48 @@
         <el-breadcrumb-item :to="{ path: '/course' }">课程列表</el-breadcrumb-item>
         <el-breadcrumb-item>{{ breadcrumbTitle }}</el-breadcrumb-item>
     </el-breadcrumb>
-    <el-table :data="tableData.article_list" v-loading="loading" height="97%" style="width: 100%"
-              :cell-style="{ textAlign: 'left' }" :header-cell-style="{ textAlign: 'left' }"
-              :row-style="{ height: '50px' }"
-              table-layout="auto" stripe>
-        <el-table-column prop="id" label="ID" width="100"/>
-        <el-table-column prop="title" label="标题" width="380"/>
-        <el-table-column prop="audio.duration" label="时长" width="100">
-            <template #default="scope">
-                <span v-if="scope.row.video_status == 1">{{ secondToHour(scope.row.video[0]?.duration) }}</span>
-                <span v-else-if="scope.row.audio?.duration">{{ secondToHour(scope.row.audio?.duration) }}</span>
-            </template>
-        </el-table-column>
-        <el-table-column prop="summary" label="简介">
-            <template #default="scope">
-                <el-popover title="简介" trigger="hover" placement="left" :width="480"
-                            :disabled="scope.row.summary.length <= 30">
-                    <p v-html="scope.row.summary?.replaceAll('\n', '<br/>')"></p>
-                    <template #reference>
-            <span slot="reference" v-if="scope.row.summary && scope.row.summary.length <= 30">{{
-                scope.row.summary
-                }}</span>
-                        <span slot="reference" v-if="scope.row.summary && scope.row.summary.length > 30">{{
-                            scope.row.summary.substring(0, 30)
-                            + "..."
-                            }}</span>
-                    </template>
-                </el-popover>
-            </template>
-        </el-table-column>
-        <el-table-column prop="cur_learn_count" label="学习人数" width="100"/>
-        <el-table-column fixed="right" label="操作" width="200">
-            <template #default="scope">
-                <el-button icon="VideoPlay" size="small" type="primary" link @click="handlePlay(scope.row)"
-                           v-if="scope.row.audio_alias_ids.length || scope.row.video_status">播放
-                </el-button>
-                <el-button icon="Memo" size="small" type="primary" link @click="gotoArticleDetail(scope.row)">文稿
-                </el-button>
-                <el-button icon="download" size="small" type="primary" link @click="openDownloadDialog(scope.row)">下载
-                </el-button>
-
-            </template>
-        </el-table-column>
-    </el-table>
-    <el-pagination background v-model:currentPage="page" v-model:page-size="pageSize" :page-sizes="pageSizes"
-                   :total="total" :layout="layout" @current-change="handleChangePage" @size-change="handleSizeChange"/>
-
+    <div
+        v-infinite-scroll="loadMoreArticles"
+        :infinite-scroll-disabled="loading || finished"
+        infinite-scroll-distance="10"
+        @scroll="onScroll"
+    >
+        <ul class="article-list">
+            <li v-for="item in tableData.article_list" :key="item.id" class="article-card">
+                <el-card shadow="hover" class="article-el-card">
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="card-title">{{ item.title }}</span>
+                        </div>
+                        <el-image :src="item.logo" class="card-image" />
+                        <div class="card-meta-row">
+                            <span class="card-meta">
+                                <el-icon><Clock /></el-icon>
+                                {{ item.video_status == 1 ? secondToHour(item.video?.[0]?.duration !== undefined ? item.video[0].duration : 0) : (item.audio?.duration ? secondToHour(item.audio.duration) : '') }}
+                            </span>
+                            <span class="card-meta">
+                                <el-icon><User /></el-icon>
+                                {{ item.cur_learn_count }}
+                            </span>
+                            <span class="card-meta">
+                                <el-icon><Calendar /></el-icon>
+                                {{ item.publish_time ? timestampToDate(item.publish_time) : '' }}
+                            </span>
+                        </div>
+                        <div class="card-actions">
+                            <el-button icon="VideoPlay" size="small" type="primary" link @click="handlePlay(item)"
+                                       v-if="item.audio_alias_ids.length || item.video_status">播放
+                            </el-button>
+                            <el-button icon="Memo" size="small" type="primary" link @click="gotoArticleDetail(item)">文稿</el-button>
+                            <el-button icon="download" size="small" type="primary" link @click="openDownloadDialog(item)">下载</el-button>
+                        </div>
+                    </div>
+                </el-card>
+            </li>
+        </ul>
+        <div v-if="loading" class="loading" style="text-align:center;padding:12px;">加载中...</div>
+        <div v-if="finished && hasScrolled" class="finished" style="text-align:center;padding:12px;color:#999;">没有更多了</div>
+    </div>
     <download-dialog
             v-if="dialogDownloadVisible"
             :dialog-visible="dialogDownloadVisible"
@@ -70,7 +66,6 @@
         <div style="position:relative;" id="video"></div>
     </el-drawer>
 
-
 </template>
 
 <script lang="ts" setup>
@@ -86,6 +81,8 @@ import DownloadDialog from "../components/DownloadDialog.vue";
 import videojs from 'video.js'
 import "video.js/dist/video-js.css"
 import {settingStore} from "../stores/setting";
+import { User, Clock, Calendar } from '@element-plus/icons-vue'
+import { timestampToDate } from '../utils/utils'
 
 const audioPlayer = ref()
 let media = ref()
@@ -96,11 +93,11 @@ const vePlayer = ref()
 const vedioVisible = ref(false)
 // const audiohtml = ref('')
 
-
-const loading = ref(true)
-const page = ref(1)
+const loading = ref(false) // 懒加载 loading 状态
+const finished = ref(false) // 懒加载是否全部加载完
+const page = ref(1) // 当前页码
+const pageSize = ref(30) // 每页条数
 let total = ref(0)
-const pageSize = ref(30)
 const dialogVisible = ref(false)
 const layout = ref('total, sizes, next')
 const pageSizes = ref([10, 15, 20, 30, 50]);
@@ -122,6 +119,11 @@ let enid = ref()
 let maxId = ref()
 let tableData = reactive(new services.ArticleList)
 let breadcrumbTitle = ref()
+const hasScrolled = ref(false)
+
+const onScroll = () => {
+    if (!hasScrolled.value) hasScrolled.value = true
+}
 
 onMounted(() => {
     watch(() => {
@@ -130,10 +132,21 @@ onMounted(() => {
             total.value = Number(route.query.total)
             breadcrumbTitle.value = route.query.title
         },
-        () => getTableData(),
+        () => {
+            // 初始化时清空数据，重置分页
+            tableData.article_list = []
+            page.value = 1
+            finished.value = false
+            maxId.value = 0 // 初始化 maxId
+            // 如果总数为 0，直接 finished，阻止死循环
+            if (!total.value || total.value <= 0) {
+                finished.value = true
+                return
+            }
+            loadMoreArticles()
+        },
         {immediate: true}
     )
-
 })
 
 onUnmounted(() => {
@@ -143,14 +156,9 @@ onUnmounted(() => {
 })
 
 const closeAudio = () => {
-    // if (audioPlayer.value) {
-    //   audioPlayer.value.dispose();
-    //   audiohtml.value = '';
-    // }
     audioVisible.value = false;
     media.value = ''
 }
-
 
 const closeVideo = () => {
     if (vePlayer.value) {
@@ -160,7 +168,6 @@ const closeVideo = () => {
     vePlayer.value = false;
     media.value = ''
 }
-
 
 const handlePlay = (row: any) => {
     if (row.video_status == 0) {
@@ -225,40 +232,48 @@ const openVideo = async (row: any) => {
 
 }
 
-// 分页
-const handleChangePage = (item: any) => {
-    page.value = item.page
-    getTableData()
-}
-
-const handleSizeChange = (item: any) => {
-    pageSize.value = item
-    maxId.value = 0
-    getTableData()
-}
-
-const getTableData = async () => {
-    await ArticleList(enid.value, "", pageSize.value, maxId.value).then((table) => {
+// 懒加载：滚动到底部时加载更多
+const loadMoreArticles = async () => {
+    if (loading.value || finished.value) return
+    // 如果总数为 0，直接 finished
+    if (!total.value || total.value <= 0) {
+        finished.value = true
+        return
+    }
+    // 如果已加载条数 >= 总数，直接 finished
+    if (tableData.article_list.length >= total.value) {
+        finished.value = true
+        return
+    }
+    loading.value = true
+    try {
+        // 使用 maxId 分页
+        const res = await ArticleList(enid.value, "", pageSize.value, maxId.value)
+        // 如果返回数据为空，直接 finished
+        if (!res.article_list || res.article_list.length === 0) {
+            finished.value = true
+            loading.value = false
+            return
+        }
+        tableData.article_list.push(...res.article_list)
+        // 更新 maxId 为最新一条的 id
+        maxId.value = res.article_list[res.article_list.length - 1]?.id
+        // 如果本次返回数据不足 pageSize，或总数已达 total，finished
+        if (res.article_list.length < pageSize.value || tableData.article_list.length >= total.value) {
+            finished.value = true
+        }
+    } catch (error) {
+        ElMessage({ message: '获取数据失败', type: 'error' })
+        finished.value = true // 防止异常时死循环
+    } finally {
         loading.value = false
-        Object.assign(tableData, table)
-        console.log(table)
-        maxId.value = tableData.article_list[tableData.article_list.length - 1]?.id
-
-    }).catch((error) => {
-        loading.value = false
-        ElMessage({
-            message: error,
-            type: 'warning'
-        })
-    })
+    }
 }
-
 
 const openDialog = () => {
     dialogVisible.value = true
 }
 const closeDialog = () => {
-    //   initForm()
     dialogVisible.value = false
 }
 
@@ -286,7 +301,6 @@ const openDownloadDialog = (row: any) => {
     }
 }
 const closeDownloadDialog = () => {
-    //   initForm()
     downloadType.value = 1
     dialogDownloadVisible.value = false
 }
@@ -318,4 +332,76 @@ const gotoArticleVideo = (row: any) => {
         }
     })
 }
+
 </script>
+
+<style scoped>
+.article-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.article-card {
+  /* 让卡片高度自适应内容 */
+}
+.article-el-card {
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s;
+}
+.article-el-card:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+}
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 160px;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.card-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #222;
+  flex: 1;
+  line-height: 1.4;
+  word-break: break-all;
+}
+.card-meta-row {
+  display: flex;
+  gap: 24px;
+  color: #888;
+  font-size: 15px;
+  align-items: center;
+}
+.card-meta i {
+  margin-right: 4px;
+  font-size: 16px;
+  vertical-align: middle;
+}
+.card-actions {
+  margin-top: auto;
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+}
+@media (max-width: 600px) {
+  .article-list {
+    grid-template-columns: 1fr;
+  }
+  .card-title {
+    font-size: 17px;
+  }
+  .card-meta-row {
+    font-size: 13px;
+  }
+}
+</style>

@@ -4,7 +4,7 @@
         :header-cell-style="{ textAlign: 'left' }"
         :row-style="{ height: '30px' }"
         table-layout="auto">
-        <el-table-column prop="id" label="ID" width="100" />
+        <!-- <el-table-column prop="id" label="ID" width="100" /> -->
         <el-table-column prop="title" label="标题" width="320" />
         <el-table-column prop="icon" label="封面" width="80">
             <template #default="scope">
@@ -17,7 +17,7 @@
                <span>{{scope.row.ext_info![0]?.replier_name}}</span>
             </template>
         </el-table-column>
-        <el-table-column prop="intro" label="简介" width="300" >
+        <el-table-column prop="intro" label="简介" width="340" >
             <template #default="scope">
                 <el-popover title="简介" trigger="hover" placement="left" :width="480" :disabled="scope.row.intro.length <= 30">
                 <p v-html="scope.row.intro?.replaceAll('\n', '<br/>')"></p>

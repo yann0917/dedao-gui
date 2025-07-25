@@ -2,7 +2,7 @@
     <el-table stripe :data="tableData.list" v-loading="loading" height="97%" style="width: 100%"
         :cell-style="{ textAlign: 'left' }" :header-cell-style="{ textAlign: 'left' }" :row-style="{ height: '30px' }"
         table-layout="auto">
-        <el-table-column prop="class_id" label="ID" width="80" />
+        <!-- <el-table-column prop="class_id" label="ID" width="80" /> -->
         <el-table-column prop="title" label="标题" width="280" />
         <el-table-column prop="icon" label="封面" width="80">
             <template #default="scope">
@@ -19,8 +19,8 @@
                 <span>{{ scope.row.publish_num }}/{{scope.row.course_num}}</span>
             </template>
         </el-table-column>
-        <el-table-column prop="progress" label="已学%" width="100" />
-        <el-table-column fixed="right" label="操作" width="200">
+        <el-table-column prop="progress" label="已学%" width="80" />
+        <el-table-column fixed="right" label="操作" width="240">
             <template #default="scope">
                 <el-button icon="list" size="small" type="primary" link @click="gotoArticleList(scope.row)">章节列表
                 </el-button>

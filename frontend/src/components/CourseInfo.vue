@@ -95,7 +95,7 @@
 
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, defineProps, watch } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { CourseInfo } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'

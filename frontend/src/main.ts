@@ -8,6 +8,7 @@ import { useRouter } from 'vue-router'
 
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css' //样式
+import 'element-plus/dist/index.css'
 
 const app = createApp(App)
 const pinia = createPinia()
