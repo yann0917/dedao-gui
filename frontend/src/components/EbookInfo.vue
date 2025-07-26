@@ -23,6 +23,9 @@
                 <el-button v-if="ebookInfo.is_on_bookshelf==false" @click="ebookShelfAdd(ebookInfo.enid)">
                   <el-icon><Plus /></el-icon>加入书架
                 </el-button>
+                <el-button v-if="ebookInfo.is_on_bookshelf==true" @click="ebookShelfRemove(ebookInfo.enid)" type="danger">
+                  <el-icon><Delete /></el-icon>移出书架
+                </el-button>
               </el-col>
             </el-row>
           </div>
@@ -82,19 +85,20 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import { EbookInfo, EbookShelfAdd } from '../../wailsjs/go/backend/App'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { EbookInfo, EbookShelfAdd, EbookShelfRemove } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import { repeat } from 'lodash'
 import { secondToHour } from '../utils/utils'
 import { useRouter } from 'vue-router'
+import { Plus, Delete } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const dialogVisible = ref(false)
 
 let ebookInfo = reactive(new services.EbookDetail)
 
-const emits = defineEmits(['close']);
+const emits = defineEmits(['close', 'bookshelf-changed']);
 
 const props = defineProps({
         enid: {
@@ -128,13 +132,55 @@ const getEbookInfo = async (enid: string) => {
 const ebookShelfAdd = async (enid: string) => {
   await EbookShelfAdd([enid]).then((info) => {
     console.log(info)
+    ElMessage({
+      message: '已加入书架',
+      type: 'success'
+    })
     getEbookInfo(enid)
+    // 发射事件通知父组件书架状态已改变
+    emits('bookshelf-changed')
   }).catch((error) => {
     ElMessage({
       message: error,
       type: 'warning'
     })
   })
+  return
+}
+
+const ebookShelfRemove = async (enid: string) => {
+  ElMessageBox.confirm(
+    '是否移出书架?',
+    '',
+    {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      EbookShelfRemove([enid]).then((info) => {
+        console.log(info)
+        ElMessage({
+          message: '已移出书架',
+          type: 'success'
+        })
+        getEbookInfo(enid)
+        // 发射事件通知父组件书架状态已改变
+        emits('bookshelf-changed')
+      }).catch((error) => {
+        ElMessage({
+          message: error,
+          type: 'warning'
+        })
+      })
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '取消',
+      })
+    })
   return
 }
 

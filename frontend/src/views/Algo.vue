@@ -133,13 +133,28 @@
                   </div>
                 </div>
               </div>
+              <div class="card-actions">
+                <!-- 电子书加入书架按钮 -->
+                <el-button v-if="item.item_type === 2 && !item.is_on_bookshelf" 
+                           @click="ebookShelfAdd(item.id_out, $event)" 
+                           size="small" 
+                           type="primary">
+                  <el-icon><Plus /></el-icon>加入书架
+                </el-button>
+                <el-button v-if="item.item_type === 2 && item.is_on_bookshelf" 
+                           @click="ebookShelfRemove(item.id_out, $event)" 
+                           size="small" 
+                           type="danger">
+                  <el-icon><Delete /></el-icon>移出书架
+                </el-button>
+              </div>
             </el-card>
           </li>
         </ul>
       </div>
     </div>
 
-    <EbookInfo v-if="ebookVisible" :enid="prodEnid" :dialog-visible="ebookVisible" @close="closeDialog" />
+    <EbookInfo v-if="ebookVisible" :enid="prodEnid" :dialog-visible="ebookVisible" @close="closeDialog" @bookshelf-changed="refreshAlgoData" />
     <CourseInfo v-if="courseVisible" :enid="prodEnid" :dialog-visible="courseVisible" @close="closeDialog" />
     <AudioInfo v-if="audioVisible" :enid="prodEnid" :dialog-visible="audioVisible" @close="closeDialog" />
   </div>
@@ -147,17 +162,20 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onBeforeMount, onMounted, watch} from "vue";
-import { ElTable, ElMessage } from "element-plus";
+import { ElTable, ElMessage, ElMessageBox } from "element-plus";
 import {
   SearchHot,
   AlgoFilter,
   AlgoProduct,
+  EbookShelfAdd,
+  EbookShelfRemove,
 } from "../../wailsjs/go/backend/App";
 import { services } from "../../wailsjs/go/models";
 import { useRoute, useRouter } from "vue-router";
 import EbookInfo  from '../components/EbookInfo.vue';
 import CourseInfo from "../components/CourseInfo.vue";
 import AudioInfo from "../components/AudioInfo.vue";
+import { Plus, Delete } from '@element-plus/icons-vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -310,6 +328,7 @@ const getAlgoProduct = async (param: services.AlgoFilterParam) => {
     product_list.is_more = product.is_more;
     product_list.total = product.total;
     product_list.product_list.push(...product.product_list);
+    console.log(product_list.product_list);
   } catch (error) {
     console.log(error);
     ElMessage({
@@ -382,6 +401,82 @@ const handleSort = (item: services.Option) => {
   product_list.product_list = [];
   getAlgoProduct(param);
 };
+
+const ebookShelfAdd = async (enid: string, event?: Event) => {
+  // 阻止事件冒泡，避免触发父级 el-card 的点击事件
+  if (event) {
+    event.stopPropagation()
+  }
+  
+  await EbookShelfAdd([enid]).then((info) => {
+    console.log(info)
+    ElMessage({
+      message: '已加入书架',
+      type: 'success'
+    })
+    // 清空现有数据并重新加载
+    product_list.product_list = []
+    page.value = 0
+    param.page = 0
+    getAlgoProduct(param)
+  }).catch((error) => {
+    ElMessage({
+      message: error,
+      type: 'warning'
+    })
+  })
+}
+
+const ebookShelfRemove = async (enid: string, event?: Event) => {
+  // 阻止事件冒泡，避免触发父级 el-card 的点击事件
+  if (event) {
+    event.stopPropagation()
+  }
+  
+  ElMessageBox.confirm(
+    '是否移出书架?',
+    '',
+    {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      EbookShelfRemove([enid]).then((info) => {
+        console.log(info)
+        ElMessage({
+          message: '已移出书架',
+          type: 'success'
+        })
+        // 清空现有数据并重新加载
+        product_list.product_list = []
+        page.value = 0
+        param.page = 0
+        getAlgoProduct(param)
+      }).catch((error) => {
+        ElMessage({
+          message: error,
+          type: 'warning'
+        })
+      })
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '取消',
+      })
+    })
+}
+
+// 刷新 Algo 页面数据的函数
+const refreshAlgoData = () => {
+  // 清空现有数据并重新加载
+  product_list.product_list = []
+  page.value = 0
+  param.page = 0
+  getAlgoProduct(param)
+}
 
 </script>
 
@@ -623,5 +718,25 @@ const handleSort = (item: services.Option) => {
   .el-rate__text {
     color: #ff6b00;
   }
+}
+
+.card-actions .el-button {
+  border-radius: 8px;
+  font-weight: bold;
+  border-color: #ff6b00;
+  background-color: #ff6b00;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.card-actions .el-button:hover {
+  background-color: #ff8533;
+  border-color: #ff8533;
+  transform: translateY(-2px);
+}
+
+.card-actions .el-button:not(.is-disabled) {
+  border-color: #ff6b00;
+  background-color: #ff6b00;
 }
 </style>
