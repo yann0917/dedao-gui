@@ -16,7 +16,12 @@
                         <div class="card-header">
                             <span class="card-title">{{ item.title }}</span>
                         </div>
-                        <el-image :src="item.logo" class="card-image" />
+                        <el-image 
+                            :src="item.logo" 
+                            class="card-image" 
+                            :preview-teleported="true"
+                            :preview-src-list="[item.logo]"
+                        />
                         <div class="card-meta-row">
                             <span class="card-meta">
                                 <el-icon><Clock /></el-icon>

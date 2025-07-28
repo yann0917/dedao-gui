@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "element-plus": "^2.3.3",
-    "vite": "^5.4.19"
-  },
-  "devDependencies": {
-    "vue-tsc": "^2.0.19"
-  }
-}

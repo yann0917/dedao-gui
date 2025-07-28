@@ -556,10 +556,12 @@ type EbookScore struct {
 }
 
 type EbookShelfAddResp struct {
-	Data struct {
-		N     int `json:"n"`
-		Count int `json:"count"`
-	} `json:"data"`
+	Data EbookShelfAddData `json:"data"`
+}
+
+type EbookShelfAddData struct {
+	N     int `json:"n"`
+	Count int `json:"count"`
 }
 
 // EbookCommentList get ebook comment list

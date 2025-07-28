@@ -2501,9 +2501,22 @@ export namespace services {
 		}
 	}
 	
+	export class EbookShelfAddData {
+	    n: number;
+	    count: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new EbookShelfAddData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.n = source["n"];
+	        this.count = source["count"];
+	    }
+	}
 	export class EbookShelfAddResp {
-	    // Go type: struct { N int "json:\"n\""; Count int "json:\"count\"" }
-	    data: any;
+	    data: EbookShelfAddData;
 	
 	    static createFrom(source: any = {}) {
 	        return new EbookShelfAddResp(source);
@@ -2511,7 +2524,7 @@ export namespace services {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.data = this.convertValues(source["data"], Object);
+	        this.data = this.convertValues(source["data"], EbookShelfAddData);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

@@ -6,7 +6,7 @@
         <el-table-column prop="title" label="标题" width="280"/>
         <el-table-column prop="icon" label="封面" width="80">
             <template #default="scope">
-                <el-image :src="scope.row.icon" :preview-src-list="[scope.row.icon]" :initial-index="0"
+                <el-image preview-teleported :src="scope.row.icon" :preview-src-list="[scope.row.icon]" :initial-index="0"
                           style="width: 32px;"/>
             </template>
         </el-table-column>

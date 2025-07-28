@@ -1,12 +1,16 @@
 <template>
     <el-table :data="tableData.list" v-loading="loading" height="97%" width="100%" :cell-style="{ textAlign: 'left' }"
-              :header-cell-style="{ textAlign: 'left' }" :row-style="{ height: '50px' }" table-layout="auto" stripe>
+              :header-cell-style="{ textAlign: 'left' }" :row-style="{ height: '50px' }" table-layout="auto" >
         <!-- <el-table-column prop="id" label="ID" width="100"/> -->
         <el-table-column prop="title" label="标题" width="280"/>
         <el-table-column prop="icon" label="封面" width="80">
             <template #default="scope">
-                <el-image :src="scope.row.icon" :preview-src-list="[scope.row.icon]" :initial-index="0"
-                          style="width: 32px;"/>
+                <el-image 
+                    :src="scope.row.icon" 
+                    :preview-teleported="true"
+                    :preview-src-list="[scope.row.icon]" 
+                    style="width: 32px;"
+                />
             </template>
         </el-table-column>
         <el-table-column prop="duration" label="时长" width="100">

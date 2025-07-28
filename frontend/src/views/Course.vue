@@ -1,13 +1,18 @@
 <template>
-    <el-table stripe :data="tableData.list" v-loading="loading" height="97%" style="width: 100%"
-        :cell-style="{ textAlign: 'left' }" :header-cell-style="{ textAlign: 'left' }" :row-style="{ height: '30px' }"
+    <el-table :data="tableData.list" v-loading="loading" height="97%" style="width: 100%"
+        :cell-style="{ textAlign: 'left' }" :header-cell-style="{ textAlign: 'left' }"
         table-layout="auto">
         <!-- <el-table-column prop="class_id" label="ID" width="80" /> -->
         <el-table-column prop="title" label="标题" width="280" />
         <el-table-column prop="icon" label="封面" width="80">
             <template #default="scope">
-                <el-image :src="scope.row.icon" :preview-src-list="[scope.row.icon]" :initial-index="0"
-                    style="width: 32px;" />
+                <el-image 
+                    :src="scope.row.icon" 
+                    :preview-teleported="true"
+                    :preview-src-list="[scope.row.icon]" 
+                    style="width: 32px;"
+                >
+                </el-image>
             </template>
         </el-table-column>
         <el-table-column prop="intro" label="简介" width="280" />
@@ -32,6 +37,7 @@
             </template>
         </el-table-column>
     </el-table>
+    
     <pagination :total="total" @pageChange="handleChangePage"></pagination>
     <course-info v-if="dialogVisible" :enid= "prodEnid" :dialog-visible="dialogVisible" @close="closeDialog"></course-info>
     <download-dialog
@@ -175,7 +181,6 @@ const closeDownloadDialog = () => {
     downloadType.value = 1
     dialogDownloadVisible.value = false
 }
-
 </script>
   
 <style scoped>

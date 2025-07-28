@@ -7,7 +7,7 @@
 > 1. [wails快速入门](https://wails.io/zh-Hans/)
 > 2. [Vue3.x](https://cn.vuejs.org/guide/introduction.html)
 > 3. [Vue Router 4.x](https://router.vuejs.org/zh/introduction.html)
-> 4. [vue3 element-plus](https://element-plus.gitee.io/zh-CN/)
+> 4. [vue3 element-plus](https://element-plus.org/zh-CN/)
 > 5. [typeScript](https://www.typescriptlang.org/zh/docs/)
 > 6. [Vite](https://cn.vitejs.dev/)
 > 7. [pinia](https://pinia.vuejs.org/zh/)
