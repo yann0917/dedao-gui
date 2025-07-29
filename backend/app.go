@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/yann0917/dedao-gui/backend/utils"
 )
 
@@ -34,6 +35,10 @@ func (a *App) Shutdown(ctx context.Context) {
 func (a *App) DomReady(ctx context.Context) {
 	// fmt.Println(a.Ctx)
 	// fmt.Println("dom ready")
+}
+
+func (a *App) OnSecondInstanceLaunch(secondInstanceData options.SecondInstanceData) {
+	fmt.Println("OnSecondInstanceLaunch", secondInstanceData)
 }
 
 func setupCleanupOnExit() {

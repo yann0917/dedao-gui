@@ -102,6 +102,10 @@ export function OdobUserInfo() {
   return window['go']['backend']['App']['OdobUserInfo']();
 }
 
+export function OnSecondInstanceLaunch(arg1) {
+  return window['go']['backend']['App']['OnSecondInstanceLaunch'](arg1);
+}
+
 export function OpenDirectoryDialog(arg1) {
   return window['go']['backend']['App']['OpenDirectoryDialog'](arg1);
 }

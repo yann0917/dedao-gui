@@ -47,6 +47,11 @@ func main() {
 		Bind: []interface{}{
 			app,
 		},
+		ErrorFormatter: func(err error) any { return err.Error() },
+		SingleInstanceLock: &options.SingleInstanceLock{
+			UniqueId:               "b7d0c23a-e0eb-4949-aa69-bb2f8ebe40e2",
+			OnSecondInstanceLaunch: app.OnSecondInstanceLaunch,
+		},
 		// Windows platform specific options
 		Windows: &windows.Options{
 			// WebviewIsTransparent:              true,
@@ -86,6 +91,9 @@ func main() {
 		},
 		Linux: &linux.Options{
 			Icon: icon,
+		},
+		Debug: options.Debug{
+			OpenInspectorOnStartup: false,
 		},
 	})
 

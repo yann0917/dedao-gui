@@ -8,5 +8,12 @@
   "author": {
     "name": "Yabo",
     "email": "386139859@qq.com"
+  }, 
+  "bindings": {
+    "ts_generation": {
+      "prefix": "",
+      "suffix": "",
+      "outputType": "classes"
+    }
   }
 }
