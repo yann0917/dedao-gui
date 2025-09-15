@@ -2,7 +2,14 @@
     <el-table :data="tableData.list" v-loading="loading" height="97%" width="100%" :cell-style="{ textAlign: 'left' }"
               :header-cell-style="{ textAlign: 'left' }" :row-style="{ height: '50px' }" table-layout="auto" >
         <!-- <el-table-column prop="id" label="ID" width="100"/> -->
-        <el-table-column prop="title" label="标题" width="280"/>
+        <el-table-column prop="title" label="标题" width="280">
+            <template #default="scope">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span>{{ scope.row.title }}</span>
+                    <el-tag v-if="scope.row.type === 1013" type="warning" size="small">名家讲书</el-tag>
+                </div>
+            </template>
+        </el-table-column>
         <el-table-column prop="icon" label="封面" width="80">
             <template #default="scope">
                 <el-image 
@@ -45,7 +52,7 @@
                 <el-button icon="Memo" size="small" type="primary" link @click="gotoArticleDetail(scope.row)">文稿
                 </el-button>
                 <el-tooltip content="详情">
-                <el-button icon="view" size="small" type="primary" link @click="handleProd(scope.row.enid)">
+                <el-button icon="view" size="small" type="primary" link @click="handleProd(scope.row)">
                 </el-button>
               </el-tooltip>
                 <el-button icon="download" size="small" type="primary" link @click="openDownloadDialog(scope.row)">下载
@@ -56,6 +63,7 @@
     </el-table>
     <Pagination :total="total" @pageChange="handleChangePage"></Pagination>
     <audio-info v-if="dialogVisible" :enid="prodEnid" :dialog-visible="dialogVisible" @close="closeDialog"></audio-info>
+    <outside-info v-if="outsideVisible" :enid="prodEnid" :dialog-visible="outsideVisible" @close="closeDialog"></outside-info>
 
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="60%" :before-close="closeDialog">
         <el-space wrap>
@@ -127,6 +135,7 @@ import {CourseCategory, CourseList, OdobDownload, SetDir} from '../../wailsjs/go
 import {services} from '../../wailsjs/go/models'
 import Pagination from '../components/Pagination.vue'
 import AudioInfo from '../components/AudioInfo.vue'
+import OutsideInfo from '../components/OutsideInfo.vue'
 import {useRouter} from 'vue-router'
 import {userStore} from '../stores/user';
 import {settingStore} from "../stores/setting";
@@ -151,6 +160,7 @@ const total = ref(0)
 const pageSize = ref(15)
 const searchInfo = ref({})
 const dialogVisible = ref(false)
+const outsideVisible = ref(false)
 const prodEnid = ref("")
 
 const dialogDownloadVisible = ref(false)
@@ -283,6 +293,7 @@ const openDialog = () => {
 }
 const closeDialog = () => {
     dialogVisible.value = false
+    outsideVisible.value = false
 }
 getTableData()
 
@@ -346,9 +357,15 @@ const gotoArticleDetail = (row: any) => {
     router.push({path: `/odob/${id}`, query: {from: "odob"}})
 }
 
-const handleProd = (enid: string) => {
-    prodEnid.value = enid
-    dialogVisible.value = true
+const handleProd = (row: any) => {
+    prodEnid.value = row.enid
+    if (row.type === 1013) {
+        // 名家讲书类型显示 OutsideInfo 组件
+        outsideVisible.value = true
+    } else {
+        // 普通音频类型显示 AudioInfo 组件
+        dialogVisible.value = true
+    }
 }
 
 </script>

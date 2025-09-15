@@ -93,7 +93,7 @@
             <el-card
               class="content-card"
               shadow="hover"
-              @click="handleProd(item.id_out, item.item_type)"
+              @click="handleProd(item.id_out, item.item_type, item.product_type)"
             >
               <div class="card-content">
                 <img
@@ -157,6 +157,7 @@
     <EbookInfo v-if="ebookVisible" :enid="prodEnid" :dialog-visible="ebookVisible" @close="closeDialog" @bookshelf-changed="refreshAlgoData" />
     <CourseInfo v-if="courseVisible" :enid="prodEnid" :dialog-visible="courseVisible" @close="closeDialog" />
     <AudioInfo v-if="audioVisible" :enid="prodEnid" :dialog-visible="audioVisible" @close="closeDialog" />
+    <OutsideInfo v-if="outsideVisible" :enid="prodEnid" :dialog-visible="outsideVisible" @close="closeDialog" />
   </div>
 </template>
 
@@ -169,12 +170,14 @@ import {
   AlgoProduct,
   EbookShelfAdd,
   EbookShelfRemove,
+  OutsideDetail,
 } from "../../wailsjs/go/backend/App";
 import { services } from "../../wailsjs/go/models";
 import { useRoute, useRouter } from "vue-router";
 import EbookInfo  from '../components/EbookInfo.vue';
 import CourseInfo from "../components/CourseInfo.vue";
 import AudioInfo from "../components/AudioInfo.vue";
+import OutsideInfo from "../components/OutsideInfo.vue";
 import { Plus, Delete } from '@element-plus/icons-vue';
 
 const route = useRoute();
@@ -188,6 +191,7 @@ const pageSize = ref(4);
 const ebookVisible = ref(false);
 const courseVisible = ref(false);
 const audioVisible = ref(false);
+const outsideVisible = ref(false);
 const prodEnid = ref("");
 
 const idxProd = ref(0);
@@ -374,13 +378,16 @@ const loadProduction = () => {
   }
 };
 
-const handleProd = (enid:string, iType:number)=>{
+const handleProd = (enid:string, iType:number, pType:number)=>{
   prodEnid.value = enid
   if (iType == 2) {
     ebookVisible.value = true
   } else if(iType == 66) {
     courseVisible.value = true
-  } else if(iType == 13) {
+  } else if(iType == 13 && pType == 1013) {
+    // 13-单本, 1013-名家讲书合集
+    outsideVisible.value = true
+  } else if(iType == 13 && pType == 13) {
     audioVisible.value = true
   }
 }
@@ -392,6 +399,7 @@ const closeDialog = () => {
   ebookVisible.value = false
   courseVisible.value = false
   audioVisible.value = false
+  outsideVisible.value = false
 }
 
 const handleSort = (item: services.Option) => {

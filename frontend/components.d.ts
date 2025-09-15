@@ -53,6 +53,7 @@ declare module 'vue' {
     Menu: typeof import('./src/components/Menu.vue')['default']
     MenuItem: typeof import('./src/components/MenuItem.vue')['default']
     NotesItem: typeof import('./src/components/NotesItem.vue')['default']
+    OutsideInfo: typeof import('./src/components/OutsideInfo.vue')['default']
     Pagination: typeof import('./src/components/Pagination.vue')['default']
     QrLogin: typeof import('./src/components/QrLogin.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

@@ -110,6 +110,10 @@ export function OpenDirectoryDialog(arg1) {
   return window['go']['backend']['App']['OpenDirectoryDialog'](arg1);
 }
 
+export function OutsideDetail(arg1) {
+  return window['go']['backend']['App']['OutsideDetail'](arg1);
+}
+
 export function SearchHot() {
   return window['go']['backend']['App']['SearchHot']();
 }

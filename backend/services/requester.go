@@ -85,11 +85,24 @@ func (s *Service) reqCourseType() (io.ReadCloser, error) {
 func (s *Service) reqCourseList(category, order string, page, limit int) (io.ReadCloser, error) {
 	resp, err := s.client.R().SetBody(map[string]interface{}{
 		"category":        category,
+		"display_group":   true,
+		"filter":          "all",
+		"group_id":        0,
 		"order":           order,
 		"filter_complete": 0,
 		"page":            page,
 		"page_size":       limit,
-	}).Post("/api/hades/v1/product/list")
+		"sort_type":       "desc",
+	}).Post("/api/hades/v2/product/list")
+	return handleHTTPResponse(resp, err)
+}
+
+// reqOutsideDetail 请求名家讲书课程详情
+func (s *Service) reqOutsideDetail(enid string) (io.ReadCloser, error) {
+	resp, err := s.client.R().SetBody(map[string]interface{}{
+		"product_enid": enid,
+		"product_type": 1013,
+	}).Post("pc/sunflower/v1/depot/outside/detail")
 	return handleHTTPResponse(resp, err)
 }
 

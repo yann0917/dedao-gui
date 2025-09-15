@@ -35,3 +35,12 @@ func CourseInfoByEnid(enID string) (info *services.CourseInfo, err error) {
 	}
 	return
 }
+
+// OutsideDetail 名家讲书课程详情
+func OutsideDetail(enid string) (detail *services.OutsideDetail, err error) {
+	detail, err = getService().OutsideDetail(enid)
+	if err != nil {
+		return
+	}
+	return
+}

@@ -29,6 +29,14 @@ func (a *App) CourseInfo(enid string) (info *services.CourseInfo, err error) {
 	return
 }
 
+func (a *App) OutsideDetail(enid string) (detail *services.OutsideDetail, err error) {
+	detail, err = app.OutsideDetail(enid)
+	if err != nil {
+		return
+	}
+	return
+}
+
 func (a *App) ArticleList(enid, chapterID string, count, maxID int) (list *services.ArticleList, err error) {
 	list, err = app.ArticleList(enid, chapterID, count, maxID)
 	if err != nil {

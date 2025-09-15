@@ -1380,6 +1380,24 @@ export namespace services {
 		    return a;
 		}
 	}
+	export class ClassExtReview {
+	    show_text: string;
+	    review_done: boolean;
+	    is_satisfied: boolean;
+	    detail: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ClassExtReview(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.show_text = source["show_text"];
+	        this.review_done = source["review_done"];
+	        this.is_satisfied = source["is_satisfied"];
+	        this.detail = source["detail"];
+	    }
+	}
 	export class Collection {
 	    is_collected: boolean;
 	    collection_count: number;
@@ -2027,6 +2045,94 @@ export namespace services {
 	}
 	
 	
+	export class EbookExtInfo {
+	    is_tts_switch: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new EbookExtInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.is_tts_switch = source["is_tts_switch"];
+	    }
+	}
+	export class OdobGroupExtInfo {
+	    group_type: number;
+	    group_type_name: string;
+	    odob_total_duration: number;
+	    odob_alias_list: string[];
+	    progress_percent: number;
+	    progress_learned_count: number;
+	    publish_time: string;
+	    publish_status: number;
+	    audio_detail: Audio;
+	
+	    static createFrom(source: any = {}) {
+	        return new OdobGroupExtInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.group_type = source["group_type"];
+	        this.group_type_name = source["group_type_name"];
+	        this.odob_total_duration = source["odob_total_duration"];
+	        this.odob_alias_list = source["odob_alias_list"];
+	        this.progress_percent = source["progress_percent"];
+	        this.progress_learned_count = source["progress_learned_count"];
+	        this.publish_time = source["publish_time"];
+	        this.publish_status = source["publish_status"];
+	        this.audio_detail = this.convertValues(source["audio_detail"], Audio);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class TrainingCampInfo {
+	    course_id: number;
+	    course_type: number;
+	    course_sales_nature: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new TrainingCampInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.course_id = source["course_id"];
+	        this.course_type = source["course_type"];
+	        this.course_sales_nature = source["course_sales_nature"];
+	    }
+	}
+	export class InstituteExtInfo {
+	    course_id: number;
+	    course_type: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new InstituteExtInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.course_id = source["course_id"];
+	        this.course_type = source["course_type"];
+	    }
+	}
 	export class WendaExtInfo {
 	    answer_id: number;
 	
@@ -2037,30 +2143,6 @@ export namespace services {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.answer_id = source["answer_id"];
-	    }
-	}
-	export class ReplierInfo {
-	    replier_uid: number;
-	    replier_name: string;
-	    replier_img: string;
-	    replier_intro: string;
-	    replier_v_status: boolean;
-	    replier_v_state_value: number;
-	    replier_title: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new ReplierInfo(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.replier_uid = source["replier_uid"];
-	        this.replier_name = source["replier_name"];
-	        this.replier_img = source["replier_img"];
-	        this.replier_intro = source["replier_intro"];
-	        this.replier_v_status = source["replier_v_status"];
-	        this.replier_v_state_value = source["replier_v_state_value"];
-	        this.replier_title = source["replier_title"];
 	    }
 	}
 	export class Course {
@@ -2096,11 +2178,28 @@ export namespace services {
 	    price: string;
 	    product_intro: string;
 	    has_play_auth: boolean;
-	    ext_info: ReplierInfo[];
+	    ext_info: any;
 	    status: number;
 	    dd_ext_url: string;
 	    is_collected: boolean;
 	    wenda_ext_info: WendaExtInfo;
+	    class_ext_review: ClassExtReview;
+	    plan_status: number;
+	    is_sphere: number;
+	    institute_ext_info: InstituteExtInfo;
+	    training_camp_ext_info: TrainingCampInfo;
+	    last_read_info: string;
+	    odob_group_ext_info: OdobGroupExtInfo;
+	    ebook_ext_info: EbookExtInfo;
+	    is_video_odob: boolean;
+	    is_show_play_later_button: boolean;
+	    is_add_play_later: boolean;
+	    en_package_id?: string;
+	    is_group: boolean;
+	    group_id: number;
+	    is_self_build_group: boolean;
+	    group_type: number;
+	    label_id: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new Course(source);
@@ -2140,11 +2239,28 @@ export namespace services {
 	        this.price = source["price"];
 	        this.product_intro = source["product_intro"];
 	        this.has_play_auth = source["has_play_auth"];
-	        this.ext_info = this.convertValues(source["ext_info"], ReplierInfo);
+	        this.ext_info = source["ext_info"];
 	        this.status = source["status"];
 	        this.dd_ext_url = source["dd_ext_url"];
 	        this.is_collected = source["is_collected"];
 	        this.wenda_ext_info = this.convertValues(source["wenda_ext_info"], WendaExtInfo);
+	        this.class_ext_review = this.convertValues(source["class_ext_review"], ClassExtReview);
+	        this.plan_status = source["plan_status"];
+	        this.is_sphere = source["is_sphere"];
+	        this.institute_ext_info = this.convertValues(source["institute_ext_info"], InstituteExtInfo);
+	        this.training_camp_ext_info = this.convertValues(source["training_camp_ext_info"], TrainingCampInfo);
+	        this.last_read_info = source["last_read_info"];
+	        this.odob_group_ext_info = this.convertValues(source["odob_group_ext_info"], OdobGroupExtInfo);
+	        this.ebook_ext_info = this.convertValues(source["ebook_ext_info"], EbookExtInfo);
+	        this.is_video_odob = source["is_video_odob"];
+	        this.is_show_play_later_button = source["is_show_play_later_button"];
+	        this.is_add_play_later = source["is_add_play_later"];
+	        this.en_package_id = source["en_package_id"];
+	        this.is_group = source["is_group"];
+	        this.group_id = source["group_id"];
+	        this.is_self_build_group = source["is_self_build_group"];
+	        this.group_type = source["group_type"];
+	        this.label_id = source["label_id"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2278,8 +2394,9 @@ export namespace services {
 	
 	export class CourseList {
 	    list: Course[];
+	    total: number;
 	    is_more: number;
-	    page: number;
+	    has_single_book: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new CourseList(source);
@@ -2288,8 +2405,9 @@ export namespace services {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.list = this.convertValues(source["list"], Course);
+	        this.total = source["total"];
 	        this.is_more = source["is_more"];
-	        this.page = source["page"];
+	        this.has_single_book = source["has_single_book"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2519,6 +2637,7 @@ export namespace services {
 		    return a;
 		}
 	}
+	
 	
 	export class EbookShelfAddData {
 	    n: number;
@@ -2882,6 +3001,167 @@ export namespace services {
 	
 	
 	
+	
+	export class PrivilegeProduct {
+	    alias_id: string;
+	    alias_name: string;
+	    ddurl: string;
+	    has_privilege: boolean;
+	    id: number;
+	    is_privilege_live: boolean;
+	    live_id: number;
+	    live_start_time: number;
+	    product_group_id: number;
+	    product_id: number;
+	    product_sub_id: number;
+	    product_type: number;
+	    title: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new PrivilegeProduct(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.alias_id = source["alias_id"];
+	        this.alias_name = source["alias_name"];
+	        this.ddurl = source["ddurl"];
+	        this.has_privilege = source["has_privilege"];
+	        this.id = source["id"];
+	        this.is_privilege_live = source["is_privilege_live"];
+	        this.live_id = source["live_id"];
+	        this.live_start_time = source["live_start_time"];
+	        this.product_group_id = source["product_group_id"];
+	        this.product_id = source["product_id"];
+	        this.product_sub_id = source["product_sub_id"];
+	        this.product_type = source["product_type"];
+	        this.title = source["title"];
+	    }
+	}
+	export class LiveInfoDetail {
+	    alert_tips: string;
+	    alias_id: string;
+	    appointment_status: number;
+	    author: string;
+	    can_watch: boolean;
+	    dd_url: string;
+	    duration: number;
+	    endtime: number;
+	    has_buy: boolean;
+	    hide_online_number: number;
+	    home_img: string;
+	    id: number;
+	    intro: string;
+	    invite_count: number;
+	    is_privilege_live: boolean;
+	    ld_flv: string;
+	    live_cover_m3u8: string;
+	    live_duration_text: string;
+	    live_privilege_tips: string;
+	    live_privilege_type: number;
+	    live_pv: number;
+	    live_type: string;
+	    live_viewers: number;
+	    log_id: number;
+	    log_type: string;
+	    logo: string;
+	    online_num: number;
+	    playback_status: number;
+	    privilege_live_tag: string;
+	    privilege_product: PrivilegeProduct;
+	    privilege_status: number;
+	    publish_status: number;
+	    pv_num: number;
+	    reservation_num: number;
+	    room_id: number;
+	    show_pv: number;
+	    show_subscribe_summary: number;
+	    starttime: number;
+	    starttime_desc: string;
+	    status: number;
+	    subscribe_summary: string;
+	    time_report: number;
+	    title: string;
+	    type: number;
+	    video_cover_m3u8: string;
+	    video_cover_media_id: number;
+	    video_duration: string;
+	    web_pc_media_token: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new LiveInfoDetail(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.alert_tips = source["alert_tips"];
+	        this.alias_id = source["alias_id"];
+	        this.appointment_status = source["appointment_status"];
+	        this.author = source["author"];
+	        this.can_watch = source["can_watch"];
+	        this.dd_url = source["dd_url"];
+	        this.duration = source["duration"];
+	        this.endtime = source["endtime"];
+	        this.has_buy = source["has_buy"];
+	        this.hide_online_number = source["hide_online_number"];
+	        this.home_img = source["home_img"];
+	        this.id = source["id"];
+	        this.intro = source["intro"];
+	        this.invite_count = source["invite_count"];
+	        this.is_privilege_live = source["is_privilege_live"];
+	        this.ld_flv = source["ld_flv"];
+	        this.live_cover_m3u8 = source["live_cover_m3u8"];
+	        this.live_duration_text = source["live_duration_text"];
+	        this.live_privilege_tips = source["live_privilege_tips"];
+	        this.live_privilege_type = source["live_privilege_type"];
+	        this.live_pv = source["live_pv"];
+	        this.live_type = source["live_type"];
+	        this.live_viewers = source["live_viewers"];
+	        this.log_id = source["log_id"];
+	        this.log_type = source["log_type"];
+	        this.logo = source["logo"];
+	        this.online_num = source["online_num"];
+	        this.playback_status = source["playback_status"];
+	        this.privilege_live_tag = source["privilege_live_tag"];
+	        this.privilege_product = this.convertValues(source["privilege_product"], PrivilegeProduct);
+	        this.privilege_status = source["privilege_status"];
+	        this.publish_status = source["publish_status"];
+	        this.pv_num = source["pv_num"];
+	        this.reservation_num = source["reservation_num"];
+	        this.room_id = source["room_id"];
+	        this.show_pv = source["show_pv"];
+	        this.show_subscribe_summary = source["show_subscribe_summary"];
+	        this.starttime = source["starttime"];
+	        this.starttime_desc = source["starttime_desc"];
+	        this.status = source["status"];
+	        this.subscribe_summary = source["subscribe_summary"];
+	        this.time_report = source["time_report"];
+	        this.title = source["title"];
+	        this.type = source["type"];
+	        this.video_cover_m3u8 = source["video_cover_m3u8"];
+	        this.video_cover_media_id = source["video_cover_media_id"];
+	        this.video_duration = source["video_duration"];
+	        this.web_pc_media_token = source["web_pc_media_token"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	
 	
 	export class VolcFormat {
@@ -3444,6 +3724,7 @@ export namespace services {
 		}
 	}
 	
+	
 	export class OdobUser {
 	    avatar: string;
 	    avatar_s: string;
@@ -3530,6 +3811,381 @@ export namespace services {
 		    return a;
 		}
 	}
+	
+	export class OutsideItemExtra {
+	    enid: string;
+	    duration: number;
+	    group_type: number;
+	    group_type_name: string;
+	    is_ebook_vip: boolean;
+	    is_odob_vip: boolean;
+	    live_info_detail: LiveInfoDetail;
+	    audio_alias_id: string;
+	    equity: boolean;
+	    odob_audio_detail: Audio;
+	    progress_max_progress: number;
+	    progress_learned: boolean;
+	    progress_is_finish: boolean;
+	    publish_time: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new OutsideItemExtra(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.enid = source["enid"];
+	        this.duration = source["duration"];
+	        this.group_type = source["group_type"];
+	        this.group_type_name = source["group_type_name"];
+	        this.is_ebook_vip = source["is_ebook_vip"];
+	        this.is_odob_vip = source["is_odob_vip"];
+	        this.live_info_detail = this.convertValues(source["live_info_detail"], LiveInfoDetail);
+	        this.audio_alias_id = source["audio_alias_id"];
+	        this.equity = source["equity"];
+	        this.odob_audio_detail = this.convertValues(source["odob_audio_detail"], Audio);
+	        this.progress_max_progress = source["progress_max_progress"];
+	        this.progress_learned = source["progress_learned"];
+	        this.progress_is_finish = source["progress_is_finish"];
+	        this.publish_time = source["publish_time"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class OutsideItem {
+	    biz_type: number;
+	    ptype: number;
+	    pid: number;
+	    ptype_pid: string;
+	    title: string;
+	    summary: string;
+	    intro: string;
+	    icon: string;
+	    lessons_num: number;
+	    department: string[];
+	    first_item_publish_time: string;
+	    create_time: string;
+	    update_time: string;
+	    spu_code: string;
+	    creator: string;
+	    ddid: number;
+	    share_title: string;
+	    share_summary: string;
+	    share_url: string;
+	    ddurl: string;
+	    author_uid: number;
+	    sku_info: OutsideSKUInfo;
+	    relation_info: OutsideRelationInfo;
+	    group_type_id: number;
+	    group_type_name: string;
+	    publish_time: string;
+	    extra: OutsideItemExtra;
+	
+	    static createFrom(source: any = {}) {
+	        return new OutsideItem(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.biz_type = source["biz_type"];
+	        this.ptype = source["ptype"];
+	        this.pid = source["pid"];
+	        this.ptype_pid = source["ptype_pid"];
+	        this.title = source["title"];
+	        this.summary = source["summary"];
+	        this.intro = source["intro"];
+	        this.icon = source["icon"];
+	        this.lessons_num = source["lessons_num"];
+	        this.department = source["department"];
+	        this.first_item_publish_time = source["first_item_publish_time"];
+	        this.create_time = source["create_time"];
+	        this.update_time = source["update_time"];
+	        this.spu_code = source["spu_code"];
+	        this.creator = source["creator"];
+	        this.ddid = source["ddid"];
+	        this.share_title = source["share_title"];
+	        this.share_summary = source["share_summary"];
+	        this.share_url = source["share_url"];
+	        this.ddurl = source["ddurl"];
+	        this.author_uid = source["author_uid"];
+	        this.sku_info = this.convertValues(source["sku_info"], OutsideSKUInfo);
+	        this.relation_info = this.convertValues(source["relation_info"], OutsideRelationInfo);
+	        this.group_type_id = source["group_type_id"];
+	        this.group_type_name = source["group_type_name"];
+	        this.publish_time = source["publish_time"];
+	        this.extra = this.convertValues(source["extra"], OutsideItemExtra);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class OutsideSPUExtra {
+	    enid: string;
+	    book_shelf_status: boolean;
+	    group_type: number;
+	    group_type_name: string;
+	    intro_text: string;
+	    latest_learning_id: number;
+	    newest_intro: string;
+	    odob_consumer_num: number;
+	    odob_free_maximum: number;
+	    progress_percent: number;
+	    qcg_id: number;
+	    rn_learn_count: number;
+	    rn_learn_count_desc: string;
+	    subscribe_status: number;
+	    live_tag: string;
+	    teacher_avatar: string;
+	    teacher_ddurl: string;
+	    teacher_intro: string;
+	    teacher_name: string;
+	    progress_learned_count: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new OutsideSPUExtra(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.enid = source["enid"];
+	        this.book_shelf_status = source["book_shelf_status"];
+	        this.group_type = source["group_type"];
+	        this.group_type_name = source["group_type_name"];
+	        this.intro_text = source["intro_text"];
+	        this.latest_learning_id = source["latest_learning_id"];
+	        this.newest_intro = source["newest_intro"];
+	        this.odob_consumer_num = source["odob_consumer_num"];
+	        this.odob_free_maximum = source["odob_free_maximum"];
+	        this.progress_percent = source["progress_percent"];
+	        this.qcg_id = source["qcg_id"];
+	        this.rn_learn_count = source["rn_learn_count"];
+	        this.rn_learn_count_desc = source["rn_learn_count_desc"];
+	        this.subscribe_status = source["subscribe_status"];
+	        this.live_tag = source["live_tag"];
+	        this.teacher_avatar = source["teacher_avatar"];
+	        this.teacher_ddurl = source["teacher_ddurl"];
+	        this.teacher_intro = source["teacher_intro"];
+	        this.teacher_name = source["teacher_name"];
+	        this.progress_learned_count = source["progress_learned_count"];
+	    }
+	}
+	export class OutsideRelationInfo {
+	    parent_pk: string;
+	    status: number;
+	    sort_id: number;
+	    title: string;
+	    sku_code: string;
+	    price: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new OutsideRelationInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.parent_pk = source["parent_pk"];
+	        this.status = source["status"];
+	        this.sort_id = source["sort_id"];
+	        this.title = source["title"];
+	        this.sku_code = source["sku_code"];
+	        this.price = source["price"];
+	    }
+	}
+	export class OutsideSKUInfo {
+	    sku_code: string;
+	    ptype_pid: string;
+	    status: number;
+	    channel_type: string;
+	    publish_time: string;
+	    spu_code: string;
+	    ptype: number;
+	    is_sale: number;
+	    product_features: number;
+	    remark: string;
+	    price: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new OutsideSKUInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.sku_code = source["sku_code"];
+	        this.ptype_pid = source["ptype_pid"];
+	        this.status = source["status"];
+	        this.channel_type = source["channel_type"];
+	        this.publish_time = source["publish_time"];
+	        this.spu_code = source["spu_code"];
+	        this.ptype = source["ptype"];
+	        this.is_sale = source["is_sale"];
+	        this.product_features = source["product_features"];
+	        this.remark = source["remark"];
+	        this.price = source["price"];
+	    }
+	}
+	export class OutsideSPU {
+	    biz_type: number;
+	    ptype: number;
+	    pid: number;
+	    ptype_pid: string;
+	    title: string;
+	    summary: string;
+	    intro: string;
+	    icon: string;
+	    lessons_num: number;
+	    department: string[];
+	    first_item_publish_time: string;
+	    create_time: string;
+	    update_time: string;
+	    spu_code: string;
+	    creator: string;
+	    ddid: number;
+	    share_title: string;
+	    share_summary: string;
+	    share_url: string;
+	    ddurl: string;
+	    author_uid: number;
+	    sku_info: OutsideSKUInfo;
+	    relation_info: OutsideRelationInfo;
+	    group_type_id: number;
+	    group_type_name: string;
+	    publish_time: string;
+	    extra: OutsideSPUExtra;
+	
+	    static createFrom(source: any = {}) {
+	        return new OutsideSPU(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.biz_type = source["biz_type"];
+	        this.ptype = source["ptype"];
+	        this.pid = source["pid"];
+	        this.ptype_pid = source["ptype_pid"];
+	        this.title = source["title"];
+	        this.summary = source["summary"];
+	        this.intro = source["intro"];
+	        this.icon = source["icon"];
+	        this.lessons_num = source["lessons_num"];
+	        this.department = source["department"];
+	        this.first_item_publish_time = source["first_item_publish_time"];
+	        this.create_time = source["create_time"];
+	        this.update_time = source["update_time"];
+	        this.spu_code = source["spu_code"];
+	        this.creator = source["creator"];
+	        this.ddid = source["ddid"];
+	        this.share_title = source["share_title"];
+	        this.share_summary = source["share_summary"];
+	        this.share_url = source["share_url"];
+	        this.ddurl = source["ddurl"];
+	        this.author_uid = source["author_uid"];
+	        this.sku_info = this.convertValues(source["sku_info"], OutsideSKUInfo);
+	        this.relation_info = this.convertValues(source["relation_info"], OutsideRelationInfo);
+	        this.group_type_id = source["group_type_id"];
+	        this.group_type_name = source["group_type_name"];
+	        this.publish_time = source["publish_time"];
+	        this.extra = this.convertValues(source["extra"], OutsideSPUExtra);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class OutsideDetail {
+	    spu: OutsideSPU;
+	    items: OutsideItem[];
+	    count: number;
+	    current_count: number;
+	    now_time: string;
+	    has_more: boolean;
+	    up_more: boolean;
+	    down_more: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new OutsideDetail(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.spu = this.convertValues(source["spu"], OutsideSPU);
+	        this.items = this.convertValues(source["items"], OutsideItem);
+	        this.count = source["count"];
+	        this.current_count = source["current_count"];
+	        this.now_time = source["now_time"];
+	        this.has_more = source["has_more"];
+	        this.up_more = source["up_more"];
+	        this.down_more = source["down_more"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	
+	
+	
+	
+	
 	
 	
 	export class ProductSimple {
@@ -3641,7 +4297,6 @@ export namespace services {
 		    return a;
 		}
 	}
-	
 	export class SearchTot {
 	    hot_tab_list: HotTab[];
 	    recommend_map: Recommend[];
@@ -4013,6 +4668,7 @@ export namespace services {
 		    return a;
 		}
 	}
+	
 	
 	
 	
