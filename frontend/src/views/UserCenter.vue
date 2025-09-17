@@ -156,7 +156,7 @@ getOdobUserInfo()
 <style scoped>
 .user-center {
     padding: 24px;
-    background: #f5f7fa;
+    background: var(--fill-color-light);
     min-height: calc(100vh - 60px);
 }
 
@@ -192,12 +192,12 @@ getOdobUserInfo()
 .nickname {
     font-size: 24px;
     font-weight: 500;
-    color: #333;
+    color: var(--text-primary);
     margin: 0 0 8px;
 }
 
 .slogan {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 14px;
     margin: 0 0 12px;
 }
@@ -220,8 +220,9 @@ getOdobUserInfo()
     gap: 40px;
     margin-bottom: 30px;
     padding: 20px;
-    background: #f8f9fa;
+    background: var(--fill-color-light);
     border-radius: 12px;
+    border: 1px solid var(--border-soft);
 }
 
 .stat-item {
@@ -234,12 +235,12 @@ getOdobUserInfo()
 .stat-value {
     font-size: 28px;
     font-weight: 500;
-    color: #ff6b00;
+    color: var(--accent-color);
 }
 
 .stat-label {
     font-size: 14px;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .teacher-tag {
@@ -250,7 +251,7 @@ getOdobUserInfo()
 .membership-section {
     margin-top: 30px;
     padding-top: 20px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border-soft);
 }
 
 .section-header {
@@ -260,12 +261,31 @@ getOdobUserInfo()
 .section-header h3 {
     font-size: 18px;
     font-weight: 500;
-    color: #333;
+    color: var(--text-primary);
     margin: 0;
 }
 
 .membership-alert {
     margin-bottom: 16px;
+}
+
+/* 暗色主题下的 alert 适配 */
+.theme-dark .membership-alert {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-soft) !important;
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .membership-alert .el-alert__title {
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .membership-alert .el-alert__content {
+    color: var(--text-secondary) !important;
+}
+
+.theme-dark .membership-alert .el-alert__icon {
+    color: var(--accent-color) !important;
 }
 
 .membership-info {
@@ -293,5 +313,27 @@ getOdobUserInfo()
 
 :deep(.el-tag .el-icon) {
     margin-right: 4px;
+}
+
+/* 暗色主题适配 */
+.theme-dark .study-stats {
+    background: var(--fill-color-light) !important;
+    border-color: var(--border-soft) !important;
+}
+
+.theme-dark .stat-value {
+    color: var(--accent-color) !important;
+}
+
+.theme-dark .stat-label {
+    color: var(--text-secondary) !important;
+}
+
+.theme-dark .section-header h3 {
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .membership-section {
+    border-top-color: var(--border-soft) !important;
 }
 </style>

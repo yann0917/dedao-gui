@@ -3,7 +3,7 @@
         <div class="topic-header">
             <el-image class="cover" :src="ossProcess(props.topicDetail.img)" fit="cover" />
             <div class="detail">
-                <h2 class="title"><span style="color:#ff6b00">#</span>{{props.topicDetail.name}}</h2>
+                <h2 class="title"><span class="title-hash">#</span>{{props.topicDetail.name}}</h2>
                 <p class="summary" style="font-size: small">
                     <span style="font-size: small"></span>阅读{{props.topicDetail.view_count}}
                     <span style="font-size: small"></span>讨论{{props.topicDetail.notes_count}}
@@ -307,7 +307,7 @@ const ossProcess = (url: string) => {
 
 <style scoped lang="scss">
 .el-card{
-    color:#606266;
+    color: var(--text-secondary);
     .card-header, .card-content {
         text-align: left ;
     }
@@ -334,7 +334,7 @@ ul {
 .note-line{
     border-radius: 0.4em;
     white-space: pre-wrap;
-    background:rgb(242, 241, 241);
+    background: var(--fill-color-light);
     opacity: 1;
     padding-top: 1em;
     text-align: left;
@@ -422,11 +422,55 @@ ul {
 .topic-tab .elected {
     margin-right: 20px;
     padding-bottom: 12px;
-    border-bottom: 4px solid #fff;
+    border-bottom: 4px solid var(--bg-color);
     cursor: pointer;
 }
 
 .topic-tab .topic-tab-active {
-    border-bottom: 4px solid #ff6b00;
+    border-bottom: 4px solid var(--accent-color);
+}
+
+/* 标题中的 # 符号样式 */
+.title-hash {
+    color: var(--accent-color);
+}
+
+/* 暗色主题适配 */
+.theme-dark .note-line {
+    background: var(--fill-color-light) !important;
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .el-card {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-soft) !important;
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .el-card .card-header,
+.theme-dark .el-card .card-content {
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .topic-item {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-soft) !important;
+}
+
+.theme-dark .topic-item .title {
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .topic-item .intro {
+    color: var(--text-secondary) !important;
+}
+
+.theme-dark .topic-tab .el-button {
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .topic-tab .topic-tab-active {
+    border-bottom-color: var(--accent-color) !important;
+    color: var(--accent-color) !important;
 }
 </style>

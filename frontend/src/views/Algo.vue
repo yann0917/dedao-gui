@@ -123,7 +123,7 @@
                         show-score
                         allow-half
                         size="small"
-                        text-color="#ff6b00"
+                        text-color="var(--accent-color)"
                       />
                       <span v-else class="no-rating">暂无评分</span>
                     </div>
@@ -488,19 +488,19 @@ const refreshAlgoData = () => {
 
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .category {
   padding: 24px;
-  background: #f5f7fa;
+  background: var(--fill-color-light);
   min-height: calc(100vh - 60px);
 }
 
 .filters {
-  background: #fff;
+  background: var(--card-bg);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 24px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-soft);
 }
 
 .filter-container {
@@ -513,7 +513,7 @@ const refreshAlgoData = () => {
   }
 
   .filter-label {
-    color: #333;
+    color: var(--text-primary);
     font-size: 16px;
     font-weight: 500;
     line-height: 32px;
@@ -530,36 +530,37 @@ const refreshAlgoData = () => {
     padding: 6px 16px;
     border-radius: 16px;
     transition: all 0.3s ease;
+    color: var(--text-secondary);
 
     &:hover {
-      color: #ff6b00;
+      color: var(--accent-color);
       background: rgba(255, 107, 0, 0.05);
     }
   }
 
   .active-btn {
-    color: #ff6b00;
+    color: var(--accent-color);
     font-weight: 500;
     background: rgba(255, 107, 0, 0.1);
   }
 }
 
 .sub-options {
-  background: #f8f9fa;
+  background: var(--fill-color);
   padding: 12px;
   border-radius: 8px;
 }
 
 .filter-divider {
   margin: 16px 0;
-  border-color: #eee;
+  border-color: var(--border-soft);
 }
 
 .content-container {
-  background: #fff;
+  background: var(--card-bg);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-soft);
 }
 
 .result-header {
@@ -570,10 +571,10 @@ const refreshAlgoData = () => {
 
   .result-count {
     font-size: 16px;
-    color: #333;
+    color: var(--text-primary);
 
     .highlight {
-      color: #ff6b00;
+      color: var(--accent-color);
       font-weight: 500;
     }
   }
@@ -583,16 +584,16 @@ const refreshAlgoData = () => {
     gap: 16px;
 
     .sort-btn {
-      color: #666;
+      color: var(--text-secondary);
       font-size: 14px;
       transition: all 0.3s ease;
 
       &:hover {
-        color: #ff6b00;
+        color: var(--accent-color);
       }
 
       &.active-sort {
-        color: #ff6b00;
+        color: var(--accent-color);
         font-weight: 500;
       }
     }
@@ -601,7 +602,7 @@ const refreshAlgoData = () => {
 
 .content-divider {
   margin: 16px 0;
-  border-color: #eee;
+  border-color: var(--border-soft);
 }
 
 .content-list {
@@ -636,7 +637,7 @@ const refreshAlgoData = () => {
   height: 150px;
   object-fit: cover;
   border-radius: 8px;
-  background: #f5f7fa;
+  background: var(--fill-color-light);
 }
 
 .content-info {
@@ -650,7 +651,7 @@ const refreshAlgoData = () => {
 .content-title {
   font-size: 16px;
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary);
   margin: 0;
   line-height: 1.4;
   text-align: left;
@@ -658,11 +659,12 @@ const refreshAlgoData = () => {
 
 .content-intro {
   font-size: 14px;
-  color: #666;
+  color: var(--text-secondary);
   margin: 0;
   line-height: 1.6;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-align: left;
@@ -670,7 +672,7 @@ const refreshAlgoData = () => {
 
 .meta-info {
   font-size: 13px;
-  color: #999;
+  color: var(--text-tertiary);
   margin-top: auto;
   text-align: left;
 
@@ -681,7 +683,7 @@ const refreshAlgoData = () => {
   }
 
   .episode-count {
-    color: #666;
+    color: var(--text-secondary);
     text-align: left;
   }
 }
@@ -697,13 +699,13 @@ const refreshAlgoData = () => {
     text-align: left;
     .no-rating {
       font-size: 13px;
-      color: #999;
+      color: var(--text-tertiary);
     }
   }
 
   .learner-count {
     font-size: 12px;
-    color: #999;
+    color: var(--text-tertiary);
     text-align: right;
   }
 }
@@ -724,27 +726,115 @@ const refreshAlgoData = () => {
   align-items: center;
   
   .el-rate__text {
-    color: #ff6b00;
+    color: var(--accent-color);
   }
 }
 
 .card-actions .el-button {
   border-radius: 8px;
   font-weight: bold;
-  border-color: #ff6b00;
-  background-color: #ff6b00;
+  border-color: var(--accent-color);
+  background-color: var(--accent-color);
   color: #fff;
   transition: all 0.3s ease;
 }
 
 .card-actions .el-button:hover {
-  background-color: #ff8533;
-  border-color: #ff8533;
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
   transform: translateY(-2px);
 }
 
 .card-actions .el-button:not(.is-disabled) {
-  border-color: #ff6b00;
-  background-color: #ff6b00;
+  border-color: var(--accent-color);
+  background-color: var(--accent-color);
+}
+
+/* 暗色主题适配 */
+.theme-dark .result-count {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .result-count .highlight {
+  color: var(--accent-color) !important;
+}
+
+.theme-dark .sort-btn {
+  color: var(--text-secondary) !important;
+}
+
+.theme-dark .sort-btn:hover {
+  color: var(--accent-color) !important;
+}
+
+.theme-dark .sort-btn.active-sort {
+  color: var(--accent-color) !important;
+  font-weight: 500;
+}
+
+.theme-dark .content-divider {
+  border-color: var(--border-soft) !important;
+}
+
+.theme-dark .content-cover {
+  background: var(--fill-color-light) !important;
+}
+
+.theme-dark .content-title {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .content-intro {
+  color: var(--text-secondary) !important;
+}
+
+.theme-dark .meta-info {
+  color: var(--text-tertiary) !important;
+}
+
+.theme-dark .meta-info .episode-count {
+  color: var(--text-secondary) !important;
+}
+
+.theme-dark .rating .no-rating {
+  color: var(--text-tertiary) !important;
+}
+
+.theme-dark .learner-count {
+  color: var(--text-tertiary) !important;
+}
+
+.theme-dark :deep(.el-rate__text) {
+  color: var(--accent-color) !important;
+}
+
+.theme-dark .card-actions .el-button {
+  border-color: var(--accent-color) !important;
+  background-color: var(--accent-color) !important;
+  color: #fff !important;
+}
+
+.theme-dark .card-actions .el-button:hover {
+  background-color: var(--accent-hover) !important;
+  border-color: var(--accent-hover) !important;
+}
+
+/* 确保选中按钮在暗色主题下可见 */
+.theme-dark .filter-btn.active-btn {
+  color: var(--accent-color) !important;
+  background: rgba(255, 107, 0, 0.15) !important;
+  border: 1px solid var(--accent-color) !important;
+}
+
+.theme-dark .filter-btn {
+  color: var(--text-secondary) !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+}
+
+.theme-dark .filter-btn:hover {
+  color: var(--accent-color) !important;
+  background: rgba(255, 107, 0, 0.05) !important;
+  border: 1px solid var(--accent-color) !important;
 }
 </style>

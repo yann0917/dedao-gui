@@ -46,12 +46,12 @@
 
                 <div class="comment-info flex items-left" style="text-align: left;" v-if="courseInfo.class_comment_info?.comment_list.length >0">
                     <el-divider content-position="left">
-                        <el-rate v-model="averageScore" disabled show-score :allow-half="true" text-color="#ff9900" />
+                        <el-rate v-model="averageScore" disabled show-score :allow-half="true" text-color="var(--accent-color)" />
                     </el-divider>
                     <el-carousel height="200px" direction="vertical" loop>
                         <el-carousel-item v-for="item in courseInfo.class_comment_info.comment_list" :key="item.id">
                             <p class="text-large font-600 mr-3" v-if="item.title"> {{ item.title }} </p>
-                            <p class="text-sm mr-2" style="color: var(--el-text-color-regular)"
+                            <p class="text-sm mr-2" style="color: var(--text-secondary)"
                                 v-if="item.no_style_content">
                                 <el-popover trigger="hover" placement="right" :width="300"
                                     :disabled="item.no_style_content.length <= 240" :content="item.no_style_content">
@@ -69,15 +69,12 @@
                             <el-avatar class="mr-3" :size="20" :src="item.avatar_s" /><span> &emsp;{{ item.nickname }}
                                 评价了
                                 <el-rate v-model.number="item.score" disabled show-score :allow-half="true"
-                                    text-color="#ff9900" />
+                                    text-color="var(--accent-color)" />
                             </span>
                         </el-carousel-item>
                     </el-carousel>
                 </div>
 
-                <div class="flex items-center">
-
-                </div>
                 <el-divider content-position="left">课程亮点</el-divider>
                 <div style="text-align:left">
                     <span v-html="courseInfo.class_info.highlight?.replaceAll('\n', '<br/>')"></span>
@@ -180,7 +177,7 @@ const getCourseInfo = async (enid: string) => {
 .my-header h4 {
   margin: 0;
   font-size: 20px;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .book-tag {
@@ -207,5 +204,101 @@ const getCourseInfo = async (enid: string) => {
 
 :deep(.el-alert) {
   margin-bottom: 8px;
+}
+
+/* 暗色主题适配 */
+.theme-dark .my-header h4 {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .text-sm {
+  color: var(--text-secondary) !important;
+}
+
+.theme-dark :deep(.el-rate__text) {
+  color: var(--accent-color) !important;
+}
+
+.theme-dark :deep(.el-dialog) {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-dark :deep(.el-dialog__header) {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border-bottom-color: var(--border-soft) !important;
+}
+
+.theme-dark :deep(.el-dialog__body) {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-dark :deep(.el-card) {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-dark :deep(.el-card__header) {
+  background-color: var(--card-bg) !important;
+  border-bottom-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-dark :deep(.el-card__body) {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-dark :deep(.el-divider__text) {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-dark :deep(.el-carousel__item) {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-dark :deep(.el-popover) {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-dark :deep(.el-popover__content) {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark :deep(.el-tag) {
+  background-color: var(--fill-color-light) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-dark :deep(.el-tag--success) {
+  background-color: var(--success-color-light) !important;
+  color: var(--success-color) !important;
+  border-color: var(--success-color) !important;
+}
+
+.theme-dark :deep(.el-tag--info) {
+  background-color: var(--info-color-light) !important;
+  color: var(--info-color) !important;
+  border-color: var(--info-color) !important;
+}
+
+.theme-dark :deep(.el-tag--warning) {
+  background-color: var(--warning-color-light) !important;
+  color: var(--warning-color) !important;
+  border-color: var(--warning-color) !important;
+}
+
+.theme-dark :deep(.el-tag--danger) {
+  background-color: var(--danger-color-light) !important;
+  color: var(--danger-color) !important;
+  border-color: var(--danger-color) !important;
 }
 </style>

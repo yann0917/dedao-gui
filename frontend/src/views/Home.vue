@@ -6,7 +6,7 @@
         class="classification"
         :collapse="true"
         :router="true"
-        active-text-color="#ffd04b"
+        active-text-color="var(--accent-color)"
         :popper-class="'menu-popper'"
         @open="handleOpen"
         @close="handleClose"
@@ -62,11 +62,11 @@
           </div>
           <div class="data">
             <p class="time">
-              <span>今日学习</span><em style="font-size: 22px;color:#333;">{{user.today_study_time > 0 ? (user.today_study_time / 60).toFixed(0):''}}</em><span>分钟</span>
+              <span>今日学习</span><em style="font-size: 22px;color:var(--text-primary);">{{user.today_study_time > 0 ? (user.today_study_time / 60).toFixed(0):''}}</em><span>分钟</span>
             </p>
             <el-divider border-style="dotted" />
             <p class="time">
-              <span>连续学习</span><em style="font-size: 22px;color: #333;">{{user.study_serial_days}}</em><span>天</span>
+              <span>连续学习</span><em style="font-size: 22px;color: var(--text-primary);">{{user.study_serial_days}}</em><span>天</span>
             </p>
           </div>
           <!-- <el-button class="button" @click="logout()"> 退出 </el-button> -->
@@ -139,7 +139,7 @@
                       show-score
                       allow-half
                       size="small"
-                      text-color="#ff6b00"
+                      text-color="var(--accent-color)"
                     />
                   </div>
                   <div class="bottom">
@@ -173,7 +173,7 @@
                       show-score
                       allow-half
                       size="small"
-                      text-color="#ff6b00"
+                      text-color="var(--accent-color)"
                     />
                     <p style="font-size: small; line-height: 0">
                       {{ item.learn_user_count }}人加入学习
@@ -205,6 +205,7 @@
                       :title="item.title"
                       :width="200"
                       trigger="hover"
+                      popper-class="ebook-popover"
                       :content="
                         ebookPopoverContent(item.intro, item.introduction)
                       "
@@ -231,7 +232,7 @@
                             show-score
                             allow-half
                             size="small"
-                            text-color="#ff6b00"
+                            text-color="var(--accent-color)"
                             v-if="item.score.length > 0"
                           />
                         </div>
@@ -586,8 +587,8 @@ h4 {
 
 .classification {
   width: 160px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  background: #fff;
+  box-shadow: var(--shadow-soft);
+  background: var(--card-bg);
 }
 
 /* 主菜单项样式 */
@@ -601,7 +602,7 @@ h4 {
 }
 
 .classification .el-sub-menu:hover {
-  background-color: #fff5f0;
+  background-color: var(--card-hover-bg);
 }
 
 /* 子菜单项样式 */
@@ -612,17 +613,17 @@ h4 {
   line-height: 40px;
   cursor: pointer;
   padding: 0 20px;
-  color: #666;
+  color: var(--text-secondary);
   transition: all 0.3s ease;
 }
 
 .el-menu .el-menu-item:hover {
-  background-color: #fff5f0 !important;
-  color: #ff6b00;
+  background-color: var(--card-hover-bg);
+  color: var(--accent-color);
 }
 
 .el-menu .el-menu-item.is-active {
-  background-color: #ff6b00 !important;
+  background-color: var(--accent-color) !important;
   color: #fff;
 }
 
@@ -631,7 +632,10 @@ h4 {
   min-width: 180px;
   padding: 8px 0;
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-soft);
+  background: var(--card-bg);
+  border: 1px solid var(--border-soft);
+  transition: all 0.3s ease;
 }
 
 .el-menu--popup .el-menu-item {
@@ -640,34 +644,69 @@ h4 {
   padding: 0 20px;
   margin: 0 8px;
   border-radius: 4px;
+  color: var(--text-primary);
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+
+.el-menu--popup .el-menu-item:hover {
+  background-color: var(--fill-color);
+  color: var(--accent-color);
+}
+
+.el-menu--popup .el-menu-item.is-active {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+
+/* 暗色模式下的子菜单弹出层 */
+.theme-dark .el-menu--popup {
+  background: var(--card-bg) !important;
+  border-color: var(--border-soft) !important;
+  box-shadow: var(--shadow-medium) !important;
+}
+
+.theme-dark .el-menu--popup .el-menu-item {
+  color: var(--text-primary) !important;
+  background-color: transparent !important;
+}
+
+.theme-dark .el-menu--popup .el-menu-item:hover {
+  background-color: var(--fill-color) !important;
+  color: var(--accent-color) !important;
+}
+
+.theme-dark .el-menu--popup .el-menu-item.is-active {
+  background-color: var(--accent-color) !important;
+  color: #fff !important;
 }
 
 /* 菜单标题样式 */
 .el-sub-menu__title {
   position: relative;
   padding-left: 20px !important;
-  color: #333;
+  color: var(--text-primary);
   font-weight: 500;
 }
 
 .el-sub-menu__title:hover {
-  background-color: #fff5f0 !important;
-  color: #ff6b00;
+  background-color: var(--card-hover-bg);
+  color: var(--accent-color);
 }
 
 /* 菜单图标样式 */
 .el-sub-menu__icon-arrow {
-  color: #999;
+  color: var(--text-tertiary);
   transition: all 0.3s ease;
 }
 
 .el-sub-menu:hover .el-sub-menu__icon-arrow {
-  color: #ff6b00;
+  color: var(--accent-color);
 }
 
 /* 更多菜单样式 */
 .el-sub-menu[index="more"] .el-sub-menu__title {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -689,7 +728,7 @@ h4 {
   right: 20px;
   bottom: 0;
   height: 1px;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--border-soft);
 }
 
 .el-carousel {
@@ -726,11 +765,16 @@ h4 {
   transition: all 0.3s ease;
   transform: translateZ(0);
   will-change: transform;
+  background: var(--card-bg);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-soft);
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .cards-cover .el-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-medium);
 }
 
 .cards-cover .el-card img {
@@ -792,15 +836,15 @@ h4 {
   border-radius: 4px;
   font-size: 14px;
   line-height: 32px;
-  color: #666;
-  background: #f5f5f5;
+  color: var(--text-secondary);
+  background: var(--fill-color-light);
   transition: all 0.2s ease;
   min-width: 64px;
   text-align: center;
 }
 .scrollbar-item:hover {
-  color: #ff6b00;
-  background: #f7f7f7;
+  color: var(--accent-color);
+  background: var(--card-hover-bg);
 }
 .active-btn {
   height: 32px;
@@ -808,14 +852,15 @@ h4 {
   border-radius: 4px;
   font-size: 14px;
   line-height: 32px;
-  background: #ff6b00;
+  background: var(--accent-color);
   color: #fff;
   min-width: 64px;
   text-align: center;
+  font-weight: 500;
 }
 .active-btn:hover {
   color: #fff !important;
-  background: #ff7b1a;
+  background: var(--accent-hover);
 }
 /* 覆盖 element-plus 的默认样式 */
 .el-button.is-text {
@@ -865,8 +910,8 @@ h4 {
 
 .classification {
   width: 160px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  background: #fff;
+  box-shadow: var(--shadow-soft);
+  background: var(--card-bg);
 }
 
 .classification .el-sub-menu {
@@ -879,7 +924,7 @@ h4 {
 }
 
 .classification .el-sub-menu:hover {
-  background-color: #fff5f0;
+  background-color: var(--card-hover-bg);
 }
 
 /* 中间 banner 样式 */
@@ -888,7 +933,7 @@ h4 {
     height: 380px;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-soft);
     margin-left: 32px;
   }
 
@@ -910,11 +955,11 @@ h4 {
   .el-carousel__arrow {
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 50%;
-    color: #666;
+    color: var(--text-secondary);
     
     &:hover {
-      background-color: #fff;
-      color: #ff6b00;
+      background-color: var(--card-bg);
+      color: var(--accent-color);
     }
   }
 }
@@ -922,10 +967,10 @@ h4 {
 /* 右侧用户信息样式 */
 .user {
   .not-login, .logged {
-    background: #fff;
+    background: var(--card-bg);
     border-radius: 12px;
     height: 380px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-soft);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -957,14 +1002,14 @@ h4 {
       border-radius: 22px;
       font-weight: 500;
       border: none;
-      background-color: #ff6b00;
+      background-color: var(--accent-color);
       color: #fff;
       transition: all 0.3s ease;
 
       &:hover {
-        background-color: #ff7b1a;
+        background-color: var(--accent-hover);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(255, 107, 0, 0.2);
+        box-shadow: var(--shadow-medium);
       }
     }
   }
@@ -979,7 +1024,7 @@ h4 {
       margin-bottom: 30px;
 
       .el-avatar {
-        border: 4px solid rgba(255, 107, 0, 0.1);
+        border: 4px solid var(--accent-color-light);
         transition: transform 0.3s ease;
 
         &:hover {
@@ -990,7 +1035,7 @@ h4 {
       h3 {
         margin: 16px 0 0;
         font-size: 18px;
-        color: #333;
+        color: var(--text-primary);
         font-weight: 500;
         text-align: center;
         max-width: 200px;
@@ -1002,10 +1047,10 @@ h4 {
 
     .data {
       width: 180px;
-      background: #fff;
+      background: var(--card-bg);
       border-radius: 16px;
       padding: 20px 0;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+      box-shadow: var(--shadow-soft);
       background: url(https://piccdn2.umiwi.com/fe-oss/default/MTYzNTMwNDkxMjc1.png) no-repeat center bottom / 180px 40px;
       
       .time {
@@ -1017,7 +1062,7 @@ h4 {
         text-align: center;
         
         span {
-          color: #666;
+          color: var(--text-secondary);
           font-size: 14px;
           margin-bottom: 4px;
         }
@@ -1025,7 +1070,7 @@ h4 {
         em {
           font-style: normal;
           font-size: 28px;
-          color: #ff6b00;
+          color: var(--accent-color);
           font-weight: 500;
           line-height: 1.2;
         }
@@ -1037,7 +1082,7 @@ h4 {
 
       .el-divider {
         margin: 20px 0;
-        border-color: rgba(0, 0, 0, 0.06);
+        border-color: var(--border-soft);
       }
     }
   }
@@ -1050,5 +1095,121 @@ h4 {
 
 .el-col {
   padding: 0 calc(var(--el-row-gutter) / 2);
+}
+
+/* 电子书弹出层样式 */
+.ebook-popover {
+  background-color: var(--card-bg);
+  border-color: var(--border-soft);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-medium);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.ebook-popover .el-popover__title {
+  color: var(--text-primary);
+  border-bottom-color: var(--border-soft);
+  font-weight: 500;
+}
+
+.ebook-popover .el-popover__content {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* 暗色模式下的电子书弹出层 */
+.theme-dark .ebook-popover {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+  box-shadow: var(--shadow-medium) !important;
+}
+
+.theme-dark .ebook-popover .el-popover__title {
+  color: var(--text-primary) !important;
+  border-bottom-color: var(--border-soft) !important;
+}
+
+.theme-dark .ebook-popover .el-popover__content {
+  color: var(--text-secondary) !important;
+}
+
+/* 暗色主题下的按钮样式适配 */
+.theme-dark .scrollbar-item {
+  color: var(--text-secondary) !important;
+  background: var(--fill-color-light) !important;
+}
+
+.theme-dark .scrollbar-item:hover {
+  color: var(--accent-color) !important;
+  background: var(--card-hover-bg) !important;
+}
+
+.theme-dark .active-btn {
+  background: var(--accent-color) !important;
+  color: #fff !important;
+  font-weight: 500 !important;
+  border: 1px solid var(--accent-color) !important;
+}
+
+.theme-dark .active-btn:hover {
+  background: var(--accent-hover) !important;
+  color: #fff !important;
+  border-color: var(--accent-hover) !important;
+}
+
+/* 暗色主题下的菜单样式 */
+.theme-dark .el-menu .el-menu-item {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .el-menu .el-menu-item:hover {
+  color: var(--accent-color) !important;
+  background-color: var(--card-hover-bg) !important;
+}
+
+.theme-dark .el-menu .el-menu-item.is-active {
+  color: #fff !important;
+  background-color: var(--accent-color) !important;
+}
+
+.theme-dark .el-sub-menu__title {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .el-sub-menu__title:hover {
+  color: var(--accent-color) !important;
+  background-color: var(--card-hover-bg) !important;
+}
+
+.theme-dark .el-sub-menu:hover .el-sub-menu__icon-arrow {
+  color: var(--accent-color) !important;
+}
+
+/* 暗色主题下的用户信息样式 */
+.theme-dark .user h3 {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .user .time span {
+  color: var(--text-secondary) !important;
+}
+
+.theme-dark .user .time em {
+  color: var(--accent-color) !important;
+}
+
+.theme-dark .user .el-divider {
+  border-color: var(--border-soft) !important;
+}
+
+/* 暗色主题下的轮播图箭头 */
+.theme-dark .el-carousel__arrow {
+  color: var(--text-secondary) !important;
+}
+
+.theme-dark .el-carousel__arrow:hover {
+  color: var(--accent-color) !important;
 }
 </style>

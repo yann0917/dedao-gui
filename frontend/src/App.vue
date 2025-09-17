@@ -1,12 +1,23 @@
 <script lang="ts" setup>
+import { onMounted, computed } from 'vue'
 import Menu from './components/Menu.vue'
 import { ElConfigProvider } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import { themeStore } from './stores/theme'
+
+// 初始化主题
+const store = themeStore()
+onMounted(() => {
+  store.initTheme()
+})
+
+// Element Plus 主题配置
+const elementTheme = computed(() => store.isDark ? 'dark' : 'light')
 </script>
 
 <template>
-  <el-config-provider :locale="zhCn">
+  <el-config-provider :locale="zhCn" :theme="elementTheme">
     <el-container>
       <el-header>
         <Menu />
@@ -39,6 +50,8 @@ body {
 
 .el-container {
   height: 100%;
+  background-color: var(--bg-color);
+  transition: background-color 0.3s ease;
 }
 
 .el-header {
@@ -49,6 +62,9 @@ body {
   justify-content: space-between;
   height: 60px;
   padding: 0 0;
+  background-color: var(--bg-color);
+  border-bottom: 1px solid var(--border-color-lighter);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 
   .el-menu {
     height: auto;
@@ -56,9 +72,10 @@ body {
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     background-color: transparent;
     border-bottom-width: 0px;
+    flex: 1;
 
     .el-menu-item:hover,
     .el-menu-item:active,
@@ -80,6 +97,8 @@ body {
         text-decoration: none;
         white-space: nowrap;
         text-decoration: none;
+        color: var(--text-color);
+        transition: color 0.3s ease;
       }
     }
   }
@@ -88,9 +107,11 @@ body {
 
 .el-main {
   overflow-y: scroll;
-  // color: #606266;
+  color: var(--text-color-secondary);
   width: 100%;
   height: 100%;
+  background-color: var(--bg-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 
   .el-pagination {
     margin-top: 10px;

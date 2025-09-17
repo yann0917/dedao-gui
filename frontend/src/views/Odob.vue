@@ -1,6 +1,12 @@
 <template>
-    <el-table :data="tableData.list" v-loading="loading" height="97%" width="100%" :cell-style="{ textAlign: 'left' }"
-              :header-cell-style="{ textAlign: 'left' }" :row-style="{ height: '50px' }" table-layout="auto" >
+    <el-table 
+        :data="tableData.list" 
+        v-loading="loading" 
+        height="97%" 
+        width="100%" 
+        class="custom-table"
+        table-layout="auto"
+    >
         <!-- <el-table-column prop="id" label="ID" width="100"/> -->
         <el-table-column prop="title" label="标题" width="280">
             <template #default="scope">
@@ -47,16 +53,22 @@
 
         <el-table-column fixed="right" label="操作" width="240">
             <template #default="scope">
-                <el-button icon="VideoPlay" size="small" type="primary" link @click="handlePlay(scope.row)">播放
+                <el-tooltip content="播放">
+                <el-button icon="VideoPlay" size="small" type="primary" link @click="handlePlay(scope.row)">
                 </el-button>
-                <el-button icon="Memo" size="small" type="primary" link @click="gotoArticleDetail(scope.row)">文稿
+                </el-tooltip>
+                <el-tooltip content="文稿">
+                <el-button icon="Memo" size="small" type="primary" link @click="gotoArticleDetail(scope.row)">
                 </el-button>
+                </el-tooltip>
                 <el-tooltip content="详情">
                 <el-button icon="view" size="small" type="primary" link @click="handleProd(scope.row)">
                 </el-button>
               </el-tooltip>
-                <el-button icon="download" size="small" type="primary" link @click="openDownloadDialog(scope.row)">下载
+              <el-tooltip content="下载">
+                <el-button icon="download" size="small" type="primary" link @click="openDownloadDialog(scope.row)">
                 </el-button>
+                </el-tooltip>
 
             </template>
         </el-table-column>
@@ -369,4 +381,92 @@ const handleProd = (row: any) => {
 }
 
 </script>
+
+<style scoped>
+/* 自定义表格样式 */
+.custom-table {
+  text-align: left;
+}
+
+.custom-table :deep(.el-table__cell) {
+  text-align: left;
+  height: 50px;
+}
+
+.custom-table :deep(.el-table__header .el-table__cell) {
+  text-align: left;
+  font-weight: 500;
+  background-color: var(--fill-color);
+  color: var(--text-primary);
+}
+
+.custom-table :deep(.el-table__body .el-table__cell) {
+  text-align: left;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  border-color: var(--border-soft);
+}
+
+.custom-table :deep(.el-table__row:hover .el-table__cell) {
+  background-color: var(--fill-color);
+  color: var(--text-primary);
+}
+
+/* 暗色模式下的表格样式 */
+.theme-dark .custom-table :deep(.el-table__header .el-table__cell) {
+  background-color: var(--fill-color) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-soft) !important;
+}
+
+.theme-dark .custom-table :deep(.el-table__body .el-table__cell) {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-soft) !important;
+}
+
+.theme-dark .custom-table :deep(.el-table__row:hover .el-table__cell) {
+  background-color: var(--fill-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* 表格按钮样式 */
+.custom-table :deep(.el-button--primary.is-link) {
+  color: var(--accent-color);
+  padding: 4px 8px;
+}
+
+.custom-table :deep(.el-button--primary.is-link:hover) {
+  color: var(--accent-hover);
+  background-color: var(--fill-color);
+}
+
+/* 表格标签样式 */
+.custom-table :deep(.el-tag) {
+  background-color: var(--fill-color);
+  border-color: var(--border-soft);
+  color: var(--text-primary);
+}
+
+/* 表格图片样式 */
+.custom-table :deep(.el-image) {
+  border-radius: 4px;
+  border: 1px solid var(--border-soft);
+}
+
+/* 表格弹出层样式 */
+.custom-table :deep(.el-popover) {
+  background-color: var(--card-bg);
+  border-color: var(--border-soft);
+  color: var(--text-primary);
+}
+
+.custom-table :deep(.el-popover .el-popover__title) {
+  color: var(--text-primary);
+}
+
+.custom-table :deep(.el-popover .el-popover__content) {
+  color: var(--text-secondary);
+}
+</style>
   

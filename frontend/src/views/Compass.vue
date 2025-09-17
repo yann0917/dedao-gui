@@ -3,7 +3,8 @@
         :cell-style="{ textAlign: 'left' }"
         :header-cell-style="{ textAlign: 'left' }"
         :row-style="{ height: '30px' }"
-        table-layout="auto">
+        table-layout="auto"
+        class="custom-table">
         <!-- <el-table-column prop="id" label="ID" width="100" /> -->
         <el-table-column prop="title" label="标题" width="320" />
         <el-table-column prop="icon" label="封面" width="80">
@@ -155,5 +156,45 @@ const download = async (id: number, dType: number) => {
 
 .el-col {
     border-radius: 4px;
+}
+
+/* 自定义表格样式 */
+.custom-table {
+    text-align: left;
+}
+
+.custom-table :deep(.el-table__cell) {
+    text-align: left;
+    height: 50px;
+}
+
+/* 暗色主题适配 */
+.theme-dark .custom-table {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .custom-table :deep(.el-table__header) {
+    background-color: var(--fill-color-light) !important;
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .custom-table :deep(.el-table__body) {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .custom-table :deep(.el-table__row) {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .custom-table :deep(.el-table__row:hover) {
+    background-color: var(--card-hover-bg) !important;
+}
+
+.theme-dark .custom-table :deep(.el-table__cell) {
+    border-color: var(--border-soft) !important;
+    color: var(--text-primary) !important;
 }
 </style>
