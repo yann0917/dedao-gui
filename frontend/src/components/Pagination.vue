@@ -78,7 +78,7 @@ const handleCurrentChange = (val:any)=>{
 
 .custom-pagination :deep(.el-pagination__sizes .el-select .el-input__inner:focus) {
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2);
+    box-shadow: 0 0 0 2px var(--accent-color, rgba(255, 107, 0, 0.2));
 }
 
 .custom-pagination :deep(.el-pager li) {
@@ -173,7 +173,7 @@ const handleCurrentChange = (val:any)=>{
 
 .custom-pagination :deep(.el-pagination__jump .el-input__inner:focus) {
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2);
+    box-shadow: 0 0 0 2px var(--accent-color, rgba(255, 107, 0, 0.2));
 }
 
 /* 暗色模式下的分页器样式 */
@@ -193,7 +193,7 @@ const handleCurrentChange = (val:any)=>{
 
 .theme-dark .custom-pagination :deep(.el-pagination__sizes .el-select .el-input__inner:focus) {
     border-color: var(--accent-color) !important;
-    box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2) !important;
+    box-shadow: 0 0 0 2px var(--accent-color, rgba(255, 107, 0, 0.2)) !important;
 }
 
 .theme-dark .custom-pagination :deep(.el-pager li) {
@@ -264,6 +264,6 @@ const handleCurrentChange = (val:any)=>{
 
 .theme-dark .custom-pagination :deep(.el-pagination__jump .el-input__inner:focus) {
     border-color: var(--accent-color) !important;
-    box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2) !important;
+    box-shadow: 0 0 0 2px var(--accent-color, rgba(255, 107, 0, 0.2)) !important;
 }
 </style>

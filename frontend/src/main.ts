@@ -5,6 +5,7 @@ import App from './App.vue'
 import router from "./router";
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
+import { themeStore } from './stores/theme'
 
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css' //样式
@@ -45,5 +46,10 @@ app.config.warnHandler = function(msg, vm, trace) {
   console.warn('warnHandler msg: %o, vm: %o, trace: %o', msg, vm, trace)
 }
 
+// 在应用挂载后初始化主题
 app.mount('#app')
+
+// 初始化主题 - 必须在应用挂载后
+const theme = themeStore()
+theme.initTheme()
 

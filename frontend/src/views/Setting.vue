@@ -177,11 +177,14 @@ import {
   CircleCheck
 } from '@element-plus/icons-vue'
 import { settingStore } from "../stores/setting"
+import { themeStore } from "../stores/theme"
 import { OpenDirectoryDialog } from "../../wailsjs/go/backend/App"
 import { setThemeColor } from "../utils/utils"
 import { ElMessage } from 'element-plus'
 
 const store = settingStore()
+const themeStoreInstance = themeStore()
+
 const predefineColors = ref([
   '#ff6b00',
   '#ff4500',
@@ -202,7 +205,7 @@ const predefineColors = ref([
 
 const form = reactive({
   downloadDir: store.getDownloadDir,
-  systemColor: store.getColor,
+  systemColor: themeStoreInstance.color || store.getColor || '#ff6b00',
   ffmpegDir: store.getFfmpegDirDir,
   wkhtmltopdfDir: store.getWkDir,
 })
@@ -210,7 +213,7 @@ const form = reactive({
 // 保存原始设置值用于重置
 const originalSettings = {
   downloadDir: store.getDownloadDir,
-  systemColor: store.getColor,
+  systemColor: themeStoreInstance.color || store.getColor || '#ff6b00',
   ffmpegDir: store.getFfmpegDirDir,
   wkhtmltopdfDir: store.getWkDir,
 }
@@ -265,11 +268,14 @@ const resetForm = () => {
 const onSubmit = () => {
   console.log('保存设置:', form)
   
-  // 更新存储
+  // 更新设置存储
   store.setting.downloadDir = form.downloadDir
   store.setting.theme = form.systemColor
   store.setting.ffmpegDir = form.ffmpegDir
   store.setting.wkhtmltopdfDir = form.wkhtmltopdfDir
+  
+  // 更新主题存储
+  themeStoreInstance.setThemeColor(form.systemColor)
   
   // 更新原始设置，用于重置
   Object.assign(originalSettings, {

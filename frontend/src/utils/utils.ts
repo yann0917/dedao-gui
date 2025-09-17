@@ -1,6 +1,5 @@
 import {settingStore} from "../stores/setting";
 import {OpenDirectoryDialog} from "../../wailsjs/go/backend/App";
-const store = settingStore()
 export const secondToHour = function (msd:number) {
     let second = 0; // 秒
     let minute = 0; // 分
@@ -49,25 +48,75 @@ export const  timestampToDate = (timestamp:number)=> {
 export function setThemeColor(color:any) {
   const el = document.documentElement;
   const body = document.querySelector("body");
-  // const nprogress = document.querySelector("#nprogress .bar");
-  // console.log(nprogress)
+  
+  // 设置 Element Plus 主题色
   el.style.setProperty("--el-color-primary", color);
   body?.style.setProperty("--van-primary-color", color);
-  // nprogress.style.setProperty("background", color);
-  // 此行判断是否为白天/暗夜模式，可根据自身业务调整代码
-  let mixColor = store.setting.theme === "light" ? "#ffffff" : "#000000";
-  // 此行判断是否为白天/暗夜模式，可根据自身业务调整代码
+  
+  // 设置自定义主题色变量
+  el.style.setProperty("--accent-color", color);
+  
+  // 生成主题色的悬停效果色
+  const hoverColor = adjustBrightness(color, 20);
+  el.style.setProperty("--accent-hover", hoverColor);
+  
+  // 判断当前主题模式
+  const isDark = el.classList.contains('theme-dark');
+  let mixColor = isDark ? "#000000" : "#ffffff";
+  
+  // 生成主题色的各种变体
   for (let i = 1; i < 10; i++) {
     el.style.setProperty(`--el-color-primary-light-${i}`, colourBlend(color, mixColor, i / 10));
     el.style.setProperty(`--el-color-primary-dark-${i}`, colourBlend(color, mixColor, i / 10));
   }
   el.style.setProperty(`--el-color-primary-dark-2`, colourBlend(color, mixColor, 0.2));
-  if (mixColor == "#ffffff") {
-    store.setting.theme="light"
-  } else {
-    store.setting.theme="dark"
+  
+  // 更新设置存储 - 在函数内部获取 store 实例
+  try {
+    const store = settingStore();
+    store.setting.color = color;
+    store.setting.theme = isDark ? "dark" : "light";
+  } catch (error) {
+    console.warn('无法更新设置存储，可能 Pinia 尚未初始化:', error);
   }
-  store.setting.color = color
+  
+  // 生成暗色模式下的主题色变体
+  if (isDark) {
+    generateDarkThemeColors(color);
+  }
+}
+
+// 调整颜色亮度的辅助函数
+function adjustBrightness(color: string, percent: number): string {
+  const num = parseInt(color.replace("#", ""), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = (num >> 16) + amt;
+  const G = (num >> 8 & 0x00FF) + amt;
+  const B = (num & 0x0000FF) + amt;
+  return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+    (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+    (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+}
+
+// 生成暗色模式下的主题色变体
+function generateDarkThemeColors(primaryColor: string) {
+  const el = document.documentElement;
+  
+  // 生成暗色模式下的主题色变体
+  const darkAccent = adjustBrightness(primaryColor, -10);
+  const darkAccentHover = adjustBrightness(primaryColor, 10);
+  
+  el.style.setProperty("--accent-color-dark", darkAccent);
+  el.style.setProperty("--accent-hover-dark", darkAccentHover);
+  
+  // 生成暗色模式下的背景色变体
+  const darkBg = adjustBrightness(primaryColor, -95);
+  const darkCardBg = adjustBrightness(primaryColor, -90);
+  const darkHoverBg = adjustBrightness(primaryColor, -85);
+  
+  el.style.setProperty("--dark-bg-color", darkBg);
+  el.style.setProperty("--dark-card-bg", darkCardBg);
+  el.style.setProperty("--dark-hover-bg", darkHoverBg);
 }
 
 export function colourBlend(c1:any, c2:any, ratio:any) {

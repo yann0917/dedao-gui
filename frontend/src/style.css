@@ -63,11 +63,18 @@
     --text-primary: #f0f6fc;
     --text-secondary: #c9d1d9;
     --text-tertiary: #8b949e;
-    --accent-color: #ff6b00;
-    --accent-hover: #ff7b1a;
+    --accent-color: var(--accent-color, #ff6b00);
+    --accent-hover: var(--accent-hover, #ff7b1a);
     --border-soft: #30363d;
     --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.36);
     --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.48);
+    
+    /* 动态主题色变量 - 在暗色模式下使用更柔和的主题色 */
+    --accent-color-dark: var(--accent-color-dark, var(--accent-color));
+    --accent-hover-dark: var(--accent-hover-dark, var(--accent-hover));
+    --dark-bg-color: var(--dark-bg-color, #0d1117);
+    --dark-card-bg: var(--dark-card-bg, #161b22);
+    --dark-hover-bg: var(--dark-hover-bg, #21262d);
 }
 
 html {

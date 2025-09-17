@@ -430,16 +430,6 @@ const handleProd = (row: any) => {
   color: var(--text-primary) !important;
 }
 
-/* 表格按钮样式 */
-.custom-table :deep(.el-button--primary.is-link) {
-  color: var(--accent-color);
-  padding: 4px 8px;
-}
-
-.custom-table :deep(.el-button--primary.is-link:hover) {
-  color: var(--accent-hover);
-  background-color: var(--fill-color);
-}
 
 /* 表格标签样式 */
 .custom-table :deep(.el-tag) {

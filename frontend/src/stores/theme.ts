@@ -1,6 +1,7 @@
 import { ref, computed, reactive } from "vue";
 import { defineStore } from "pinia";
 import { services } from '../../wailsjs/go/models'
+import { setThemeColor } from '../utils/utils'
 
 export const themeStore = defineStore("themeStore",  {
     state:() =>{
@@ -8,7 +9,7 @@ export const themeStore = defineStore("themeStore",  {
             // 主题模式：'light' | 'dark'
             theme: 'light' as 'light' | 'dark',
             // 主题颜色
-            color: '#409EFF',
+            color: '#ff6b00',
         }
     },
     getters: {
@@ -31,6 +32,12 @@ export const themeStore = defineStore("themeStore",  {
             this.theme = theme;
             this.applyTheme();
         },
+        // 设置主题色
+        setThemeColor(color: string) {
+            console.log('设置主题色:', color);
+            this.color = color;
+            setThemeColor(color);
+        },
         // 应用主题到 DOM
         applyTheme() {
             const html = document.documentElement;
@@ -41,6 +48,8 @@ export const themeStore = defineStore("themeStore",  {
             html.classList.add(this.themeClass);
             // 设置 CSS 变量
             html.setAttribute('data-theme', this.theme);
+            // 应用主题色
+            setThemeColor(this.color);
             console.log('HTML 类名:', html.className);
         },
         // 初始化主题
