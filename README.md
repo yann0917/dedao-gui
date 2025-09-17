@@ -35,8 +35,9 @@
 * 课程可生成PDF，文稿生成 Markdown 文档，也可生成 mp3 文件
 * 每天听本书可下载音频，文稿生成 pdf、 Markdown 文档
 * 电子书可下载 pdf，html, epub 等格式
+* UI亮色/暗色主题切换
 
-### 注：
+### 注
 
 1. 下载均在后台执行，下载完毕弹框会关闭，等待弹窗关闭或者点击确定下载后关闭，均会在后台执行下载程序。
 2. 如果遇到 `496 NoCertificate` 消息提示，请登录网页版进行图形验证码验证。
@@ -60,8 +61,6 @@ wails 构建需要安装以下依赖：
 
 #### pdf下载
 
-* google chrome
-  > 课程生成 PDF 需要借助 [Google-Chrome](https://www.google.cn/intl/zh-CN/chrome/)的渲染引擎
 * wkhtmltopdf
   > 电子书转 PDF 需要借助[wkhtmltopdf](https://wkhtmltopdf.org/downloads.html)
 
@@ -70,7 +69,7 @@ wails 构建需要安装以下依赖：
 * ffmpeg
   > 音频需要借助 [ffmpeg](https://ffmpeg.org/) 合成
 
-### 功能截图如下：
+### 功能截图如下
 
 ![](image/Snipaste_2023-04-16_21-11-23.png)
 ![](image/Snipaste_2023-04-17_00-01-03.png)
