@@ -1254,6 +1254,481 @@ export namespace services {
 	        this.playOrder = source["playOrder"];
 	    }
 	}
+	export class ChannelItemSource {
+	    source_name: string;
+	    source_type: number;
+	    source_id: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChannelItemSource(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.source_name = source["source_name"];
+	        this.source_type = source["source_type"];
+	        this.source_id = source["source_id"];
+	    }
+	}
+	export class ChannelItem {
+	    product_type: number;
+	    product_id: number;
+	    en_id: string;
+	    class_id: number;
+	    class_en_id: string;
+	    title: string;
+	    cover: string;
+	    logo: string;
+	    summary: string;
+	    difficulty_level: number;
+	    ddurl: string;
+	    status: string;
+	    has_video: boolean;
+	    has_live: boolean;
+	    duration: number;
+	    progress: number;
+	    publish_time: number;
+	    learn_count: number;
+	    is_read: boolean;
+	    live_status: number;
+	    live_playback_status: number;
+	    live_status_tips: string;
+	    source: ChannelItemSource;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChannelItem(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.product_type = source["product_type"];
+	        this.product_id = source["product_id"];
+	        this.en_id = source["en_id"];
+	        this.class_id = source["class_id"];
+	        this.class_en_id = source["class_en_id"];
+	        this.title = source["title"];
+	        this.cover = source["cover"];
+	        this.logo = source["logo"];
+	        this.summary = source["summary"];
+	        this.difficulty_level = source["difficulty_level"];
+	        this.ddurl = source["ddurl"];
+	        this.status = source["status"];
+	        this.has_video = source["has_video"];
+	        this.has_live = source["has_live"];
+	        this.duration = source["duration"];
+	        this.progress = source["progress"];
+	        this.publish_time = source["publish_time"];
+	        this.learn_count = source["learn_count"];
+	        this.is_read = source["is_read"];
+	        this.live_status = source["live_status"];
+	        this.live_playback_status = source["live_playback_status"];
+	        this.live_status_tips = source["live_status_tips"];
+	        this.source = this.convertValues(source["source"], ChannelItemSource);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ChannelTopicCategory {
+	    id: number;
+	    channel_id: number;
+	    title: string;
+	    icon: string;
+	    night_icon: string;
+	    intro: string;
+	    description: string;
+	    status: number;
+	    sort_no: number;
+	    content_type: string;
+	    show_homepage: number;
+	    dd_url: string;
+	    items: ChannelItem[];
+	    length: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChannelTopicCategory(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.channel_id = source["channel_id"];
+	        this.title = source["title"];
+	        this.icon = source["icon"];
+	        this.night_icon = source["night_icon"];
+	        this.intro = source["intro"];
+	        this.description = source["description"];
+	        this.status = source["status"];
+	        this.sort_no = source["sort_no"];
+	        this.content_type = source["content_type"];
+	        this.show_homepage = source["show_homepage"];
+	        this.dd_url = source["dd_url"];
+	        this.items = this.convertValues(source["items"], ChannelItem);
+	        this.length = source["length"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ChannelHomepageCategory {
+	    category_id: number;
+	    category_name: string;
+	    category_icon: string;
+	    category_dark_icon: string;
+	    list: ChannelTopicCategory[];
+	
+	    static createFrom(source: any = {}) {
+	        return new ChannelHomepageCategory(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.category_id = source["category_id"];
+	        this.category_name = source["category_name"];
+	        this.category_icon = source["category_icon"];
+	        this.category_dark_icon = source["category_dark_icon"];
+	        this.list = this.convertValues(source["list"], ChannelTopicCategory);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ChannelStyleSheet {
+	    host_bg: string;
+	    host_border: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChannelStyleSheet(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.host_bg = source["host_bg"];
+	        this.host_border = source["host_border"];
+	    }
+	}
+	export class ChannelSellingPoint {
+	    count_desc: string;
+	    name: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChannelSellingPoint(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.count_desc = source["count_desc"];
+	        this.name = source["name"];
+	    }
+	}
+	export class ChannelStatistics {
+	    total_subscribers: number;
+	    selling_points: ChannelSellingPoint[];
+	    content_quantity: number;
+	    messages: string[];
+	    tips: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new ChannelStatistics(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.total_subscribers = source["total_subscribers"];
+	        this.selling_points = this.convertValues(source["selling_points"], ChannelSellingPoint);
+	        this.content_quantity = source["content_quantity"];
+	        this.messages = source["messages"];
+	        this.tips = source["tips"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ChannelPerson {
+	    uid: number;
+	    name: string;
+	    title: string;
+	    bio: string;
+	    avatar: string;
+	    v_stat: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChannelPerson(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.uid = source["uid"];
+	        this.name = source["name"];
+	        this.title = source["title"];
+	        this.bio = source["bio"];
+	        this.avatar = source["avatar"];
+	        this.v_stat = source["v_stat"];
+	    }
+	}
+	export class ChannelInfo {
+	    channel_id: number;
+	    is_free: boolean;
+	    is_sharable: boolean;
+	    is_show_equity: boolean;
+	    subscription_ptype: number;
+	    theme: string;
+	    title: string;
+	    description: string;
+	    logo: string;
+	    badge: string;
+	    theme_color: string;
+	    host: ChannelPerson;
+	    hosts: ChannelPerson[];
+	    guests: ChannelPerson[];
+	    equity_title: string;
+	    equity_description: string;
+	    guests_url: string;
+	    equity_url: string;
+	    purchase_url: string;
+	    guests_ddurl: string;
+	    equity_ddurl: string;
+	    purchase_ddurl: string;
+	    statistics: ChannelStatistics;
+	    main_button: string;
+	    vice_button: string;
+	    vice_line: string;
+	    style_sheet: ChannelStyleSheet;
+	    equity_manage_ddurl: string;
+	    is_vip: boolean;
+	    is_pop: boolean;
+	    show_ai_assistant: boolean;
+	    show_new_classes_layout: boolean;
+	    show_coupon_renewal: boolean;
+	    countdown_tips: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChannelInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.channel_id = source["channel_id"];
+	        this.is_free = source["is_free"];
+	        this.is_sharable = source["is_sharable"];
+	        this.is_show_equity = source["is_show_equity"];
+	        this.subscription_ptype = source["subscription_ptype"];
+	        this.theme = source["theme"];
+	        this.title = source["title"];
+	        this.description = source["description"];
+	        this.logo = source["logo"];
+	        this.badge = source["badge"];
+	        this.theme_color = source["theme_color"];
+	        this.host = this.convertValues(source["host"], ChannelPerson);
+	        this.hosts = this.convertValues(source["hosts"], ChannelPerson);
+	        this.guests = this.convertValues(source["guests"], ChannelPerson);
+	        this.equity_title = source["equity_title"];
+	        this.equity_description = source["equity_description"];
+	        this.guests_url = source["guests_url"];
+	        this.equity_url = source["equity_url"];
+	        this.purchase_url = source["purchase_url"];
+	        this.guests_ddurl = source["guests_ddurl"];
+	        this.equity_ddurl = source["equity_ddurl"];
+	        this.purchase_ddurl = source["purchase_ddurl"];
+	        this.statistics = this.convertValues(source["statistics"], ChannelStatistics);
+	        this.main_button = source["main_button"];
+	        this.vice_button = source["vice_button"];
+	        this.vice_line = source["vice_line"];
+	        this.style_sheet = this.convertValues(source["style_sheet"], ChannelStyleSheet);
+	        this.equity_manage_ddurl = source["equity_manage_ddurl"];
+	        this.is_vip = source["is_vip"];
+	        this.is_pop = source["is_pop"];
+	        this.show_ai_assistant = source["show_ai_assistant"];
+	        this.show_new_classes_layout = source["show_new_classes_layout"];
+	        this.show_coupon_renewal = source["show_coupon_renewal"];
+	        this.countdown_tips = source["countdown_tips"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	
+	export class ChannelMedal {
+	    dd_url: string;
+	    status: number;
+	    icon: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChannelMedal(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.dd_url = source["dd_url"];
+	        this.status = source["status"];
+	        this.icon = source["icon"];
+	    }
+	}
+	
+	
+	
+	
+	
+	export class DefaultVipCard {
+	    pid: number;
+	    ptype: number;
+	    img: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new DefaultVipCard(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.pid = source["pid"];
+	        this.ptype = source["ptype"];
+	        this.img = source["img"];
+	    }
+	}
+	export class ChannelVipInfo {
+	    uid: number;
+	    nickname: string;
+	    slogan: string;
+	    avatar: string;
+	    avatar_s: string;
+	    v_state_value: number;
+	    is_vip: boolean;
+	    begin_time: number;
+	    end_time: number;
+	    expire_time: number;
+	    current_time: number;
+	    surplus_days: number;
+	    subscribed_days: number;
+	    is_ever_subscribed: boolean;
+	    is_expire: boolean;
+	    current_work_card_id: number;
+	    err_tips: string;
+	    medals: ChannelMedal[];
+	    default_vip_card: DefaultVipCard;
+	    equity_intro: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChannelVipInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.uid = source["uid"];
+	        this.nickname = source["nickname"];
+	        this.slogan = source["slogan"];
+	        this.avatar = source["avatar"];
+	        this.avatar_s = source["avatar_s"];
+	        this.v_state_value = source["v_state_value"];
+	        this.is_vip = source["is_vip"];
+	        this.begin_time = source["begin_time"];
+	        this.end_time = source["end_time"];
+	        this.expire_time = source["expire_time"];
+	        this.current_time = source["current_time"];
+	        this.surplus_days = source["surplus_days"];
+	        this.subscribed_days = source["subscribed_days"];
+	        this.is_ever_subscribed = source["is_ever_subscribed"];
+	        this.is_expire = source["is_expire"];
+	        this.current_work_card_id = source["current_work_card_id"];
+	        this.err_tips = source["err_tips"];
+	        this.medals = this.convertValues(source["medals"], ChannelMedal);
+	        this.default_vip_card = this.convertValues(source["default_vip_card"], DefaultVipCard);
+	        this.equity_intro = source["equity_intro"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class Chapter {
 	    id: number;
 	    id_str: string;
@@ -2428,6 +2903,7 @@ export namespace services {
 		    return a;
 		}
 	}
+	
 	
 	export class SelfInfo {
 	    score: number;

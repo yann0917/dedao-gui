@@ -540,3 +540,44 @@ func (s *Service) reqAlgoProduct(param AlgoFilterParam) (io.ReadCloser, error) {
 		Post("/pc/label/v2/algo/pc/product/list")
 	return handleHTTPResponse(resp, err)
 }
+
+// reqChannelInfo 请求学习圈频道信息
+// channelID: 频道ID
+func (s *Service) reqChannelInfo(channelID int) (io.ReadCloser, error) {
+	resp, err := s.client.R().
+		SetBody(map[string]interface{}{
+			"channel_id": channelID,
+		}).
+		Post("/sphere/v1/app/channel/info")
+	return handleHTTPResponse(resp, err)
+}
+
+// reqChannelHomepage 请求学习圈频道首页分类
+func (s *Service) reqChannelHomepage(channelID int) (io.ReadCloser, error) {
+	resp, err := s.client.R().
+		SetBody(map[string]interface{}{
+			"channel_id": channelID,
+		}).
+		Post("/pc/sphere/v1/app/topic/homepage/v2")
+	return handleHTTPResponse(resp, err)
+}
+
+// reqChannelVipInfo 请求学习圈VIP/权限信息
+// 使用 query 参数 channel_id 并以 POST 方式请求
+func (s *Service) reqChannelVipInfo(channelID int) (io.ReadCloser, error) {
+	resp, err := s.client.R().
+		SetQueryParam("channel_id", fmt.Sprintf("%d", channelID)).
+		Post("/sphere/v1/app/vip/info")
+	return handleHTTPResponse(resp, err)
+}
+
+// reqEbookNoteList 请求电子书笔记列表
+// bookEnid: 电子书的加密ID
+func (s *Service) reqEbookNoteList(bookEnid string) (io.ReadCloser, error) {
+	resp, err := s.client.R().
+		SetBody(map[string]interface{}{
+			"book_enid": bookEnid,
+		}).
+		Post("/api/pc/ledgers/ebook/list")
+	return handleHTTPResponse(resp, err)
+}

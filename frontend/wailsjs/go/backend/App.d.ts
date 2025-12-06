@@ -14,6 +14,14 @@ export function ArticleList(arg1:string,arg2:string,arg3:number,arg4:number):Pro
 
 export function AudioDetail(arg1:string):Promise<services.AudioInfoResp>;
 
+export function ChannelCategoryList(arg1:number,arg2:number):Promise<Array<services.ChannelTopicCategory>>;
+
+export function ChannelHomepage(arg1:number):Promise<Array<services.ChannelHomepageCategory>>;
+
+export function ChannelInfo(arg1:number):Promise<services.ChannelInfo>;
+
+export function ChannelVipInfo(arg1:number):Promise<services.ChannelVipInfo>;
+
 export function CheckLogin(arg1:string,arg2:string):Promise<backend.LoginResult>;
 
 export function CourseCategory():Promise<Array<services.CourseCategory>>;
