@@ -16,13 +16,18 @@
       "ESNext",
       "DOM"
     ],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "../wailsjs/*": ["./wailsjs/*"]
+    }
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
+    "../wailsjs/**/*.ts",
+    "../wailsjs/**/*.d.ts"
   ],
   "references": [
     {

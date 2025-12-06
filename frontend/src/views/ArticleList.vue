@@ -1,6 +1,6 @@
 <template>
     <el-breadcrumb :separator-icon="ArrowRight">
-        <el-breadcrumb-item :to="{ path: '/course' }">课程列表</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ name: ROUTE_NAMES.COURSE }">课程列表</el-breadcrumb-item>
         <el-breadcrumb-item>{{ breadcrumbTitle }}</el-breadcrumb-item>
     </el-breadcrumb>
     <div
@@ -79,7 +79,7 @@ import {ElMessage, ElTable} from 'element-plus'
 import {ArrowRight} from '@element-plus/icons-vue'
 import {ArticleList, SetDir} from '../../wailsjs/go/backend/App'
 import {services} from '../../wailsjs/go/models'
-import {useRoute, useRouter} from 'vue-router'
+import {useRoute} from 'vue-router'
 import {secondToHour} from '../utils/utils'
 import DownloadDialog from "../components/DownloadDialog.vue";
 
@@ -88,6 +88,8 @@ import "video.js/dist/video-js.css"
 import {settingStore} from "../stores/setting";
 import { User, Clock, Calendar } from '@element-plus/icons-vue'
 import { timestampToDate } from '../utils/utils'
+import {useAppRouter} from '../composables/useRouter'
+import {ROUTE_NAMES} from '../router/routes'
 
 const audioPlayer = ref()
 let media = ref()
@@ -108,7 +110,7 @@ const layout = ref('total, sizes, next')
 const pageSizes = ref([10, 15, 20, 30, 50]);
 const route = useRoute()
 const setStore = settingStore()
-const router = useRouter()
+const { router, pushArticleDetail, pushVideo } = useAppRouter()
 
 const dialogDownloadVisible = ref(false)
 const downloadType = ref(1)
@@ -311,30 +313,23 @@ const closeDownloadDialog = () => {
 }
 
 const gotoArticleDetail = (row: any) => {
-    let total = route.query.total
-    router.push({
-        path: `/article/${row.enid}`,
-        query: {
-            from: "course",
-            class_id: row.class_id,
-            class_enid: row.class_enid,
-            total: total,
-            title: row.title,
-            parentTitle: breadcrumbTitle.value
-        }
+    const total = route.query.total
+    pushArticleDetail(row.enid, 'course', {
+        class_id: row.class_id,
+        class_enid: row.class_enid,
+        total: total,
+        title: row.title,
+        parentTitle: breadcrumbTitle.value
     })
 }
 
 const gotoArticleVideo = (row: any) => {
-    router.push({
-        path: `/video`,
-        query: {
-            from: "course",
-            media_id: row.media_base_info![0].source_id,
-            security_token: row.media_base_info![0].security_token,
-            title: row.title,
-            parentTitle: breadcrumbTitle.value
-        }
+    pushVideo({
+        from: "course",
+        media_id: row.media_base_info![0].source_id,
+        security_token: row.media_base_info![0].security_token,
+        title: row.title,
+        parentTitle: breadcrumbTitle.value
     })
 }
 

@@ -5,7 +5,6 @@
 <script lang="ts"  setup>
 import { ref, reactive, onMounted, watch } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
-import { ArrowRight } from '@element-plus/icons-vue'
 import { GetVolcPlayAuthToken,GetVolcPlayInfo } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import { useRoute, useRouter } from 'vue-router'

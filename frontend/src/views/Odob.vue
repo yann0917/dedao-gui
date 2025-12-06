@@ -148,10 +148,10 @@ import {services} from '../../wailsjs/go/models'
 import Pagination from '../components/Pagination.vue'
 import AudioInfo from '../components/AudioInfo.vue'
 import OutsideInfo from '../components/OutsideInfo.vue'
-import {useRouter} from 'vue-router'
 import {userStore} from '../stores/user';
 import {settingStore} from "../stores/setting";
 import {Local} from '../utils/storage';
+import {useAppRouter} from "../composables/useRouter";
 
 import {secondToHour} from '../utils/utils'
 import videojs from 'video.js'
@@ -165,7 +165,7 @@ const videohtml = ref('')
 
 const store = userStore()
 const setStore = settingStore()
-const router = useRouter()
+const { router, pushOdobDetail, pushLogin, pushSetting } = useAppRouter()
 const loading = ref(true)
 const page = ref(1)
 const total = ref(0)
@@ -265,7 +265,7 @@ onMounted(() => {
     }).catch((error) => {
         if (error == '401 Unauthorized') {
             store.user = null
-            router.push("/user/login")
+            pushLogin()
         }
         Local.remove("cookies")
         Local.remove("userStore")
@@ -320,7 +320,7 @@ const openDownloadDialog = (row: any) => {
             message: '请设置文件保存目录',
             type: 'warning'
         })
-        router.push('/setting')
+        pushSetting()
     } else {
         SetDir([setStore.getDownloadDir,
             setStore.getFfmpegDirDir,
@@ -365,8 +365,8 @@ const download = async (id: number, dType: number) => {
 
 
 const gotoArticleDetail = (row: any) => {
-    let id = row.audio_detail.alias_id
-    router.push({path: `/odob/${id}`, query: {from: "odob"}})
+    const id = row.audio_detail.alias_id
+    pushOdobDetail(id)
 }
 
 const handleProd = (row: any) => {

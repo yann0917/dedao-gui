@@ -14,12 +14,12 @@ import { ref, reactive, onMounted, watch } from 'vue'
 import 'element-plus/es/components/message/style/css'
 import { ElMessage } from 'element-plus'
 import { ArticleDetail } from '../../wailsjs/go/backend/App'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
+import { ROUTE_NAMES } from '../router/routes'
 
 import { marked } from 'marked'
 
 const route = useRoute()
-const router = useRouter()
 
 marked.setOptions({
     pedantic: false,
@@ -37,7 +37,7 @@ let from = ref()
 let breadcrumbItem1 = ref()
 let htmlStr = ref()
 let aType = 0
-let parentPath = reactive({path:"",query:{}})
+let parentPath = reactive({name: '', params: {}, query: {}})
 
 
 const PDFFile = {
@@ -53,13 +53,14 @@ onMounted(() => {
 
         if (from.value == "course") {
             aType = 1
-            parentPath.path = '/'+from.value+'/'+classId.value
+            parentPath.name = ROUTE_NAMES.ARTICLE_LIST
+            parentPath.params = { id: String(classId.value) }
             parentPath.query={total: route.query.total, enid: route.query.class_enid, title: route.query.parentTitle}
             breadcrumbItem1.value = route.query.title
         }
         if (from.value == "odob") {
             aType = 2
-            parentPath.path= '/'+from.value
+            parentPath.name = ROUTE_NAMES.ODOB
             breadcrumbItem1.value = '听书书架'
         }
     },

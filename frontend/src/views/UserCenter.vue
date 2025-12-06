@@ -94,6 +94,20 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 退出按钮 -->
+            <div class="logout-section">
+                <el-button
+                    type="danger"
+                    size="large"
+                    plain
+                    @click="handleLogout"
+                    class="logout-btn"
+                >
+                    <el-icon><SwitchButton /></el-icon>
+                    <span>退出登录</span>
+                </el-button>
+            </div>
         </el-card>
     </div>
 </template>
@@ -101,6 +115,7 @@
 <script lang="ts" setup>
 import { reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { SwitchButton } from '@element-plus/icons-vue'
 
 import { UserInfo, EbookUserInfo, OdobUserInfo } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
@@ -111,6 +126,16 @@ let user = reactive(new services.User)
 let ebookUser = reactive(new services.EbookVIPInfo)
 let odobUser = reactive(new services.OdobVip)
 odobUser.user = new services.OdobUser
+
+const handleLogout = async () => {
+    try {
+        await store.logout()
+        ElMessage.success('已退出登录')
+    } catch (error) {
+        ElMessage.error('退出失败，请重试')
+        console.error('Logout error:', error)
+    }
+}
 
 onMounted(() => {
 
@@ -335,5 +360,45 @@ getOdobUserInfo()
 
 .theme-dark .membership-section {
     border-top-color: var(--border-soft) !important;
+}
+
+.logout-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-soft);
+    display: flex;
+    justify-content: center;
+}
+
+.logout-btn {
+    padding: 12px 32px;
+    font-size: 16px;
+    border-radius: 8px;
+}
+
+.logout-btn .el-icon {
+    margin-right: 8px;
+}
+
+.logout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.logout-btn:active {
+    transform: translateY(0);
+}
+
+/* 暗色主题退出按钮样式 */
+.theme-dark .logout-btn {
+    --el-button-bg-color: transparent;
+    --el-button-border-color: #f56c6c;
+    --el-button-text-color: #f56c6c;
+    --el-button-hover-bg-color: rgba(245, 108, 108, 0.1);
+    --el-button-hover-border-color: #ff5252;
+    --el-button-hover-text-color: #ff5252;
+    --el-button-active-bg-color: rgba(245, 108, 108, 0.2);
+    --el-button-active-border-color: #ff5252;
+    --el-button-active-text-color: #ff5252;
 }
 </style>

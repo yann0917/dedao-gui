@@ -36,14 +36,18 @@
     color: var(--text-tertiary) !important;
   }
   
-  /* 增强文本对比度 */
+  /* 增强文本对比度 - 排除菜单项，避免影响悬停效果 */
   p, span, div, h1, h2, h3, h4, h5, h6 {
     color: var(--text-primary) !important;
   }
-  
-  /* 确保所有文本元素都有足够的对比度 */
+
+  /* 取消对菜单项的 !important，让悬停效果正常工作 */
   .el-menu-item,
-  .el-sub-menu__title,
+  .el-sub-menu__title {
+    color: var(--text-primary);
+  }
+
+  /* 确保其他元素的文本对比度 */
   .el-card__body,
   .el-table th,
   .el-table td,
@@ -825,7 +829,46 @@
   color: var(--text-primary) !important;
 }
 
-/* 菜单弹出层适配 */
+/* 菜单弹出层适配 - 修复亮色模式下二级菜单悬浮背景色 */
+.el-menu--popup {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-soft) !important;
+  box-shadow: var(--shadow-medium) !important;
+  border-radius: 12px !important;
+  padding: 8px 0 !important;
+}
+
+.el-menu--popup .el-menu-item {
+  background-color: transparent !important;
+  color: var(--text-primary) !important;
+  margin: 0 8px !important;
+  border-radius: 4px !important;
+  transition: all 0.3s ease !important;
+}
+
+.el-menu--popup .el-menu-item:hover {
+  background-color: var(--fill-color) !important;
+  color: var(--accent-color) !important;
+}
+
+.el-menu--popup .el-menu-item.is-active {
+  background-color: var(--accent-color) !important;
+  color: #fff !important;
+}
+
+.el-menu--popup .el-sub-menu__title {
+  background-color: transparent !important;
+  color: var(--text-primary) !important;
+  margin: 0 8px !important;
+  border-radius: 4px !important;
+  transition: all 0.3s ease !important;
+}
+
+.el-menu--popup .el-sub-menu__title:hover {
+  background-color: var(--fill-color) !important;
+  color: var(--accent-color) !important;
+}
+
 .theme-dark .el-menu--popup {
   background-color: var(--card-bg) !important;
   border-color: var(--border-soft) !important;
@@ -834,27 +877,9 @@
   padding: 8px 0 !important;
 }
 
-.theme-dark .el-menu--popup .el-menu-item {
-  background-color: transparent !important;
-  color: var(--text-primary) !important;
-  margin: 0 8px !important;
-  border-radius: 4px !important;
-  transition: all 0.3s ease !important;
-}
-
 .theme-dark .el-menu--popup .el-menu-item:hover {
   background-color: var(--fill-color) !important;
   color: var(--accent-color) !important;
-}
-
-.theme-dark .el-menu--popup .el-menu-item.is-active {
-  background-color: var(--accent-color) !important;
-  color: #fff !important;
-}
-
-.theme-dark .el-menu--popup .el-sub-menu__title {
-  background-color: transparent !important;
-  color: var(--text-primary) !important;
 }
 
 .theme-dark .el-menu--popup .el-sub-menu__title:hover {
@@ -1279,8 +1304,14 @@
   border-color: var(--accent-color) !important;
 }
 
-/* 分类菜单 hover 效果 */
-.theme-dark .classification .el-sub-menu:hover {
+/* 分类菜单 hover 效果 - 修复亮色和暗色模式下的背景色 */
+.classification .el-sub-menu:hover,
+.classification .el-sub-menu__title:hover {
+  background-color: var(--menu-hover-bg) !important;
+}
+
+.theme-dark .classification .el-sub-menu:hover,
+.theme-dark .classification .el-sub-menu__title:hover {
   background-color: var(--menu-hover-bg) !important;
 }
 

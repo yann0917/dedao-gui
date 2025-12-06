@@ -78,14 +78,14 @@ import Pagination from '../components/Pagination.vue'
 import EbookInfo from '../components/EbookInfo.vue'
 import DownloadDialog from "../components/DownloadDialog.vue";
 
-import {useRouter} from 'vue-router'
+import {useAppRouter} from '../composables/useRouter'
 import {userStore} from '../stores/user'
 import {settingStore} from "../stores/setting";
 import {Local} from '../utils/storage'
 
 const store = userStore()
 const setStore = settingStore()
-const router = useRouter()
+const { pushEbookComment, pushSetting, pushLogin } = useAppRouter()
 const loading = ref(true)
 const page = ref(1)
 const total = ref(0)
@@ -115,7 +115,7 @@ onMounted(() => {
     }).catch((error) => {
         if (error == '401 Unauthorized') {
             store.user = null
-            router.push("/user/login")
+            pushLogin()
         }
         Local.remove("cookies")
         Local.remove("userStore")
@@ -202,7 +202,7 @@ const openDownloadDialog = (row: any) => {
             message: '请设置文件保存目录',
             type: 'warning'
         })
-        router.push('/setting')
+        pushSetting()
     } else {
         SetDir([setStore.getDownloadDir,
             setStore.getFfmpegDirDir,
@@ -222,14 +222,11 @@ const closeDownloadDialog = () => {
 }
 
 const gotoCommentList = (row: any) => {
-    router.push({
-        path: `/ebook/comment`,
-        query: {
-            id: row.id,
-            enid: row.enid,
-            total: row.publish_num,
-            title: row.title
-        }
+    pushEbookComment({
+        id: row.id,
+        enid: row.enid,
+        total: row.publish_num,
+        title: row.title
     })
 }
 

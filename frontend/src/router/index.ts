@@ -43,9 +43,9 @@ const router = createRouter({
             ],
         },
         {
-            path: "/",
-            meta: { name: "课程", icon:"Management",menuType: 2 },
-            redirect: '/course',
+            path: "/bought",
+            meta: { name: "我的学习", icon:"Collection", menuType: 3 },
+            redirect: '/bought/course',
             children: [
                 {
                     path: 'course',
@@ -56,7 +56,7 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: 'course/:id(\\d+)',
+                    path: 'course/:id',
                     name: "articleList",
                     component: () => import("../views/ArticleList.vue"),
                     meta: {
@@ -65,24 +65,20 @@ const router = createRouter({
                 },
                 {
                     path: 'article/:id',
+                    name: "article",
                     component: () => import("../views/Article.vue"),
                     meta: {
                         name: "文稿", hideMenu:true, requiresAuth:true
                     },
-                },{
+                },
+                {
                     path: 'video',
+                    name: "video",
                     component: () => import("../views/Veplayer.vue"),
                     meta: {
                         name: "视频", hideMenu:true, requiresAuth:true
                     },
-                }
-            ],
-        },
-        {
-            path: "/",
-            meta: { name: "听书书架", icon:"Headset", menuType: 2 },
-            redirect: '/odob',
-            children: [
+                },
                 {
                     path: 'odob',
                     name: "odob",
@@ -90,21 +86,15 @@ const router = createRouter({
                     meta: {
                         name: "听书书架", requiresAuth:true
                     },
-                },{
+                },
+                {
                     path: 'odob/:id',
+                    name: "odobArticle",
                     component: () => import("../views/Article.vue"),
                     meta: {
                         name: "文稿",hideMenu:true, requiresAuth:true
                     },
-                }
-            ],
-        },
-        {
-            path: "/",
-            // name: "ebook",
-            meta: { name: "电子书架", icon:"Reading", menuType: 2 },
-            redirect: "/ebook",
-            children: [
+                },
                 {
                     path: 'ebook',
                     name: "ebook",
@@ -112,12 +102,13 @@ const router = createRouter({
                     meta: {
                         name: "电子书架", requiresAuth:true
                     },
-                },{
+                },
+                {
                     path: 'ebook/comment',
                     name: "ebookComment",
                     component: () => import("../views/EbookComment.vue"),
                     meta: {
-                        name: "书评", requiresAuth:false
+                        name: "书评", hideMenu:true,requiresAuth:false
                     },
                 }
             ],
@@ -181,7 +172,7 @@ const router = createRouter({
                     name: "login",
                     component: () => import("../views/Login.vue"),
                     meta: {
-                        name: "登录",icon:"promotion"
+                        name: "登录",icon:"promotion", hideMenu:true
                     },
                 },
                 {

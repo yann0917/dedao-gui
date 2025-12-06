@@ -1,6 +1,6 @@
 <template>
   <el-breadcrumb :separator-icon="ArrowRight">
-    <el-breadcrumb-item :to="{ path: '/ebook' }">电子书架</el-breadcrumb-item>
+    <el-breadcrumb-item :to="{ path: '/bought/ebook' }">电子书架</el-breadcrumb-item>
     <el-breadcrumb-item>{{ breadcrumbTitle }}</el-breadcrumb-item>
   </el-breadcrumb>
 

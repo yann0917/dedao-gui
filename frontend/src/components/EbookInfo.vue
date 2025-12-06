@@ -90,10 +90,10 @@ import { EbookInfo, EbookShelfAdd, EbookShelfRemove } from '../../wailsjs/go/bac
 import { services } from '../../wailsjs/go/models'
 import { repeat } from 'lodash'
 import { secondToHour } from '../utils/utils'
-import { useRouter } from 'vue-router'
+import { useAppRouter } from '../composables/useRouter'
 import { Plus, Delete } from '@element-plus/icons-vue'
 
-const router = useRouter()
+const { pushEbookComment } = useAppRouter()
 const dialogVisible = ref(false)
 
 let ebookInfo = reactive(new services.EbookDetail)
@@ -193,14 +193,11 @@ const closeDialog = () => {
 }
 
 const gotoCommentList = (row: any) => {
-    router.push({
-        path: `/ebook/comment`,
-        query: {
-            id: row.id,
-            enid:row.enid,
-            total: row.publish_num,
-            title: row.title
-        }
+    pushEbookComment({
+        id: row.id,
+        enid:row.enid,
+        total: row.publish_num,
+        title: row.title
     })
 }
 </script>

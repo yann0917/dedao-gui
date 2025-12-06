@@ -294,17 +294,17 @@ import {
   SunflowerLabelContent,
   SunflowerResourceList,
   UserInfo,
-  Logout,
 } from "../../wailsjs/go/backend/App";
 import { services } from "../../wailsjs/go/models";
-import { BrowserOpenURL, WindowReloadApp } from "../../wailsjs/runtime";
+import { BrowserOpenURL } from "../../wailsjs/runtime";
 import QrLogin from "../components/QrLogin.vue";
 import EbookInfo from "../components/EbookInfo.vue";
 import CourseInfo from "../components/CourseInfo.vue";
-import { useRouter } from "vue-router";
+import { useAppRouter } from "../composables/useRouter";
+import { ROUTE_NAMES } from "../router/routes";
 import { Local } from "../utils/storage";
 
-const router = useRouter();
+const { pushByName, replace } = useAppRouter();
 
 const loading = ref(true);
 const page = ref(0);
@@ -419,16 +419,7 @@ const getUserInfo = async () => {
 };
 
 const logout = async () => {
-  await Logout()
-    .then((result) => {
-      console.log(result);
-      WindowReloadApp();
-      Local.remove("cookies")
-      router.push("/home");
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  await store.logout()
 };
 
 const handleProd = (enid: string, iType: number) => {
@@ -555,16 +546,13 @@ const gotoCategory = (item: any, label_id: string) => {
   } else if (item.navType == 4) {
     product_type = "66";
   }
-  router.push({
-    path: `/category`,
-    query: {
-        id: item.id,
-        enid: item.enid,
-        name: item.name,
-        nav_type: item.navType,
-        label_id: label_id,
-        product_type: product_type,
-    },
+  pushByName(ROUTE_NAMES.CATEGORY, {}, {
+    id: item.id,
+    enid: item.enid,
+    name: item.name,
+    nav_type: item.navType,
+    label_id: label_id,
+    product_type: product_type,
   });
 };
 </script>
@@ -601,8 +589,10 @@ h4 {
   transition: all 0.3s ease;
 }
 
-.classification .el-sub-menu:hover {
-  background-color: var(--card-hover-bg);
+/* 修复一级菜单鼠标悬浮背景色问题 */
+.classification .el-sub-menu:hover,
+.classification .el-sub-menu__title:hover {
+  background-color: var(--card-hover-bg) !important;
 }
 
 /* 子菜单项样式 */
@@ -925,6 +915,17 @@ h4 {
 
 .classification .el-sub-menu:hover {
   background-color: var(--card-hover-bg);
+}
+
+/* 一级菜单标题悬停效果 - 修复亮色模式下背景色问题 */
+.classification .el-sub-menu__title:hover {
+  background-color: var(--card-hover-bg) !important;
+}
+
+/* 暗色主题下的一级菜单悬停效果 */
+.theme-dark .classification .el-sub-menu:hover,
+.theme-dark .classification .el-sub-menu__title:hover {
+  background-color: var(--card-hover-bg) !important;
 }
 
 /* 中间 banner 样式 */
