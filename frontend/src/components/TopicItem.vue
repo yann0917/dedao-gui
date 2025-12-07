@@ -87,24 +87,35 @@ const sendTopicDetail = (row: any) => {
     border-radius:8px;
 }
 .topic-item {
-    height: 110px;
+    min-height: 110px;
+    height: auto;
+    padding: 16px;
+    text-align: left;
 }
 /* 深度选择器（样式穿透）*/
 :deep(.el-button>span) {
-    display: inline-block;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    text-align: left;
 }
 .topic-item .title {
     font-size: large;
     font-weight: bold;
     text-align: left;
     margin-bottom: 10px;
+    word-wrap: break-word;
+    word-break: break-all;
+    line-height: 1.4;
 }
 .topic-item .intro{
     white-space: pre-wrap;
     font-weight:normal;
     text-align: left;
-    line-height: 1.5;
+    line-height: 1.6;
+    word-wrap: break-word;
+    word-break: break-all;
 }
 ul {
     padding: 0;
@@ -122,18 +133,16 @@ ul {
 }
 .infinite-list .infinite-list-item {
     margin: 1%;
-    /*background: var(--el-color-primary-light-9);*/
-    /*color: var(--el-color-primary);*/
     color: #606266;
-    padding-bottom: 1%;
-    border-bottom: 1px dashed;
+    border-bottom: 1px dashed var(--el-border-color);
+    padding: 0;
 }
 .infinite-list .infinite-list-item:last-child {
     margin-bottom: 0;
 }
 
 .infinite-list .infinite-list-item+.list-item {
-    margin-top: 10px;
+    margin-top: 0;
 }
 
 </style>

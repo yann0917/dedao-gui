@@ -4,19 +4,39 @@
             <!-- 用户信息头部 -->
             <div class="user-header">
                 <div class="user-info">
-                    <el-avatar :size="80" :src="user.avatar" fit="cover" class="user-avatar" />
+                    <div class="avatar-container">
+                        <el-avatar :size="80" :src="user.avatar" fit="cover" class="user-avatar" />
+                        <div v-if="user.is_teacher" class="teacher-badge">
+                            <el-icon><School /></el-icon>
+                            <span>教师</span>
+                        </div>
+                    </div>
                     <div class="user-meta">
                         <h2 class="nickname">{{ user.nickname }}</h2>
-                        <p class="slogan">{{ ebookUser.slogan }}</p>
-                        <div class="vip-tags">
-                            <el-tag v-if="odobUser.user?.is_vip" class="vip-tag" type="warning" effect="dark" round>
-                                <el-icon><HotWater /></el-icon>
-                                <span>听书会员</span>
-                            </el-tag>
-                            <el-tag v-if="ebookUser.is_vip" class="vip-tag" type="danger" effect="dark" round>
-                                <el-icon><HotWater /></el-icon>
-                                <span>电子书会员</span>
-                            </el-tag>
+                        <p v-if="ebookUser.slogan" class="slogan">{{ ebookUser.slogan }}</p>
+                        <div class="membership-badges">
+                            <div v-if="odobUser.user?.is_vip" class="vip-badge odob">
+                                <div class="badge-icon">
+                                    <el-icon><Headset /></el-icon>
+                                </div>
+                                <div class="badge-content">
+                                    <div class="badge-title">听书会员</div>
+                                    <div v-if="odobUser.user.surplus_time" class="badge-desc">
+                                        剩余 {{ odobUser.user.surplus_time }} 天
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="ebookUser.is_vip" class="vip-badge ebook">
+                                <div class="badge-icon">
+                                    <el-icon><Reading /></el-icon>
+                                </div>
+                                <div class="badge-content">
+                                    <div class="badge-title">电子书会员</div>
+                                    <div v-if="ebookUser.surplus_time" class="badge-desc">
+                                        剩余 {{ ebookUser.surplus_time }} 天
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -32,7 +52,6 @@
                     <span class="stat-value">{{ user.study_serial_days }}</span>
                     <span class="stat-label">连续学习(天)</span>
                 </div>
-                <el-tag v-if="user.is_teacher" class="teacher-tag" type="info">教师</el-tag>
             </div>
 
             <!-- 听书会员信息 -->
@@ -49,18 +68,33 @@
                 />
                 <div class="membership-info">
                     <div class="info-row">
-                        <el-tag type="danger" effect="plain">听书VIP·{{ timestampToTime(odobUser.user.expire_time) }}到期</el-tag>
-                        <el-tag type="danger" effect="plain">距到期还有{{ odobUser.user.surplus_time }}天</el-tag>
+                        <div class="expire-info">
+                            <div class="expire-date">
+                                <el-icon><Clock /></el-icon>
+                                <span class="expire-label">到期时间</span>
+                                <span class="expire-value">{{ timestampToTime(odobUser.user.expire_time) }}</span>
+                            </div>
+                            <el-tag type="danger" effect="plain" class="surplus-tag">剩 {{ odobUser.user.surplus_time }} 天</el-tag>
+                        </div>
                     </div>
                     <div class="info-row">
-                        <el-tag type="success" effect="plain">
-                            本周听书{{ odobUser.user.week_count }}本 / 累计听书{{ odobUser.user.total_count }}本
-                        </el-tag>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-number">{{ odobUser.user.week_count }}</div>
+                                <div class="stat-text">本周听书</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">{{ odobUser.user.total_count }}</div>
+                                <div class="stat-text">累计听书</div>
+                            </div>
+                        </div>
                     </div>
                     <div class="info-row">
-                        <el-tag type="warning" effect="plain">
-                            累计为你节省了{{ odobUser.user.save_price }}{{ odobUser.user.price_desc }}
-                        </el-tag>
+                        <div class="savings-highlight">
+                            <el-icon><Present /></el-icon>
+                            <span class="savings-text">累计为你节省了</span>
+                            <span class="savings-amount">{{ odobUser.user.save_price }}{{ odobUser.user.price_desc }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -79,18 +113,33 @@
                 />
                 <div class="membership-info">
                     <div class="info-row">
-                        <el-tag type="danger" effect="plain">电子书VIP·{{ timestampToTime(ebookUser.expire_time) }}到期</el-tag>
-                        <el-tag type="danger" effect="plain">距到期还有{{ ebookUser.surplus_time }}天</el-tag>
+                        <div class="expire-info">
+                            <div class="expire-date">
+                                <el-icon><Clock /></el-icon>
+                                <span class="expire-label">到期时间</span>
+                                <span class="expire-value">{{ timestampToTime(ebookUser.expire_time) }}</span>
+                            </div>
+                            <el-tag type="danger" effect="plain" class="surplus-tag">剩 {{ ebookUser.surplus_time }} 天</el-tag>
+                        </div>
                     </div>
                     <div class="info-row">
-                        <el-tag type="success" effect="plain">
-                            本月读书{{ ebookUser.month_count }}本 / 累计读书{{ ebookUser.total_count }}本
-                        </el-tag>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-number">{{ ebookUser.month_count }}</div>
+                                <div class="stat-text">本月读书</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">{{ ebookUser.total_count }}</div>
+                                <div class="stat-text">累计读书</div>
+                            </div>
+                        </div>
                     </div>
                     <div class="info-row">
-                        <el-tag type="warning" effect="plain">
-                            累计为你节省了{{ ebookUser.save_price }}{{ ebookUser.price_desc }}
-                        </el-tag>
+                        <div class="savings-highlight">
+                            <el-icon><Present /></el-icon>
+                            <span class="savings-text">累计为你节省了</span>
+                            <span class="savings-amount">{{ ebookUser.save_price }}{{ ebookUser.price_desc }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -115,7 +164,7 @@
 <script lang="ts" setup>
 import { reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { SwitchButton } from '@element-plus/icons-vue'
+import { SwitchButton, Clock, Present, School, Headset, Reading } from '@element-plus/icons-vue'
 
 import { UserInfo, EbookUserInfo, OdobUserInfo } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
@@ -197,7 +246,7 @@ getOdobUserInfo()
 
 .user-info {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 24px;
 }
 
@@ -210,33 +259,110 @@ getOdobUserInfo()
     transform: scale(1.05);
 }
 
+.avatar-container {
+    position: relative;
+}
+
+.teacher-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--accent-color);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: var(--shadow-light);
+    z-index: 10;
+}
+
 .user-meta {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .nickname {
-    font-size: 24px;
-    font-weight: 500;
+    font-size: 28px;
+    font-weight: 600;
     color: var(--text-primary);
-    margin: 0 0 8px;
+    margin: 0;
+    letter-spacing: -0.5px;
 }
 
 .slogan {
     color: var(--text-secondary);
-    font-size: 14px;
-    margin: 0 0 12px;
+    font-size: 15px;
+    margin: 0;
+    line-height: 1.6;
 }
 
-.vip-tags {
+.membership-badges {
     display: flex;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
-.vip-tag {
+.vip-badge {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 6px 12px;
+    padding: 8px 16px;
+    border-radius: 24px;
+    gap: 8px;
+    transition: all 0.3s ease;
+    cursor: default;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.vip-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-light);
+}
+
+.vip-badge.odob {
+    background: linear-gradient(135deg, #ff6b35 0%, #ff9800 100%);
+}
+
+.vip-badge.ebook {
+    background: linear-gradient(135deg, #e91e63 0%, #f44336 100%);
+}
+
+.badge-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+}
+
+.badge-icon .el-icon {
+    font-size: 14px;
+}
+
+.badge-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.badge-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.badge-desc {
+    font-size: 11px;
+    opacity: 0.9;
+    font-weight: 400;
 }
 
 .study-stats {
@@ -266,11 +392,6 @@ getOdobUserInfo()
 .stat-label {
     font-size: 14px;
     color: var(--text-secondary);
-}
-
-.teacher-tag {
-    margin-left: auto;
-    padding: 8px 16px;
 }
 
 .membership-section {
@@ -331,6 +452,108 @@ getOdobUserInfo()
     border-radius: 6px;
 }
 
+/* 新的样式 */
+.expire-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: var(--fill-color-light);
+    border-radius: 12px;
+    border: 1px solid var(--border-soft);
+    flex: 1;
+}
+
+.expire-date {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.expire-date .el-icon {
+    font-size: 18px;
+    color: var(--accent-color);
+}
+
+.expire-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.expire-value {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.surplus-tag {
+    flex-shrink: 0;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.stats-grid {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+}
+
+.stat-card {
+    flex: 1;
+    padding: 20px;
+    background: var(--fill-color-light);
+    border-radius: 12px;
+    border: 1px solid var(--border-soft);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-light);
+}
+
+.stat-card .stat-number {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--accent-color);
+    margin-bottom: 8px;
+}
+
+.stat-card .stat-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.savings-highlight {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(67, 160, 71, 0.1) 0%, rgba(67, 160, 71, 0.05) 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(67, 160, 71, 0.2);
+    width: 100%;
+}
+
+.savings-highlight .el-icon {
+    font-size: 24px;
+    color: #43a047;
+}
+
+.savings-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.savings-amount {
+    font-size: 18px;
+    font-weight: 600;
+    color: #43a047;
+    margin-left: auto;
+}
+
 :deep(.el-alert) {
     border-radius: 8px;
     margin: 16px 0;
@@ -354,12 +577,39 @@ getOdobUserInfo()
     color: var(--text-secondary) !important;
 }
 
+.theme-dark .teacher-badge {
+    background: var(--accent-color) !important;
+}
+
+.theme-dark .slogan {
+    color: var(--text-secondary) !important;
+}
+
 .theme-dark .section-header h3 {
     color: var(--text-primary) !important;
 }
 
 .theme-dark .membership-section {
     border-top-color: var(--border-soft) !important;
+}
+
+.theme-dark .expire-info {
+    background: var(--fill-color-light) !important;
+    border-color: var(--border-soft) !important;
+}
+
+.theme-dark .stat-card {
+    background: var(--fill-color-light) !important;
+    border-color: var(--border-soft) !important;
+}
+
+.theme-dark .savings-highlight {
+    background: linear-gradient(135deg, rgba(67, 160, 71, 0.15) 0%, rgba(67, 160, 71, 0.08) 100%) !important;
+    border-color: rgba(67, 160, 71, 0.25) !important;
+}
+
+.theme-dark .savings-highlight .el-icon {
+    color: #66bb6a !important;
 }
 
 .logout-section {

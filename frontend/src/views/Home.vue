@@ -58,8 +58,14 @@
         </div>
         <div v-else>
           <div class="personal">
-            <el-avatar :size="72" :src="user.avatar" fit="fill" />
-            <h3>{{ user.nickname }}</h3>
+            <el-avatar
+              :size="72"
+              :src="user.avatar"
+              fit="fill"
+              @click="goToUserCenter"
+              style="cursor: pointer;"
+            />
+            <h3 @click="goToUserCenter" style="cursor: pointer;">{{ user.nickname }}</h3>
           </div>
           <div class="data">
             <p class="time">
@@ -551,6 +557,10 @@ const closeDialog = () => {
   loginVisible.value = false;
   ebookVisible.value = false;
   courseVisible.value = false;
+};
+
+const goToUserCenter = () => {
+  pushByName(ROUTE_NAMES.PROFILE);
 };
 
 const gotoCategory = (item: any, label_id: string) => {
