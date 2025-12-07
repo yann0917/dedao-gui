@@ -10,7 +10,8 @@
         :popper-class="'menu-popper'"
         @open="handleOpen"
         @close="handleClose"
-        @mouseleave="mouseleave"
+        @mouseenter="onMenuEnter"
+        @mouseleave="onMenuLeave"
       >
         <el-sub-menu
           :index="item.enid"
@@ -62,14 +63,13 @@
           </div>
           <div class="data">
             <p class="time">
-              <span>今日学习</span><em style="font-size: 22px;color:var(--text-primary);">{{user.today_study_time > 0 ? (user.today_study_time / 60).toFixed(0):''}}</em><span>分钟</span>
+              <span>今日学习<em style="font-size: 22px;color:var(--text-primary);">{{user.today_study_time > 0 ? (user.today_study_time / 60).toFixed(0):''}}</em>分钟</span>
             </p>
             <el-divider border-style="dotted" />
             <p class="time">
-              <span>连续学习</span><em style="font-size: 22px;color: var(--text-primary);">{{user.study_serial_days}}</em><span>天</span>
+              <span>连续学习<em style="font-size: 22px;color: var(--text-primary);">{{user.study_serial_days}}</em>天</span>
             </p>
           </div>
-          <!-- <el-button class="button" @click="logout()"> 退出 </el-button> -->
         </div>
       </div>
     </el-col>
@@ -319,6 +319,7 @@ const prodEnid = ref("");
 const moreCategory = ref(9);
 const idxEbookLabel = ref(0);
 const idxCourseLabel = ref(0);
+const isMouseInMenu = ref(false);
 
 let initial = reactive(new services.HomeInitState());
 initial.homeData= reactive(new services.HomeData)
@@ -418,9 +419,6 @@ const getUserInfo = async () => {
     });
 };
 
-const logout = async () => {
-  await store.logout()
-};
 
 const handleProd = (enid: string, iType: number) => {
   prodEnid.value = enid;
@@ -502,14 +500,30 @@ const ebookPopoverContent = (intro: string, introduction: string) => {
 };
 
 const mouseenter = () => {
+  // 显示所有分类
   moreCategory.value = initial.homeData.categoryList.length;
 };
 
-const mouseleave = () => {
-  // 添加一个小延时，避免菜单闪烁
-  setTimeout(() => {
-    moreCategory.value = 9;
-  }, 100);
+const onMenuEnter = () => {
+  // 鼠标进入菜单区域
+  isMouseInMenu.value = true;
+};
+
+const onMenuLeave = (event: MouseEvent) => {
+  // 检查鼠标是否还在菜单相关的元素上
+  const menuElement = (event.currentTarget as HTMLElement);
+  const relatedTarget = event.relatedTarget as Element | null;
+
+  // 如果鼠标还在菜单内或二级菜单上，不隐藏
+  if (relatedTarget &&
+      (menuElement.contains(relatedTarget) ||
+       (relatedTarget.closest && relatedTarget.closest('.el-menu--popup')))) {
+    return;
+  }
+
+  // 鼠标真正离开菜单区域，隐藏多余的分类
+  isMouseInMenu.value = false;
+  moreCategory.value = 9;
 };
 
 const handleOpen = (key: string, keyPath: string[]) => {
@@ -575,8 +589,12 @@ h4 {
 
 .classification {
   width: 160px;
+  height: 380px;
+  max-height: 380px;
+  overflow-y: auto;
   box-shadow: var(--shadow-soft);
   background: var(--card-bg);
+  box-sizing: border-box;
 }
 
 /* 主菜单项样式 */
@@ -900,8 +918,33 @@ h4 {
 
 .classification {
   width: 160px;
+  height: 380px;
+  max-height: 380px;
+  overflow-y: auto;
   box-shadow: var(--shadow-soft);
   background: var(--card-bg);
+}
+
+/* 分类菜单滚动条样式 */
+.classification::-webkit-scrollbar {
+  width: 6px;
+}
+
+.classification::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.classification::-webkit-scrollbar-thumb {
+  background: var(--border-soft);
+  border-radius: 3px;
+}
+
+.classification::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+.classification::-webkit-scrollbar-thumb:active {
+  background: var(--accent-color);
 }
 
 .classification .el-sub-menu {
@@ -936,6 +979,7 @@ h4 {
     overflow: hidden;
     box-shadow: var(--shadow-soft);
     margin-left: 32px;
+    box-sizing: border-box;
   }
 
   .el-carousel__item {
@@ -976,6 +1020,7 @@ h4 {
     display: flex;
     flex-direction: column;
     align-items: center;
+    box-sizing: border-box;
   }
 
   .not-login {
@@ -1186,6 +1231,19 @@ h4 {
 
 .theme-dark .el-sub-menu:hover .el-sub-menu__icon-arrow {
   color: var(--accent-color) !important;
+}
+
+/* 暗色主题下的分类菜单滚动条 */
+.theme-dark .classification::-webkit-scrollbar-thumb {
+  background: var(--border-color) !important;
+}
+
+.theme-dark .classification::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary) !important;
+}
+
+.theme-dark .classification::-webkit-scrollbar-thumb:active {
+  background: var(--accent-color) !important;
 }
 
 /* 暗色主题下的用户信息样式 */
