@@ -564,17 +564,17 @@ const goToUserCenter = () => {
 };
 
 const gotoCategory = (item: any, label_id: string) => {
-  let product_type = "0";
-  if (item.navType == 2) {
-    product_type = "2";
-  } else if (item.navType == 4) {
-    product_type = "66";
+  let product_type = "0"; // 默认设置为课程类型
+  if (item.nav_type == 2) {
+    product_type = "2"; // 电子书
+  } else if (item.nav_type == 4) {
+    product_type = "66"; // 课程/专栏
   }
   pushByName(ROUTE_NAMES.CATEGORY, {}, {
     id: item.id,
     enid: item.enid,
     name: item.name,
-    nav_type: item.navType,
+    nav_type: item.nav_type,
     label_id: label_id,
     product_type: product_type,
   });
