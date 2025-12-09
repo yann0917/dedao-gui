@@ -41,14 +41,14 @@
                 </div>
                 <div class="stat-divider"></div>
                 <div class="stat-item clickable" @click="toggleCollection">
-                    <el-icon class="stat-icon" :class="{ active: courseInfo.class_info?.collection?.is_collected }">
-                        <StarFilled v-if="courseInfo.class_info?.collection?.is_collected" />
+                    <el-icon class="stat-icon" :class="isCollected ? 'active' : ''">
+                        <StarFilled v-if="isCollected" />
                         <Star v-else />
                     </el-icon>
                     <span class="stat-text">
-                        {{ courseInfo.class_info?.collection?.is_collected ? '已收藏' : '收藏' }}
-                        <span class="stat-count" v-if="courseInfo.class_info?.collection?.collection_count">
-                            ({{ courseInfo.class_info?.collection?.collection_count }})
+                        {{ isCollected ? '已收藏' : '收藏' }}
+                        <span class="stat-count" v-if="collectionCount">
+                            ({{ collectionCount }})
                         </span>
                     </span>
                 </div>
@@ -127,7 +127,7 @@
 
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, computed, watch } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { CourseInfo as GetCourseInfo } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
@@ -181,12 +181,15 @@ const updateStatusText = computed(() => {
     }
 })
 
-const resetCourseInfo = () => {
-  courseInfo.class_info = new services.ClassInfo;
-  courseInfo.class_info.collection = new services.Collection;
-  courseInfo.intro_article = new services.ArticleIntro;
-  averageScore.value = 0;
-}
+// 计算属性：是否已收藏
+const isCollected = computed(() => {
+    return !!courseInfo.class_info?.collection?.is_collected
+})
+
+// 计算属性：收藏数量
+const collectionCount = computed(() => {
+    return courseInfo.class_info?.collection?.collection_count || 0
+})
 
 const closeDialog = () => {
   dialogVisible.value = false;
