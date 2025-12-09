@@ -33,6 +33,15 @@
     --border-soft: #ebeef5;
     --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.08);
     --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.12);
+
+    /* Element Plus 全局变量覆盖 - 统一色调 */
+    --el-color-primary: var(--accent-color);
+    --el-color-primary-light-3: rgba(255, 107, 0, 0.3); /* 基于 #ff6b00 */
+    --el-color-primary-light-5: rgba(255, 107, 0, 0.2);
+    --el-color-primary-light-7: rgba(255, 107, 0, 0.1);
+    --el-color-primary-light-8: rgba(255, 107, 0, 0.05);
+    --el-color-primary-light-9: var(--fill-color); /* 最浅色直接用填充色，避免蓝色/橙色底 */
+    --el-color-primary-dark-2: #cc5600;
 }
 
 /* 暗色主题变量 */
@@ -75,6 +84,15 @@
     --dark-bg-color: var(--dark-bg-color, #0d1117);
     --dark-card-bg: var(--dark-card-bg, #161b22);
     --dark-hover-bg: var(--dark-hover-bg, #21262d);
+
+    /* Element Plus 全局变量覆盖 - 暗色模式 */
+    --el-color-primary: var(--accent-color);
+    --el-color-primary-light-3: rgba(255, 107, 0, 0.3);
+    --el-color-primary-light-5: rgba(255, 107, 0, 0.2);
+    --el-color-primary-light-7: rgba(255, 107, 0, 0.1);
+    --el-color-primary-light-8: rgba(255, 107, 0, 0.05);
+    --el-color-primary-light-9: var(--fill-color);
+    --el-color-primary-dark-2: #cc5600;
 }
 
 html {
@@ -321,16 +339,16 @@ body {
 }
 
 .el-pagination .el-pager li.is-active {
-    background-color: var(--accent-color);
-    color: #fff;
-    border-color: var(--accent-color);
-    font-weight: 500;
+    background-color: var(--fill-color);
+    color: var(--accent-color);
+    border-color: var(--border-soft);
+    font-weight: 600;
 }
 
 .el-pagination .el-pager li.is-active:hover {
-    background-color: var(--accent-hover);
-    border-color: var(--accent-hover);
-    color: #fff;
+    background-color: var(--fill-color);
+    border-color: var(--border-soft);
+    color: var(--accent-color);
 }
 
 /* 分页器上一页/下一页按钮 */
@@ -556,8 +574,9 @@ body {
 }
 
 .el-option.is-selected {
-    background-color: var(--accent-color);
-    color: #fff;
+    background-color: var(--fill-color);
+    color: var(--accent-color);
+    font-weight: 600;
 }
 
 .el-option.is-disabled {
@@ -603,8 +622,9 @@ body {
 }
 
 .el-menu--popup .el-menu-item.is-active {
-    background-color: var(--accent-color);
-    color: #fff;
+    background-color: var(--fill-color);
+    color: var(--accent-color);
+    font-weight: 600;
 }
 
 .el-menu--popup .el-sub-menu__title {
@@ -641,8 +661,9 @@ body {
 }
 
 .el-cascader-menu__item.is-active {
-    background-color: var(--accent-color);
-    color: #fff;
+    background-color: var(--fill-color);
+    color: var(--accent-color);
+    font-weight: 600;
 }
 
 /* 日期选择器 */
@@ -862,9 +883,38 @@ body {
 }
 
 /* 覆盖所有可能的白色边框 */
-.theme-dark *[style*="border-color: white"],
 .theme-dark *[style*="border-color: #fff"],
 .theme-dark *[style*="border-color: #ffffff"],
+.theme-dark *[style*="border-color: white"] {
+    border-color: var(--border-soft) !important;
+}
+
+/* 全局覆盖：去落实心背景 */
+/* Tab 选中态去背景 */
+.el-tabs__item.is-active {
+    color: var(--accent-color) !important;
+}
+
+/* 按钮 Primary 类型去背景（可选，如果用户希望 Primary 也是淡雅风格） 
+   目前保留 Primary 的实心风格，但颜色已统一为 accent-color。
+   如果用户觉得 Primary 按钮太抢眼，建议在具体使用处改为 plain 或 text 类型。
+*/
+.el-button--primary {
+    --el-button-bg-color: var(--accent-color);
+    --el-button-border-color: var(--accent-color);
+    --el-button-hover-bg-color: var(--accent-hover);
+    --el-button-hover-border-color: var(--accent-hover);
+    --el-button-active-bg-color: var(--accent-hover);
+    --el-button-active-border-color: var(--accent-hover);
+}
+
+/* 所有的 light-9 背景强制改为 fill-color */
+.el-dropdown-menu__item:not(.is-disabled):hover, 
+.el-select-dropdown__item.hover, 
+.el-select-dropdown__item:hover {
+    background-color: var(--fill-color);
+    color: var(--accent-color);
+}
 .theme-dark *[style*="border: 1px solid white"],
 .theme-dark *[style*="border: 1px solid #fff"],
 .theme-dark *[style*="border: 1px solid #ffffff"] {

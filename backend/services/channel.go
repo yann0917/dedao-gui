@@ -78,6 +78,10 @@ type ChannelHomepageCategory struct {
 	List             []ChannelTopicCategory `json:"list"`
 }
 
+type ChannelTopicDetail struct {
+	Topic *ChannelTopicCategory `json:"topic"`
+}
+
 // ChannelTopicCategory 分类下的主题
 type ChannelTopicCategory struct {
 	ID           int           `json:"id"`
@@ -212,56 +216,17 @@ func (s *Service) ChannelVipInfo(channelID int) (info *ChannelVipInfo, err error
 	return
 }
 
-// ChannelTopicDetail 获取学习圈主题详情
-func (s *Service) ChannelTopicDetail(channelID int, topicID int) (topic *ChannelTopicCategory, err error) {
-	homepage, err := s.ChannelHomepage(channelID)
+// ChannelTopicDetail 根据主题ID获取主题详情列表
+func (s *Service) ChannelTopicDetail(productID int) (topic *ChannelTopicDetail, err error) {
+	body, err := s.reqChannelTopicDetail(productID)
 	if err != nil {
 		return
 	}
+	defer body.Close()
 
-	// 在所有分类中查找指定主题
-	for _, category := range homepage {
-		for _, t := range category.List {
-			if t.ID == topicID {
-				topic = &t
-				return topic, nil
-			}
-		}
-	}
-
-	return nil, nil
-}
-
-// ChannelTopicItems 获取学习圈主题下的所有条目
-func (s *Service) ChannelTopicItems(channelID int, topicID int) (items []ChannelItem, err error) {
-	topic, err := s.ChannelTopicDetail(channelID, topicID)
-	if err != nil {
-		return
-	}
-	if topic != nil {
-		items = topic.Items
-	}
-	return items, nil
-}
-
-// ChannelItemDetail 获取学习圈条目详情（根据enid获取条目信息）
-func (s *Service) ChannelItemDetail(channelID int, enid string) (item *ChannelItem, err error) {
-	homepage, err := s.ChannelHomepage(channelID)
-	if err != nil {
+	if err = handleJSONParse(body, &topic); err != nil {
 		return
 	}
 
-	// 在所有分类和主题中查找指定enid的条目
-	for _, category := range homepage {
-		for _, topic := range category.List {
-			for _, it := range topic.Items {
-				if it.EnID == enid {
-					item = &it
-					return item, nil
-				}
-			}
-		}
-	}
-
-	return nil, nil
+	return
 }

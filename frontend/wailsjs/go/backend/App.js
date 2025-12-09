@@ -22,16 +22,16 @@ export function AudioDetail(arg1) {
   return window['go']['backend']['App']['AudioDetail'](arg1);
 }
 
-export function ChannelCategoryList(arg1, arg2) {
-  return window['go']['backend']['App']['ChannelCategoryList'](arg1, arg2);
-}
-
 export function ChannelHomepage(arg1) {
   return window['go']['backend']['App']['ChannelHomepage'](arg1);
 }
 
 export function ChannelInfo(arg1) {
   return window['go']['backend']['App']['ChannelInfo'](arg1);
+}
+
+export function ChannelTopicDetail(arg1) {
+  return window['go']['backend']['App']['ChannelTopicDetail'](arg1);
 }
 
 export function ChannelVipInfo(arg1) {

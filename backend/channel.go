@@ -20,7 +20,12 @@ func (a *App) ChannelVipInfo(channelID int) (info *services.ChannelVipInfo, err 
 	return app.ChannelVipInfo(channelID)
 }
 
-// ChannelCategoryList 获取学习圈分类列表（根据分类ID获取主题内容列表）
-func (a *App) ChannelCategoryList(channelID int, categoryID int) (topics []services.ChannelTopicCategory, err error) {
-	return app.ChannelCategoryList(channelID, categoryID)
+// ChannelTopicDetail 根据主题ID获取主题详情列表
+func (a *App) ChannelTopicDetail(productID int) (topic *services.ChannelTopicCategory, err error) {
+	data, err := app.ChannelTopicDetail(productID)
+	if err != nil {
+		return
+	}
+	topic = data.Topic
+	return
 }

@@ -145,6 +145,22 @@ const router = createRouter({
                 }
             ]
         },
+        {
+            path: "/channel",
+            meta: { name: "学习圈", icon:"CollectionTag", menuType: 3 },
+            redirect: '/channel/ai',
+            children: [
+                {
+                    path: 'ai',
+                    name: "aiChannel",
+                    component: () => import("../views/AIChannel.vue"),
+                    meta: {
+                        name: "AI学习圈", requiresAuth:true
+                    },
+                    props: { channelId: 1000 } // 设置默认channelId
+                },
+            ],
+        },
         // {
         //     path: "/",
         //     // name: "about",

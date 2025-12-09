@@ -31,20 +31,11 @@ func ChannelVipInfo(channelID int) (info *services.ChannelVipInfo, err error) {
 	return
 }
 
-// ChannelCategoryList 获取学习圈分类列表（根据分类ID获取主题内容列表）
-func ChannelCategoryList(channelID int, categoryID int) (topics []services.ChannelTopicCategory, err error) {
-	homepage, err := getService().ChannelHomepage(channelID)
+// ChannelTopicDetail 根据主题ID获取主题详情
+func ChannelTopicDetail(productID int) (topic *services.ChannelTopicDetail, err error) {
+	topic, err = getService().ChannelTopicDetail(productID)
 	if err != nil {
 		return
 	}
-
-	// 查找指定分类
-	for _, category := range homepage {
-		if category.CategoryID == categoryID {
-			topics = category.List
-			return topics, nil
-		}
-	}
-
-	return topics, nil
+	return
 }
