@@ -427,11 +427,14 @@ const getUserInfo = async () => {
 
 
 const handleProd = (enid: string, iType: number) => {
+  // 2-ebook,4-专栏,36-大师课,66-class,22-course,65-学习圈
+  // console.log('handleProd:', enid, iType);
   prodEnid.value = enid;
   if (iType == 2) {
     ebookVisible.value = true;
+  } else if (iType == 65) {
+    courseVisible.value = false;
   } else {
-    // 4-专栏,36-大师课,66-class,22-course
     courseVisible.value = true;
   }
 };
@@ -564,6 +567,11 @@ const goToUserCenter = () => {
 };
 
 const gotoCategory = (item: any, label_id: string) => {
+  if (item.nav_type == 4 && item.enid && item.enid.startsWith("aiSphereGroupType:")) {
+    pushByName("aiChannel");
+    return;
+  }
+
   let product_type = "0"; // 默认设置为课程类型
   if (item.nav_type == 2) {
     product_type = "2"; // 电子书

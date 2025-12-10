@@ -7,32 +7,77 @@
       <div class="header-bg-overlay"></div>
       
       <div class="header-content">
+        <!-- 左侧 Logo -->
         <div class="channel-logo" v-if="channelInfo.logo">
           <img :src="channelInfo.logo" :alt="channelInfo.title" />
         </div>
-        <div class="channel-info">
+
+        <!-- 中间主要信息 -->
+        <div class="channel-main">
           <div class="title-row">
             <h1>{{ channelInfo.title }}</h1>
             <el-tag v-if="channelInfo.is_vip" class="vip-tag" effect="dark">VIP</el-tag>
           </div>
           <p class="subtitle">{{ channelInfo.description }}</p>
           
-          <div class="stats-row">
-            <div class="stat-item" v-if="channelInfo.statistics?.total_subscribers">
-              <span class="stat-value">{{ formatNumber(channelInfo.statistics.total_subscribers) }}</span>
-              <span class="stat-label">订阅</span>
+          <!-- 人员信息区域 -->
+          <div class="people-section">
+            <div class="person-group" v-if="channelInfo.host">
+              <span class="group-label">主持人</span>
+              <div class="person-content">
+                <el-avatar :size="24" :src="channelInfo.host.avatar" v-if="channelInfo.host.avatar" />
+                <span class="person-name">{{ channelInfo.host.name }}</span>
+              </div>
             </div>
-            <el-divider direction="vertical" />
-            <div class="stat-item" v-if="channelInfo.statistics?.content_quantity">
-              <span class="stat-value">{{ formatNumber(channelInfo.statistics.content_quantity) }}</span>
-              <span class="stat-label">内容</span>
-            </div>
-            <el-divider direction="vertical" v-if="channelInfo.host" />
-            <div class="host-info" v-if="channelInfo.host">
-              <span class="host-label">主持人</span>
-              <span class="host-name">{{ channelInfo.host.name }}</span>
+
+            <el-divider direction="vertical" class="section-divider" v-if="channelInfo.host && channelInfo.guests && channelInfo.guests.length > 0" />
+
+            <div class="person-group" v-if="channelInfo.guests && channelInfo.guests.length > 0">
+              <span class="group-label">嘉宾</span>
+              <div class="guest-list">
+                <el-tooltip
+                  v-for="guest in channelInfo.guests"
+                  :key="guest.uid"
+                  effect="dark"
+                  :content="guest.bio"
+                  placement="top"
+                  :disabled="!guest.bio"
+                >
+                  <div class="guest-item">
+                    <el-avatar :size="24" :src="guest.avatar" />
+                    <span class="person-name">{{ guest.name }}</span>
+                  </div>
+                </el-tooltip>
+              </div>
             </div>
           </div>
+        </div>
+
+        <!-- 右侧数据与状态 -->
+        <div class="channel-side">
+           <div class="stat-card" v-if="channelInfo.statistics?.total_subscribers">
+              <div class="stat-value">{{ formatNumber(channelInfo.statistics.total_subscribers) }}</div>
+              <div class="stat-label">人已加入</div>
+           </div>
+
+           <template v-if="vipInfo && vipInfo.is_ever_subscribed">
+              <div class="status-card" :class="{ 'is-expired': !vipInfo.is_vip }">
+                <div class="status-icon">
+                  <el-icon v-if="vipInfo.is_vip"><Trophy /></el-icon>
+                  <el-icon v-else><Warning /></el-icon>
+                </div>
+                <div class="status-info">
+                   <template v-if="vipInfo.is_vip">
+                      <div class="status-value">{{ vipInfo.surplus_days }}天</div>
+                      <div class="status-label">VIP剩余有效期</div>
+                   </template>
+                   <template v-else>
+                      <div class="status-value">{{ getExpiredDays(vipInfo) }}天</div>
+                      <div class="status-label">VIP已过期</div>
+                   </template>
+                </div>
+              </div>
+           </template>
         </div>
       </div>
     </div>
@@ -230,7 +275,9 @@ import {
   Document,
   VideoPlay,
   Clock,
-  Download
+  Download,
+  Trophy,
+  Warning
 } from '@element-plus/icons-vue'
 import type { services } from '../../wailsjs/go/models'
 import {
@@ -245,6 +292,7 @@ import CourseInfo from '../components/CourseInfo.vue'
 const loading = ref(false)
 const listLoading = ref(false)
 const channelInfo = ref<services.ChannelInfo | null>(null)
+const vipInfo = ref<services.ChannelVipInfo | null>(null)
 const categories = ref<services.ChannelHomepageCategory[]>([])
 const activeCategoryId = ref<number | null>(null)
 const activeSubcategoryId = ref<number | null>(null)
@@ -288,6 +336,7 @@ const fetchChannelInfo = async () => {
   try {
     const info = await getChannelInfo(props.channelId)
     channelInfo.value = info
+    console.log('频道信息:', info)
     error.value = null
   } catch (err) {
     console.error('获取频道信息失败:', err)
@@ -342,7 +391,9 @@ const fetchChannelHomepage = async () => {
 // 获取VIP信息
 const fetchVipInfo = async () => {
   try {
-    await getVipInfo(props.channelId)
+    const info = await getVipInfo(props.channelId)
+    vipInfo.value = info
+    console.log('VIP信息:', info)
   } catch (error) {
     console.error('获取VIP信息失败:', error)
   }
@@ -466,6 +517,14 @@ const formatNumber = (num: number): string => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
+// 计算过期天数
+const getExpiredDays = (info: services.ChannelVipInfo): number => {
+  if (!info.current_time || !info.end_time) return 0
+  const diffSeconds = info.current_time - info.end_time
+  if (diffSeconds <= 0) return 0
+  return Math.floor(diffSeconds / (24 * 3600))
+}
+
 // Props
 const props = defineProps<{
   channelId: number
@@ -547,7 +606,7 @@ onMounted(async () => {
       }
     }
 
-    .channel-info {
+    .channel-main {
       flex: 1;
       padding-top: 8px;
 
@@ -582,48 +641,147 @@ onMounted(async () => {
         max-width: 800px;
       }
 
-      .stats-row {
+      .people-section {
+        display: flex;
+        align-items: flex-start;
+        gap: 32px;
+        padding-top: 8px;
+
+        .section-divider {
+           height: 40px;
+           margin: 0;
+           align-self: center;
+           border-color: var(--border-soft);
+        }
+
+        .person-group {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+
+          .group-label {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+          }
+
+          .person-content {
+             display: flex;
+             align-items: center;
+             gap: 10px;
+             background: var(--fill-color);
+             padding: 6px 16px 6px 6px;
+             border-radius: 50px;
+             border: 1px solid var(--border-soft);
+
+             .person-name {
+               font-size: 14px;
+               font-weight: 500;
+               color: var(--text-primary);
+             }
+          }
+
+          .guest-list {
+             display: flex;
+             align-items: center;
+             gap: 12px;
+             flex-wrap: wrap;
+             
+             .guest-item {
+               display: flex;
+               align-items: center;
+               gap: 8px;
+               background: var(--fill-color);
+               padding: 4px 12px 4px 4px;
+               border-radius: 50px;
+               border: 1px solid var(--border-soft);
+               
+               .person-name {
+                 font-size: 13px;
+                 color: var(--text-primary);
+               }
+             }
+          }
+        }
+      }
+    }
+
+    .channel-side {
+      width: 260px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-top: 8px;
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        border-radius: 16px;
+        border: 1px solid var(--border-soft);
+        text-align: center;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background: var(--card-bg);
+          box-shadow: var(--shadow-soft);
+        }
+
+        .stat-value {
+           font-size: 24px;
+           font-weight: 700;
+           color: var(--text-primary);
+           line-height: 1.2;
+           margin-bottom: 4px;
+           font-family: var(--font-family-mono);
+        }
+
+        .stat-label {
+           font-size: 13px;
+           color: var(--text-tertiary);
+        }
+      }
+
+      .status-card {
+        background: linear-gradient(135deg, #2c3e50, #000000);
+        color: #ffd700;
+        padding: 16px;
+        border-radius: 16px;
         display: flex;
         align-items: center;
         gap: 16px;
-        background: rgba(255, 255, 255, 0.5);
-        backdrop-filter: blur(8px);
-        padding: 12px 20px;
-        border-radius: 12px;
-        width: fit-content;
-        border: 1px solid var(--border-soft);
-        
-        .stat-item {
-           display: flex;
-           flex-direction: column;
-           align-items: center;
-           
-           .stat-value {
-              font-size: 18px;
-              font-weight: 700;
-              color: var(--text-primary);
-           }
-           
-           .stat-label {
-              font-size: 12px;
-              color: var(--text-tertiary);
-           }
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255,255,255,0.1);
+
+        &.is-expired {
+           background: var(--fill-color);
+           color: var(--text-secondary);
+           border: 1px solid var(--border-soft);
+           box-shadow: none;
         }
-        
-        .host-info {
+
+        .status-icon {
+           font-size: 28px;
            display: flex;
-           flex-direction: column;
-           align-items: flex-start;
-           
-           .host-label {
-             font-size: 12px;
-             color: var(--text-tertiary);
+           align-items: center;
+           justify-content: center;
+           width: 48px;
+           height: 48px;
+           background: rgba(255,255,255,0.1);
+           border-radius: 12px;
+        }
+
+        .status-info {
+           .status-value {
+              font-size: 20px;
+              font-weight: 700;
+              line-height: 1.2;
+              margin-bottom: 2px;
            }
-           
-           .host-name {
-             font-size: 14px;
-             font-weight: 500;
-             color: var(--text-primary);
+           .status-label {
+              font-size: 12px;
+              opacity: 0.8;
            }
         }
       }
