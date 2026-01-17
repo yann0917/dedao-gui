@@ -171,9 +171,9 @@ type ArticleCommentList struct {
 }
 
 // ArticleList get class article list
-func (s *Service) ArticleList(id, chapterID string, count, maxID int) (list *ArticleList, err error) {
+func (s *Service) ArticleList(id, chapterID string, count, maxID int, reverse bool) (list *ArticleList, err error) {
 
-	body, err := s.reqArticleList(id, chapterID, count, maxID)
+	body, err := s.reqArticleList(id, chapterID, count, maxID, reverse)
 	if err != nil {
 		return
 	}

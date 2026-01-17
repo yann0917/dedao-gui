@@ -14,8 +14,8 @@ export function ArticleDetail(arg1, arg2) {
   return window['go']['backend']['App']['ArticleDetail'](arg1, arg2);
 }
 
-export function ArticleList(arg1, arg2, arg3, arg4) {
-  return window['go']['backend']['App']['ArticleList'](arg1, arg2, arg3, arg4);
+export function ArticleList(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['backend']['App']['ArticleList'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function AudioDetail(arg1) {

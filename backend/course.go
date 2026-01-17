@@ -37,8 +37,8 @@ func (a *App) OutsideDetail(enid string) (detail *services.OutsideDetail, err er
 	return
 }
 
-func (a *App) ArticleList(enid, chapterID string, count, maxID int) (list *services.ArticleList, err error) {
-	list, err = app.ArticleList(enid, chapterID, count, maxID)
+func (a *App) ArticleList(enid, chapterID string, count, maxID int, reverse bool) (list *services.ArticleList, err error) {
+	list, err = app.ArticleList(enid, chapterID, count, maxID, reverse)
 	if err != nil {
 		return
 	}

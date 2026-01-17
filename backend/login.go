@@ -3,6 +3,8 @@ package backend
 import (
 	"errors"
 
+	"strings"
+
 	"github.com/yann0917/dedao-gui/backend/app"
 	"github.com/yann0917/dedao-gui/backend/config"
 	"github.com/yann0917/dedao-gui/backend/services"
@@ -30,7 +32,7 @@ func (a *App) GetQrcode() (qrCode QrCodeResp, err error) {
 	if err != nil {
 		return
 	}
-	if token == `{"message":"invalid csrf token"}` {
+	if strings.Contains(token, "invalid csrf token") {
 		app.Logout()
 		services.CsrfToken = ""
 		_, _ = Instance.GetHomeInitialState()

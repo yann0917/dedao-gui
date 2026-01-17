@@ -1,9 +1,30 @@
 <template>
-    <el-breadcrumb :separator-icon="ArrowRight">
-        <el-breadcrumb-item :to="{ name: ROUTE_NAMES.COURSE }">课程列表</el-breadcrumb-item>
-        <el-breadcrumb-item>{{ breadcrumbTitle }}</el-breadcrumb-item>
-    </el-breadcrumb>
+    <div class="breadcrumb-container">
+        <el-breadcrumb :separator-icon="ArrowRight">
+            <el-breadcrumb-item :to="{ name: ROUTE_NAMES.COURSE }">课程列表</el-breadcrumb-item>
+            <el-breadcrumb-item>{{ breadcrumbTitle }}</el-breadcrumb-item>
+        </el-breadcrumb>
+        <el-button 
+            type="primary" 
+            link 
+            @click="showCourseDetail"
+            class="detail-btn"
+        >
+            课程详情
+            <el-icon class="el-icon--right"><InfoFilled /></el-icon>
+        </el-button>
+        <el-button 
+            type="primary" 
+            link 
+            @click="toggleSort"
+            class="sort-btn"
+        >
+            {{ isReverse ? '正序' : '倒序' }}
+            <el-icon class="el-icon--right"><Sort /></el-icon>
+        </el-button>
+    </div>
     <div
+        class="infinite-list-wrapper"
         v-infinite-scroll="loadMoreArticles"
         :infinite-scroll-disabled="loading || finished"
         infinite-scroll-distance="10"
@@ -61,6 +82,13 @@
             @close="closeDownloadDialog">
     </download-dialog>
 
+    <course-info
+            v-if="courseDetailVisible"
+            :dialog-visible="courseDetailVisible"
+            :enid="enid"
+            @close="closeCourseDetail">
+    </course-info>
+
     <el-drawer :title="media?.title" direction="btt" v-model="audioVisible" @close="closeAudio" @open="open"
                @opened="openVideo(media)">
         <div style="position:relative;" v-html="audiohtml"></div>
@@ -82,11 +110,12 @@ import {services} from '../../wailsjs/go/models'
 import {useRoute} from 'vue-router'
 import {secondToHour} from '../utils/utils'
 import DownloadDialog from "../components/DownloadDialog.vue";
+import CourseInfo from "../components/CourseInfo.vue";
 
 import videojs from 'video.js'
 import "video.js/dist/video-js.css"
 import {settingStore} from "../stores/setting";
-import { User, Clock, Calendar } from '@element-plus/icons-vue'
+import { User, Clock, Calendar, Sort, InfoFilled } from '@element-plus/icons-vue'
 import { timestampToDate } from '../utils/utils'
 import {useAppRouter} from '../composables/useRouter'
 import {ROUTE_NAMES} from '../router/routes'
@@ -104,6 +133,7 @@ const loading = ref(false) // 懒加载 loading 状态
 const finished = ref(false) // 懒加载是否全部加载完
 const page = ref(1) // 当前页码
 const pageSize = ref(30) // 每页条数
+const isReverse = ref(false) // 是否倒序
 let total = ref(0)
 const dialogVisible = ref(false)
 const layout = ref('total, sizes, next')
@@ -121,6 +151,16 @@ const downloadTypeOptions = [
     {value: 1, label: "MP3"}, {value: 2, label: "PDF"}, {value: 3, label: "Markdown"}
 ]
 
+const courseDetailVisible = ref(false)
+
+const showCourseDetail = () => {
+    courseDetailVisible.value = true
+}
+
+const closeCourseDetail = () => {
+    courseDetailVisible.value = false
+}
+
 let id = ref()
 let enid = ref()
 let maxId = ref()
@@ -130,6 +170,19 @@ const hasScrolled = ref(false)
 
 const onScroll = () => {
     if (!hasScrolled.value) hasScrolled.value = true
+}
+
+const toggleSort = () => {
+    isReverse.value = !isReverse.value
+    // 重置列表
+    tableData.article_list = []
+    page.value = 1
+    finished.value = false
+    maxId.value = 0
+    loading.value = false // 确保不处于 loading 状态
+    
+    // 重新加载
+    loadMoreArticles()
 }
 
 onMounted(() => {
@@ -145,11 +198,7 @@ onMounted(() => {
             page.value = 1
             finished.value = false
             maxId.value = 0 // 初始化 maxId
-            // 如果总数为 0，直接 finished，阻止死循环
-            if (!total.value || total.value <= 0) {
-                finished.value = true
-                return
-            }
+            
             loadMoreArticles()
         },
         {immediate: true}
@@ -242,20 +291,17 @@ const openVideo = async (row: any) => {
 // 懒加载：滚动到底部时加载更多
 const loadMoreArticles = async () => {
     if (loading.value || finished.value) return
-    // 如果总数为 0，直接 finished
-    if (!total.value || total.value <= 0) {
+    
+    // 如果 total > 0 且已加载条数 >= total，则 finished
+    if (total.value > 0 && tableData.article_list.length >= total.value) {
         finished.value = true
         return
     }
-    // 如果已加载条数 >= 总数，直接 finished
-    if (tableData.article_list.length >= total.value) {
-        finished.value = true
-        return
-    }
+    
     loading.value = true
     try {
         // 使用 maxId 分页
-        const res = await ArticleList(enid.value, "", pageSize.value, maxId.value)
+        const res = await ArticleList(enid.value, "", pageSize.value, maxId.value, isReverse.value)
         // 如果返回数据为空，直接 finished
         if (!res.article_list || res.article_list.length === 0) {
             finished.value = true
@@ -266,7 +312,7 @@ const loadMoreArticles = async () => {
         // 更新 maxId 为最新一条的 id
         maxId.value = res.article_list[res.article_list.length - 1]?.id
         // 如果本次返回数据不足 pageSize，或总数已达 total，finished
-        if (res.article_list.length < pageSize.value || tableData.article_list.length >= total.value) {
+        if (res.article_list.length < pageSize.value || (total.value > 0 && tableData.article_list.length >= total.value)) {
             finished.value = true
         }
     } catch (error) {
@@ -336,6 +382,20 @@ const gotoArticleVideo = (row: any) => {
 </script>
 
 <style scoped>
+.breadcrumb-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-right: 20px;
+}
+.sort-btn {
+    font-size: 14px;
+}
+.infinite-list-wrapper {
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+}
 .article-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));

@@ -134,7 +134,7 @@
                   shadow="hover"
                   v-for="(item, index) in freeResourceList.list"
                 >
-                <div @click="handleProd(item.enid, item.class_type)">
+                <div @click="handleFreeProd(item)">
                   <img :src="ossProcess(item.logo)" :alt="item.name" />
                   <div style="padding: 16px; text-align: left">
                     <span style="display: block">{{ item.name }}</span>
@@ -149,7 +149,7 @@
                     />
                   </div>
                   <div class="bottom">
-                    <el-button text class="button">立即学习</el-button>
+                    <el-button text class="button" @click.stop="handleFreeProd(item)">立即学习</el-button>
                   </div>
                 </div>
                 </el-card>
@@ -310,7 +310,7 @@ import { useAppRouter } from "../composables/useRouter";
 import { ROUTE_NAMES } from "../router/routes";
 import { Local } from "../utils/storage";
 
-const { pushByName, replace } = useAppRouter();
+const { pushByName, replace, pushCourseDetail } = useAppRouter();
 
 const loading = ref(true);
 const page = ref(0);
@@ -437,6 +437,14 @@ const handleProd = (enid: string, iType: number) => {
   } else {
     courseVisible.value = true;
   }
+};
+
+const handleFreeProd = (item: any) => {
+  // 统一跳转到详情页，不再弹窗
+  pushByName(ROUTE_NAMES.ARTICLE_LIST, { id: item.enid }, { 
+    enid: item.enid, 
+    title: item.name 
+  });
 };
 
 const handleLabel = (

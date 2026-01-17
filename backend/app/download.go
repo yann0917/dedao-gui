@@ -57,7 +57,16 @@ func (d *CourseDownload) Download() error {
 	if err != nil {
 		return err
 	}
-	articles, err := ArticleListAll(d.ID, "")
+	count := course.ClassInfo.CurrentArticleCount
+	if count == 0 {
+		count = course.ClassInfo.FormalArticleCount
+	}
+	// Fallback to ensure we at least try to fetch one page
+	if count == 0 {
+		count = 100
+	}
+
+	articles, err := ArticleListAllByInfo(d.EnId, count, "")
 	if err != nil {
 		return err
 	}

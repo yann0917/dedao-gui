@@ -8,8 +8,8 @@ import (
 )
 
 // ArticleList 已购课程文章列表分页
-func ArticleList(enid, chapterID string, count, maxID int) (list *services.ArticleList, err error) {
-	list, err = getService().ArticleList(enid, chapterID, count, maxID)
+func ArticleList(enid, chapterID string, count, maxID int, reverse bool) (list *services.ArticleList, err error) {
+	list, err = getService().ArticleList(enid, chapterID, count, maxID, reverse)
 	if err != nil {
 		return
 	}
@@ -22,23 +22,34 @@ func ArticleListAll(id int, chapterID string) (list *services.ArticleList, err e
 	if err != nil {
 		return
 	}
-	pageSize := 30
 	enid := info.Enid
 	count := info.PublishNum
+	return ArticleListAllByInfo(enid, count, chapterID)
+
+}
+
+// ArticleListAllByInfo 根据 Enid 和数量获取文章列表
+func ArticleListAllByInfo(enid string, count int, chapterID string) (list *services.ArticleList, err error) {
+	pageSize := 30
 	page := int(math.Ceil(float64(count) / float64(pageSize)))
 	maxID := 0
 	var lists []services.ArticleIntro
 	for i := 0; i < page; i++ {
-		list, err = getService().ArticleList(enid, chapterID, pageSize, maxID)
+		list, err = getService().ArticleList(enid, chapterID, pageSize, maxID, false)
 		if err != nil {
 			return
 		}
-		maxID = list.List[len(list.List)-1].ID
-		lists = append(lists, list.List...)
+		if len(list.List) > 0 {
+			maxID = list.List[len(list.List)-1].ID
+			lists = append(lists, list.List...)
+		}
+	}
+	// 如果 count 为 0 或者 page 为 0，list 可能为 nil
+	if list == nil {
+		list = &services.ArticleList{}
 	}
 	list.List = lists
 	return
-
 }
 
 // ArticleDetail article detail
