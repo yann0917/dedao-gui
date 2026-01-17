@@ -35,11 +35,19 @@
                 <el-card shadow="hover" class="article-el-card">
                     <div class="card-content">
                         <div class="card-header">
-                            <span class="card-title">{{ item.title }}</span>
+                            <el-tooltip
+                                effect="dark"
+                                :content="item.title"
+                                placement="top"
+                                :show-after="500"
+                            >
+                                <span class="card-title">{{ item.title }}</span>
+                            </el-tooltip>
                         </div>
                         <el-image 
                             :src="item.logo" 
-                            class="card-image" 
+                            class="card-image"
+                            fit="cover"
                             :preview-teleported="true"
                             :preview-src-list="[item.logo]"
                         />
@@ -89,21 +97,11 @@
             @close="closeCourseDetail">
     </course-info>
 
-    <el-drawer :title="media?.title" direction="btt" v-model="audioVisible" @close="closeAudio" @open="open"
-               @opened="openVideo(media)">
-        <div style="position:relative;" v-html="audiohtml"></div>
-    </el-drawer>
-
-    <el-drawer :title="media?.title" direction="btt" v-model="vedioVisible" @close="closeVideo" @open="open"
-               @opened="openVideo(media)">
-        <div style="position:relative;" id="video"></div>
-    </el-drawer>
-
 </template>
 
 <script lang="ts" setup>
-import {nextTick, onMounted, onUnmounted, reactive, ref, watch} from 'vue'
-import {ElMessage, ElTable} from 'element-plus'
+import { onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { ElMessage } from 'element-plus'
 import {ArrowRight} from '@element-plus/icons-vue'
 import {ArticleList, SetDir} from '../../wailsjs/go/backend/App'
 import {services} from '../../wailsjs/go/models'
@@ -112,22 +110,14 @@ import {secondToHour} from '../utils/utils'
 import DownloadDialog from "../components/DownloadDialog.vue";
 import CourseInfo from "../components/CourseInfo.vue";
 
-import videojs from 'video.js'
-import "video.js/dist/video-js.css"
 import {settingStore} from "../stores/setting";
 import { User, Clock, Calendar, Sort, InfoFilled } from '@element-plus/icons-vue'
 import { timestampToDate } from '../utils/utils'
 import {useAppRouter} from '../composables/useRouter'
 import {ROUTE_NAMES} from '../router/routes'
+import { playerStore, type PlayerTrack } from '../stores/player'
 
-const audioPlayer = ref()
-let media = ref()
-const audioVisible = ref(false)
-const audiohtml = ref('')
-
-const vePlayer = ref()
-const vedioVisible = ref(false)
-// const audiohtml = ref('')
+const pStore = playerStore()
 
 const loading = ref(false) // 懒加载 loading 状态
 const finished = ref(false) // 懒加载是否全部加载完
@@ -205,87 +195,41 @@ onMounted(() => {
     )
 })
 
-onUnmounted(() => {
-    if (audioPlayer.value) {
-        audioPlayer.value.dispose()
-    }
-})
+const buildTrack = (row: any): PlayerTrack | null => {
+    const src = String(row?.audio?.mp3_play_url ?? '').trim()
+    if (!src) return null
 
-const closeAudio = () => {
-    audioVisible.value = false;
-    media.value = ''
-}
-
-const closeVideo = () => {
-    if (vePlayer.value) {
-        vePlayer.value.dispose();
-        vePlayer.value = '';
+    return {
+        id: `${String(enid.value ?? '')}|${String(row?.enid ?? row?.id ?? '')}`,
+        title: String(row?.title ?? ''),
+        src,
+        poster: row?.logo || row?.audio?.icon || row?.video?.[0]?.cover_img,
     }
-    vePlayer.value = false;
-    media.value = ''
 }
 
 const handlePlay = (row: any) => {
-    if (row.video_status == 0) {
-        audioVisible.value = true;
-        media.value = row
-    } else {
-        gotoArticleVideo(row)
-    }
-}
+    pStore.setContext({ key: `courseArticle:${String(enid.value ?? '')}`, title: String(breadcrumbTitle.value ?? '') })
+    const queue = (tableData.article_list || []).map(buildTrack).filter((t): t is PlayerTrack => !!t)
+    const target = buildTrack(row)
 
-const open = () => {
-    audiohtml.value = '<audio id=' + media.value.log_type + media.value.enid + ' controls class="video-js vjs-big-play-centered  vjs-default-skin " style="width:100%;height:100px"></audio>';
-}
-
-const openVideo = async (row: any) => {
-    console.log(row)
-    let videoStatus = row.video_status
-    let poster = (videoStatus == 0) ? row.audio.icon : row.video[0].cover_img
-    let src = (videoStatus == 0) ? row.audio.mp3_play_url : row.video[0].bitrate_720
-    let sType = (videoStatus == 0) ? 'application/x-mpegURL' : 'video/mp4'
-
-    if (videoStatus == 0) {
-        // console.log(soc)
-        setTimeout(() => {
-            nextTick(() => {
-                audioPlayer.value = videojs(row.log_type + row.enid, {
-                    language: 'zh-Hans',
-                    poster: poster,
-                    controls: true,
-                    sources: [{
-                        src: src, type: sType
-                    }],
-                    controlBar: {
-                        remainingTimeDisplay: {
-                            displayNegative: false
-                        },
-                        fullscreenToggle: false
-                    },
-                    playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
-                    audioOnlyMode: true,
-                    audioPosterMode: true,
-                    volume: 0.5,
-                    userActions: {
-                        hotkeys: function (event: any) {
-                            // // `x` key = pause
-                            // if (event.which === 88) {
-                            //   audioPlayer.value.pause();
-                            // }
-                            // // `y` key = play
-                            // if (event.which === 89) {
-                            //   audioPlayer.value.play();
-                            // }
-                        }
-                    }
-                }, () => {
-                    audioPlayer.value.log("play.....")
-                })
-            })
-        }, 300)
+    if (!target) {
+        ElMessage({ message: '该条目没有可播放的音频地址', type: 'warning' })
+        return
     }
 
+    const startIndex = queue.findIndex((t) => t.id === target.id)
+    pStore.setQueue(queue, startIndex >= 0 ? startIndex : 0)
+}
 
+const appendToPlayerQueueIfActive = (items: any[]) => {
+    const ctxKey = `courseArticle:${String(enid.value ?? '')}`
+    if (pStore.context?.key !== ctxKey) return
+    if (pStore.queue.length === 0) return
+    const tracks = (items || []).map(buildTrack).filter((t): t is PlayerTrack => !!t)
+    pStore.appendQueue(tracks)
+    if (pStore.consumeAutoNext()) {
+        return
+    }
 }
 
 // 懒加载：滚动到底部时加载更多
@@ -309,6 +253,7 @@ const loadMoreArticles = async () => {
             return
         }
         tableData.article_list.push(...res.article_list)
+        appendToPlayerQueueIfActive(res.article_list)
         // 更新 maxId 为最新一条的 id
         maxId.value = res.article_list[res.article_list.length - 1]?.id
         // 如果本次返回数据不足 pageSize，或总数已达 total，finished
@@ -322,6 +267,22 @@ const loadMoreArticles = async () => {
         loading.value = false
     }
 }
+
+const onNeedMoreForPlayer = async (ev: any) => {
+    const detail = ev?.detail || {}
+    const ctxKey = `courseArticle:${String(enid.value ?? '')}`
+    if (detail?.contextKey !== ctxKey) return
+    if (finished.value) return
+    await loadMoreArticles()
+}
+
+onMounted(() => {
+    window.addEventListener('player:needMore', onNeedMoreForPlayer as any)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('player:needMore', onNeedMoreForPlayer as any)
+})
 
 const openDialog = () => {
     dialogVisible.value = true
@@ -370,10 +331,24 @@ const gotoArticleDetail = (row: any) => {
 }
 
 const gotoArticleVideo = (row: any) => {
+    const pickVideoMediaBaseInfo = (list: any[] | undefined) => {
+        if (!list || list.length === 0) return null
+        return list.find((m) => m?.media_type === 2) ?? list[0]
+    }
+
+    const mediaBase = pickVideoMediaBaseInfo(row?.media_base_info)
+    const mediaId = String(mediaBase?.source_id ?? '')
+    const securityToken = String(mediaBase?.security_token ?? '')
+
+    if (!mediaId || !securityToken) {
+        ElMessage({ message: '未获取到可播放的鉴权信息', type: 'warning' })
+        return
+    }
+
     pushVideo({
         from: "course",
-        media_id: row.media_base_info![0].source_id,
-        security_token: row.media_base_info![0].security_token,
+        media_id: mediaId,
+        security_token: securityToken,
         title: row.title,
         parentTitle: breadcrumbTitle.value
     })
@@ -429,21 +404,40 @@ const gotoArticleVideo = (row: any) => {
 }
 .card-title {
   font-size: 16px;
-  font-weight: 500;
-  color: #222;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.5;
   flex: 1;
-  line-height: 1.4;
-  word-break: break-all;
+  
+  /* Multi-line truncation */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 8px;
+  height: 48px; /* Ensure consistent height for alignment */
+}
+.card-image {
+  width: 100%;
+  height: 192px; /* 16:9 aspect ratio approx or fixed height */
+  border-radius: 8px;
+  display: block;
 }
 .card-meta-row {
   display: flex;
-  gap: 24px;
-  color: #888;
-  font-size: 15px;
+  justify-content: space-between;
+  color: #6b7280;
+  font-size: 13px;
   align-items: center;
+  margin-top: 8px;
+}
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 .card-meta i {
-  margin-right: 4px;
   font-size: 16px;
   vertical-align: middle;
 }

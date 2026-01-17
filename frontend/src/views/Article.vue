@@ -63,6 +63,11 @@ onMounted(() => {
             parentPath.name = ROUTE_NAMES.ODOB
             breadcrumbItem1.value = '听书书架'
         }
+        if (from.value == "aiChannel") {
+            aType = 1
+            parentPath.name = ROUTE_NAMES.AI_CHANNEL
+            breadcrumbItem1.value = route.query.parentTitle || 'AI学习圈'
+        }
     },
         () => articleDetail(aType, id.value),
         { immediate: true }

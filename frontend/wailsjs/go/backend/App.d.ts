@@ -14,6 +14,8 @@ export function ArticleList(arg1:string,arg2:string,arg3:number,arg4:number,arg5
 
 export function AudioDetail(arg1:string):Promise<services.AudioInfoResp>;
 
+export function AudioDetailAlias(arg1:string):Promise<services.Audio>;
+
 export function ChannelHomepage(arg1:number):Promise<Array<services.ChannelHomepageCategory>>;
 
 export function ChannelInfo(arg1:number):Promise<services.ChannelInfo>;
@@ -43,6 +45,8 @@ export function EbookShelfAdd(arg1:Array<string>):Promise<services.EbookShelfAdd
 export function EbookShelfRemove(arg1:Array<string>):Promise<services.EbookShelfAddResp>;
 
 export function EbookUserInfo():Promise<services.EbookVIPInfo>;
+
+export function GetArticleIntro(arg1:number,arg2:string):Promise<services.ArticleIntro>;
 
 export function GetHomeInitialState():Promise<services.HomeInitState>;
 

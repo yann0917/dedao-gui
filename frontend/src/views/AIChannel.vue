@@ -205,9 +205,6 @@
                     <div class="item-type-badge">
                       {{ getProductTypeName(item.product_type) }}
                     </div>
-                    <div class="hover-overlay">
-                      <el-icon class="play-icon"><VideoPlay /></el-icon>
-                    </div>
                   </div>
                 </div>
                 
@@ -227,15 +224,26 @@
                         </div>
                     </div>
                     
-                    <el-button
-                      class="download-btn"
-                      circle
-                      size="small"
-                      text
-                      @click.stop="handleDownloadItem(item)"
-                    >
-                      <el-icon><Download /></el-icon>
-                    </el-button>
+                    <div class="item-actions" v-if="item.en_id">
+                      <el-button
+                        class="download-btn"
+                        circle
+                        size="small"
+                        text
+                        @click.stop="openItemDetail(item)"
+                      >
+                        <el-icon><Document /></el-icon>
+                      </el-button>
+                      <el-button
+                        class="download-btn"
+                        circle
+                        size="small"
+                        text
+                        @click.stop="openOfficialArticle(item)"
+                      >
+                        <el-icon><Link /></el-icon>
+                      </el-button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -275,7 +283,7 @@ import {
   Document,
   VideoPlay,
   Clock,
-  Download,
+  Link,
   Trophy,
   Warning
 } from '@element-plus/icons-vue'
@@ -284,9 +292,10 @@ import {
   ChannelInfo as getChannelInfo,
   ChannelHomepage as getChannelHomepage,
   ChannelVipInfo as getVipInfo,
-  ChannelTopicDetail
+  ChannelTopicDetail,
 } from '../../wailsjs/go/backend/App'
 import CourseInfo from '../components/CourseInfo.vue'
+import { useAppRouter } from '../composables/useRouter'
 
 // 状态变量
 const loading = ref(false)
@@ -299,6 +308,7 @@ const activeSubcategoryId = ref<number | null>(null)
 const error = ref<string | null>(null)
 const showCourseInfo = ref(false)
 const currentClassEnId = ref('')
+const { pushArticleDetail, openDedaoArticle } = useAppRouter()
 
 // 存储完整的二级分类数据
 const subcategoryDataMap = ref<Map<number, services.ChannelTopicCategory>>(new Map())
@@ -315,6 +325,26 @@ const currentItems = computed(() => {
   const subcategoryData = subcategoryDataMap.value.get(activeSubcategoryId.value)
   return subcategoryData?.items || []
 })
+
+const openItemDetail = (item: any) => {
+  const enid = String(item?.en_id ?? '').trim()
+  if (!enid) {
+    ElMessage.warning('缺少 enid，无法查看详情')
+    return
+  }
+  pushArticleDetail(enid, 'aiChannel', {
+    parentTitle: channelInfo.value?.title ?? 'AI学习圈',
+  })
+}
+
+const openOfficialArticle = (item: any) => {
+  const enid = String(item?.en_id ?? '').trim()
+  if (!enid) {
+    ElMessage.warning('缺少 enid，无法打开官网页面')
+    return
+  }
+  openDedaoArticle(enid)
+}
 
 // 获取难度标签
 const getDifficultyLabel = (level: number): string => {
@@ -477,19 +507,23 @@ const handleSubcategoryClick = async (subcategory: services.ChannelTopicCategory
 // 处理内容项点击
 const handleItemClick = (item: services.ChannelItem) => {
   console.log('点击内容项:', item)
+
+  if (canPlayItem(item)) {
+    openItemDetail(item)
+    return
+  }
+
   if (item.class_en_id) {
     currentClassEnId.value = item.class_en_id
     showCourseInfo.value = true
-  } else {
-    ElMessage.warning('该内容暂无课程信息')
+    return
   }
+
+  ElMessage.warning('该内容暂无课程信息')
 }
 
-// 处理下载
-const handleDownloadItem = (item: services.ChannelItem) => {
-  console.log('下载内容项:', item)
-  ElMessage.success(`开始下载: ${item.title}`)
-  // 这里可以调用下载功能
+const canPlayItem = (item: services.ChannelItem) => {
+  return item.product_type === 65 && !!item.en_id
 }
 
 // 获取产品类型名称
@@ -1208,6 +1242,11 @@ onMounted(async () => {
               opacity: 1;
               transform: scale(1.1);
            }
+        }
+
+        .item-actions {
+          display: flex;
+          gap: 6px;
         }
       }
     }

@@ -1,11 +1,23 @@
 import { useRouter as useVueRouter, useRoute as useVueRoute } from 'vue-router';
 import type { RouteLocationRaw } from 'vue-router';
 import { ROUTES, ROUTE_NAMES, buildRoute } from '../router/routes';
+import { BrowserOpenURL } from '../../wailsjs/runtime';
 
 // 类型安全的路由 hook
 export function useAppRouter() {
   const router = useVueRouter();
   const route = useVueRoute();
+
+  const openExternalUrl = (url: string) => {
+    const normalized = String(url ?? '').trim();
+    if (!normalized) return;
+
+    try {
+      BrowserOpenURL(normalized);
+    } catch {
+      window.open(normalized, '_blank');
+    }
+  };
 
   return {
     // 原始 router 和 route
@@ -46,6 +58,14 @@ export function useAppRouter() {
         name: ROUTE_NAMES.VIDEO,
         query,
       });
+    },
+
+    openExternalUrl,
+
+    openDedaoArticle(enid: string) {
+      const id = String(enid ?? '').trim();
+      if (!id) return;
+      openExternalUrl(`https://www.dedao.cn/course/article?id=${encodeURIComponent(id)}`);
     },
 
     // 通用路径跳转

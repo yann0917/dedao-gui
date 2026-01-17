@@ -130,47 +130,35 @@
         </template>
 
     </el-dialog>
-
-    <el-drawer direction="btt" :title="media?.title" v-model="videoVisible" size="30%" @close="closeVideo" @open="open"
-               @opened="openVideo(media)">
-        <div style="position:relative;" v-html="videohtml"></div>
-    </el-drawer>
-
-
 </template>
 
 <script lang="ts" setup>
-import {nextTick, onMounted, onUnmounted, reactive, ref} from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import 'element-plus/es/components/message/style/css'
-import {ElMessage, ElTable} from 'element-plus'
-import {CourseCategory, CourseList, OdobDownload, SetDir} from '../../wailsjs/go/backend/App'
-import {services} from '../../wailsjs/go/models'
+import { ElMessage } from 'element-plus'
+import { AudioDetailAlias, CourseCategory, CourseList, OdobDownload, SetDir } from '../../wailsjs/go/backend/App'
+import { services } from '../../wailsjs/go/models'
 import Pagination from '../components/Pagination.vue'
 import AudioInfo from '../components/AudioInfo.vue'
 import OutsideInfo from '../components/OutsideInfo.vue'
-import {userStore} from '../stores/user';
-import {settingStore} from "../stores/setting";
-import {Local} from '../utils/storage';
-import {useAppRouter} from "../composables/useRouter";
+import { userStore } from '../stores/user'
+import { settingStore } from '../stores/setting'
+import { Local } from '../utils/storage'
+import { useAppRouter } from '../composables/useRouter'
 
-import {secondToHour} from '../utils/utils'
-import videojs from 'video.js'
-import "video.js/dist/video-js.css"
+import { secondToHour } from '../utils/utils'
 import { EventsOff, EventsOn } from '../../wailsjs/runtime/runtime'
+import { playerStore, type PlayerTrack } from '../stores/player'
 
-const videoPlayer = ref()
-let media = ref()
-const videoVisible = ref(false)
-const videohtml = ref('')
+const pStore = playerStore()
 
 const store = userStore()
 const setStore = settingStore()
-const { router, pushOdobDetail, pushLogin, pushSetting } = useAppRouter()
+const { pushOdobDetail, pushLogin, pushSetting } = useAppRouter()
 const loading = ref(true)
 const page = ref(1)
 const total = ref(0)
 const pageSize = ref(15)
-const searchInfo = ref({})
 const dialogVisible = ref(false)
 const outsideVisible = ref(false)
 const prodEnid = ref("")
@@ -186,69 +174,66 @@ const downloadTypeOptions = [
 let percentage=ref(0)
 let content=ref('')
 
-const closeVideo = () => {
-    // if (videoPlayer.value) {
-    //   videoPlayer.value.dispose();
-    //   videohtml.value = '';
-    // }
-    videoVisible.value = false;
-    // media.value = ''
+const aliasSrcCache = new Map<string, { src: string; poster?: string }>()
+const aliasPending = new Map<string, Promise<{ src: string; poster?: string }>>()
+
+const resolveOdobSrc = async (aliasId: string) => {
+    const key = String(aliasId || '').trim()
+    if (!key) return { src: '' }
+    const cached = aliasSrcCache.get(key)
+    if (cached) return cached
+    const pending = aliasPending.get(key)
+    if (pending) return pending
+    const p = AudioDetailAlias(key)
+        .then((detail) => {
+            const src = String(detail?.mp3_play_url ?? '').trim()
+            const poster = String(detail?.icon ?? '').trim() || undefined
+            const val = { src, poster }
+            if (src) aliasSrcCache.set(key, val)
+            return val
+        })
+        .finally(() => {
+            aliasPending.delete(key)
+        })
+    aliasPending.set(key, p)
+    return p
 }
 
-const handlePlay = (row: any) => {
-    videoVisible.value = true;
-    media.value = row
+const buildTrack = (row: any): PlayerTrack | null => {
+    const aliasId = String(row?.audio_detail?.alias_id ?? '').trim()
+    if (!aliasId) return null
+    const cached = aliasSrcCache.get(aliasId)
+    return {
+        id: `odob:${aliasId}`,
+        title: String(row?.title ?? ''),
+        src: cached?.src ?? '',
+        poster: cached?.poster || row?.icon || row?.audio_detail?.icon,
+    }
 }
 
-const open = () => {
-    videohtml.value = '<audio id=' + media.value.log_type + media.value.enid + ' controls class="video-js vjs-big-play-centered vjs-default-skin" style="width:100%;height:80px" muted></audio>';
-}
-
-const openVideo = async (row: any) => {
-    console.log(row)
-
-    setTimeout(() => {
-        nextTick(() => {
-
-                videoPlayer.value = videojs(row.log_type + row.enid, {
-                    language: 'zh-Hans',
-                    poster: row.audio_detail.icon,
-                    controls: true,
-                    sources: [
-                        {
-                            src: row.audio_detail.mp3_play_url,
-                            type: 'application/x-mpegURL',
-                        }
-                    ],
-                    controlBar: {
-                        remainingTimeDisplay: {
-                            displayNegative: false
-                        },
-                        fullscreenToggle: false
-                    },
-                    playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
-                    // aspectRatio:'1:1',
-                    // audioOnlyMode:true,
-                    audioPosterMode: true,
-                    userActions: {
-                        hotkeys: function (event: any) {
-
-                            // `x` key = pause
-                            if (event.which === 88) {
-                                videoPlayer.value.pause();
-                            }
-                            // `y` key = play
-                            if (event.which === 89) {
-                                videoPlayer.value.play();
-                            }
-                        }
-                    }
-                }, () => {
-                    videoPlayer.value.log("play.....")
-                })
+const handlePlay = async (row: any) => {
+    pStore.setContext({ key: 'odob:study', title: '每日听书' })
+    const queue = (tableData.list || []).map(buildTrack).filter((t): t is PlayerTrack => !!t)
+    const target = buildTrack(row)
+    if (!target) {
+        ElMessage({ message: '该条目没有可播放的音频地址', type: 'warning' })
+        return
+    }
+    const startIndex = queue.findIndex((t) => t.id === target.id)
+    const idx = startIndex >= 0 ? startIndex : 0
+    const aliasId = String(row?.audio_detail?.alias_id ?? '').trim()
+    if (aliasId) {
+        try {
+            const { src, poster } = await resolveOdobSrc(aliasId)
+            if (src) {
+                queue[idx].src = src
+                if (poster && !queue[idx].poster) queue[idx].poster = poster
             }
-        )
-    }, 300)
+        } catch (e) {
+            ElMessage({ message: '获取音频播放地址失败', type: 'warning' })
+        }
+    }
+    pStore.setQueue(queue, idx)
 }
 
 let tableData = reactive(new services.CourseList)
@@ -271,12 +256,6 @@ onMounted(() => {
         Local.remove("userStore")
     })
 
-})
-
-onUnmounted(() => {
-    if (videoPlayer.value) {
-        videoPlayer.value.dispose()
-    }
 })
 // 分页
 const handleChangePage = (item: any) => {

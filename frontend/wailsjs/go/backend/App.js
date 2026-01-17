@@ -22,6 +22,10 @@ export function AudioDetail(arg1) {
   return window['go']['backend']['App']['AudioDetail'](arg1);
 }
 
+export function AudioDetailAlias(arg1) {
+  return window['go']['backend']['App']['AudioDetailAlias'](arg1);
+}
+
 export function ChannelHomepage(arg1) {
   return window['go']['backend']['App']['ChannelHomepage'](arg1);
 }
@@ -80,6 +84,10 @@ export function EbookShelfRemove(arg1) {
 
 export function EbookUserInfo() {
   return window['go']['backend']['App']['EbookUserInfo']();
+}
+
+export function GetArticleIntro(arg1, arg2) {
+  return window['go']['backend']['App']['GetArticleIntro'](arg1, arg2);
 }
 
 export function GetHomeInitialState() {

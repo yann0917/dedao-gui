@@ -4,7 +4,6 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import App from './App.vue'
 import router from "./router";
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-import { useRouter } from 'vue-router'
 import { themeStore } from './stores/theme'
 
 import hljs from 'highlight.js';
@@ -32,10 +31,9 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 app.config.errorHandler = (err, vm, info) => {
   console.log('❌ 提示:', err);
   if (err instanceof Error) {
-    let routers = useRouter()
     console.log('❌ 提示:', err.message);
     if (err.message == '401 Unauthorized') {
-      routers.push("/user/login")
+      router.push("/user/login")
     }
   }
 }
@@ -52,4 +50,3 @@ app.mount('#app')
 // 初始化主题 - 必须在应用挂载后
 const theme = themeStore()
 theme.initTheme()
-

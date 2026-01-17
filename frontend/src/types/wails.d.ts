@@ -2,6 +2,7 @@
 declare module '../../wailsjs/go/backend/App' {
   export function CourseList(arg1: string, arg2: string, arg3: number, arg4: number): Promise<any>
   export function CourseCategory(): Promise<any>
+  export function AudioDetailAlias(arg1: string): Promise<any>
   export function SetDir(arg: string[]): Promise<void>
   export function GetHomeInitialState(): Promise<any>
   export function SearchHot(): Promise<any>

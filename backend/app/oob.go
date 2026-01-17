@@ -13,6 +13,14 @@ func AudioDetail(id string) (detail *services.AudioInfoResp, err error) {
 	return
 }
 
+func AudioDetailAlias(aliasID string) (detail *services.Audio, err error) {
+	detail, err = getService().AudioDetailAlias(aliasID)
+	if err != nil {
+		return
+	}
+	return
+}
+
 // OdobShelfAdd 听书加入书架
 func OdobShelfAdd(enIDs []string) (resp *services.EbookShelfAddResp, err error) {
 	resp, err = getService().OdobShelfAdd(enIDs)

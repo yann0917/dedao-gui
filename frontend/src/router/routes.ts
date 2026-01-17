@@ -4,6 +4,11 @@ export const ROUTES = {
   HOME: '/home',
   CATEGORY: '/category',
 
+  // 学习圈
+  CHANNEL: {
+    AI: '/channel/ai',
+  },
+
   // 我的学习
   BOUGHT: {
     BASE: '/bought',
@@ -40,6 +45,9 @@ export const ROUTE_NAMES = {
   // 首页
   HOME: 'home',
   CATEGORY: 'category',
+
+  // 学习圈
+  AI_CHANNEL: 'aiChannel',
 
   // 我的学习
   COURSE: 'course',

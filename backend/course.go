@@ -63,6 +63,15 @@ func (a *App) ArticleDetail(aType int, aEnid string) (markdown string, err error
 	return
 }
 
+func (a *App) GetArticleIntro(aType int, enid string) (intro *services.ArticleIntro, err error) {
+	info, err := Instance.ArticleInfo(enid, aType)
+	if err != nil {
+		return
+	}
+	intro = &info.ArticleInfo
+	return
+}
+
 func (a *App) GetVolcPlayAuthToken(mediaID, securityToken string) (info *services.MediaVolc, err error) {
 	info, err = Instance.GetVolcPlayAuthToken(mediaID, securityToken)
 	// fmt.Println(info)
