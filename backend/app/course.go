@@ -18,6 +18,14 @@ func CourseList(category, order string, page, limit int) (list *services.CourseL
 	return
 }
 
+func CourseGroupList(category, order string, groupID, page, limit int) (list *services.CourseList, err error) {
+	list, err = getService().CourseGroupList(category, order, groupID, page, limit)
+	if err != nil {
+		return
+	}
+	return
+}
+
 // CourseDetail 已购课程详情
 func CourseDetail(category string, id int) (detail *services.Course, err error) {
 	detail, err = getService().CourseDetail(category, id)

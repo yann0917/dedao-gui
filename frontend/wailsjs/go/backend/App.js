@@ -54,6 +54,10 @@ export function CourseDownload(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['CourseDownload'](arg1, arg2, arg3, arg4);
 }
 
+export function CourseGroupList(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['backend']['App']['CourseGroupList'](arg1, arg2, arg3, arg4, arg5);
+}
+
 export function CourseInfo(arg1) {
   return window['go']['backend']['App']['CourseInfo'](arg1);
 }

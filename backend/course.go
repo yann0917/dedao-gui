@@ -24,6 +24,14 @@ func (a *App) CourseList(category, order string, page, limit int) (list *service
 	return
 }
 
+func (a *App) CourseGroupList(category, order string, groupID, page, limit int) (list *services.CourseList, err error) {
+	list, err = app.CourseGroupList(category, order, groupID, page, limit)
+	if err != nil {
+		return
+	}
+	return
+}
+
 func (a *App) CourseInfo(enid string) (info *services.CourseInfo, err error) {
 	info, err = app.CourseInfoByEnid(enid)
 	return

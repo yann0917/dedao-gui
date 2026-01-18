@@ -1,21 +1,43 @@
 <template>
+    <div v-if="groupMode.active" style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px;">
+        <div style="display:flex; align-items:center; gap: 8px;">
+            <el-button type="primary" link @click="exitGroup">返回</el-button>
+            <span>{{ groupMode.title }}</span>
+        </div>
+    </div>
     <el-table :data="tableData.list" v-loading="loading" height="97%" width="100%" :cell-style="{ textAlign: 'left' }"
               :header-cell-style="{textAlign: 'left'}" :row-style="{height: '50px'}" table-layout="auto"
               @sort-change="handleChange">
         <!-- <el-table-column prop="id" label="ID" width="100"/> -->
-        <el-table-column prop="title" label="标题" width="280"/>
+        <el-table-column prop="title" label="标题" width="280">
+            <template #default="scope">
+                <div style="display:flex; align-items:center; gap: 8px;">
+                    <span>{{ scope.row.title }}</span>
+                    <el-tag v-if="scope.row.is_group" type="info" size="small">分组</el-tag>
+                    <span v-if="scope.row.is_group">共{{ scope.row.course_num || 0 }}本</span>
+                    <el-button v-if="scope.row.is_group" type="primary" link @click.stop="enterGroup(scope.row)">进入</el-button>
+                </div>
+            </template>
+        </el-table-column>
         <el-table-column prop="icon" label="封面" width="80">
             <template #default="scope">
-                <el-image preview-teleported :src="scope.row.icon" :preview-src-list="[scope.row.icon]" :initial-index="0"
-                          style="width: 32px;"/>
+                <el-image
+                    v-if="scope.row.icon"
+                    preview-teleported
+                    :src="scope.row.icon"
+                    :preview-src-list="[scope.row.icon]"
+                    :initial-index="0"
+                    style="width: 32px;"
+                />
+                <span v-else>-</span>
             </template>
         </el-table-column>
         <el-table-column prop="price" label="价格" width="100"/>
         <el-table-column prop="intro" label="简介" width="400">
             <template #default="scope">
                 <el-popover title="简介" trigger="hover" placement="left" :width="480"
-                            :disabled="scope.row.intro.length <= 40">
-                    <p v-html="scope.row.intro?.replaceAll('\n','<br/>')"></p>
+                            :disabled="(scope.row.intro || '').length <= 40">
+                    <p v-html="(scope.row.intro || '').replaceAll('\n','<br/>')"></p>
                     <template #reference>
                         <span slot="reference"
                               v-if="scope.row.intro && scope.row.intro.length <= 40">{{ scope.row.intro }}</span>
@@ -31,26 +53,28 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作" width="220">
             <template #default="scope">
-              <el-tooltip content="书评">
-                <el-button icon="ChatDotRound" size="small" type="primary" link @click="gotoCommentList(scope.row)">
-                </el-button>
-              </el-tooltip>
-              <el-tooltip content="详情">
-                <el-button icon="view" size="small" type="primary" link @click="handleProd(scope.row.enid)">
-                </el-button>
-              </el-tooltip>
-              <el-tooltip content="下载">
-                <el-button icon="download" size="small" type="primary" link @click="openDownloadDialog(scope.row)">
-                </el-button>
-              </el-tooltip>
-              <el-tooltip content="移出书架">
-                <el-button icon="delete" size="small" type="primary" link @click="ebookShelfRemove(scope.row.enid)">
-                </el-button>
-              </el-tooltip>
+              <template v-if="!scope.row.is_group">
+                <el-tooltip content="书评">
+                  <el-button icon="ChatDotRound" size="small" type="primary" link @click="gotoCommentList(scope.row)">
+                  </el-button>
+                </el-tooltip>
+                <el-tooltip content="详情">
+                  <el-button icon="view" size="small" type="primary" link @click="handleProd(scope.row.enid)">
+                  </el-button>
+                </el-tooltip>
+                <el-tooltip content="下载">
+                  <el-button icon="download" size="small" type="primary" link @click="openDownloadDialog(scope.row)">
+                  </el-button>
+                </el-tooltip>
+                <el-tooltip content="移出书架">
+                  <el-button icon="delete" size="small" type="primary" link @click="ebookShelfRemove(scope.row.enid)">
+                  </el-button>
+                </el-tooltip>
+              </template>
             </template>
         </el-table-column>
     </el-table>
-    <Pagination :total="total" @pageChange="handleChangePage"></Pagination>
+    <Pagination :key="paginationKey" :total="total" @pageChange="handleChangePage"></Pagination>
     <ebook-info v-if="dialogVisible" :enid="prodEnid" :dialog-visible="dialogVisible" @close="closeDialog"></ebook-info>
 
     <download-dialog
@@ -70,6 +94,7 @@ import {ElMessage, ElTable, ElMessageBox} from 'element-plus'
 import {
   CourseCategory,
   CourseList,
+  CourseGroupList,
   EbookShelfRemove,
   SetDir
 } from '../../wailsjs/go/backend/App'
@@ -89,10 +114,18 @@ const { pushEbookComment, pushSetting, pushLogin } = useAppRouter()
 const loading = ref(true)
 const page = ref(1)
 const total = ref(0)
+const outerTotal = ref(0)
 const pageSize = ref(15)
+const paginationKey = ref(0)
 const searchInfo = ref({})
 const dialogVisible = ref(false)
 const prodEnid = ref("")
+
+const groupMode = reactive({
+  active: false,
+  groupId: 0,
+  title: '',
+})
 
 const dialogDownloadVisible = ref(false)
 const downloadType = ref(1)
@@ -108,7 +141,8 @@ onMounted(() => {
     CourseCategory().then(result => {
         result.forEach((item, key) => {
             if (item.category == "ebook") {
-                total.value = item.count
+                outerTotal.value = item.count
+                if (!groupMode.active) total.value = item.count
             }
         })
 
@@ -131,10 +165,14 @@ const handleChangePage = (item: any) => {
 
 
 const getTableData = async () => {
-    await CourseList("ebook", "study", page.value, pageSize.value).then((table) => {
+    loading.value = true
+    const fetcher = groupMode.active
+        ? CourseGroupList("ebook", "study", groupMode.groupId, page.value, pageSize.value)
+        : CourseList("ebook", "study", page.value, pageSize.value)
+    await fetcher.then((table) => {
         loading.value = false
         Object.assign(tableData, table)
-        console.log(table)
+        total.value = groupMode.active ? (table.total || 0) : outerTotal.value
     }).catch((error) => {
         loading.value = false
         ElMessage({
@@ -147,6 +185,27 @@ const getTableData = async () => {
 const handleProd = (enid: string) => {
     prodEnid.value = enid
     dialogVisible.value = true
+}
+
+const enterGroup = (row: any) => {
+  const groupId = Number(row?.group_id || 0)
+  if (!groupId) return
+  groupMode.active = true
+  groupMode.groupId = groupId
+  groupMode.title = String(row?.title || '')
+  page.value = 1
+  paginationKey.value += 1
+  getTableData()
+}
+
+const exitGroup = () => {
+  groupMode.active = false
+  groupMode.groupId = 0
+  groupMode.title = ''
+  page.value = 1
+  total.value = outerTotal.value
+  paginationKey.value += 1
+  getTableData()
 }
 
 
