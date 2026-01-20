@@ -1,39 +1,48 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="50%" :before-close="closeDialog">
-    <el-space>
-      <el-card v-for="i in 1" :key="i" class="box-card" style="width: 340px">
-        <template #header>
-          <div class="card-header">
-            <span>{{ data.title }}</span>
-            <el-alert
-              :title="data.tips"
-              type="success"
-              center
-              :closable="false"
+  <el-dialog
+    v-model="dialogVisible"
+    width="400px"
+    :before-close="closeDialog"
+    :show-close="true"
+    destroy-on-close
+    center
+    class="login-dialog"
+  >
+    <div class="login-container">
+      <div class="login-header">
+        <h3 class="title">{{ data.title }}</h3>
+        <p class="subtitle">{{ data.tips }}</p>
+      </div>
+      
+      <div class="qr-container">
+        <div class="qr-wrapper">
+            <el-image
+              v-if="data.qrCode"
+              class="qr-code-img"
+              :src="data.qrCode"
+              fit="fill"
             />
-          </div>
-        </template>
-        <div id="qrcode-code" class="qrcode-code">
-          <el-image
-            style="width: 124px; height: 124px"
-            :src="data.qrCode"
-            fit="fill"
-          />
+            <div v-else class="qr-loading">
+                <el-icon class="is-loading"><Loading /></el-icon>
+            </div>
         </div>
-        <div id="bottom">
-          <el-image
-            src="https://piccdn2.umiwi.com/fe-oss/default/MTYzNzMwNzUyMzQy.png"
-            class="qrcode-login"
-          />
-        </div>
-      </el-card>
-    </el-space>
+      </div>
+
+      <div class="login-footer">
+        <el-image
+          src="https://piccdn2.umiwi.com/fe-oss/default/MTYzNzMwNzUyMzQy.png"
+          class="app-logo"
+        />
+        <span class="footer-text">得到 App 扫码登录</span>
+      </div>
+    </div>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onBeforeMount, onMounted, onBeforeUnmount } from "vue";
-import { ElTable, ElMessage } from "element-plus";
+import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
+import { ElMessage } from "element-plus";
+import { Loading } from '@element-plus/icons-vue';
 import { GetQrcode, CheckLogin } from "../../wailsjs/go/backend/App";
 import { useRouter } from "vue-router";
 import { userStore } from "../stores/user";
@@ -48,7 +57,7 @@ const data = reactive({
   qrCodeString: "",
   token: "",
   title: "扫码登录",
-  tips: "同时支持「得到App」和「微信」扫码👇",
+  tips: "使用得到App或微信扫码登录",
 });
 
 const timeState = reactive({
@@ -127,10 +136,11 @@ timeState.timer = window.setInterval(() => {
 
     console.log(loginResult);
   }).catch((error)=>{
-    ElMessage({
-      message: error,
-      type: 'warning'
-    })
+    // ElMessage({
+    //   message: error,
+    //   type: 'warning'
+    // })
+    // Silent fail on check login errors to avoid spam
     clearInterval(timeState.timer);
     timeState.timer = 0;
   });
@@ -154,10 +164,89 @@ const closeDialog = () => {
 </script>
 
 <style scoped>
-.qrcode-login {
-  width: 247px;
-  height: 80px;
-  line-height: 20px;
-  margin: 1.5rem auto;
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.qr-container {
+  background: var(--bg-color);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-inner);
+  margin-bottom: 24px;
+}
+
+.qr-wrapper {
+  width: 180px;
+  height: 180px;
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-code {
+  width: 100%;
+  height: 100%;
+}
+
+.qr-loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 24px;
+}
+
+.login-footer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.logo-image {
+  height: 40px;
+  opacity: 0.8;
+}
+
+:deep(.el-dialog) {
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--card-bg);
+  box-shadow: var(--shadow-heavy);
+}
+
+:deep(.el-dialog__header) {
+  margin: 0;
+  padding: 0;
+}
+
+:deep(.el-dialog__body) {
+  padding: 30px;
 }
 </style>

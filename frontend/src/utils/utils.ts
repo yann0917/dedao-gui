@@ -86,6 +86,25 @@ export function setThemeColor(color:any) {
   }
 }
 
+export function setFontFamily(font: string) {
+  const el = document.documentElement;
+  let fontFamilyValue = "";
+  
+  switch (font) {
+    case 'jetbrains':
+      fontFamilyValue = "'JetBrainsMono', 'PingFang SC', sans-serif";
+      break;
+    case 'wenkai':
+      fontFamilyValue = "'LXGW WenKai Lite', 'PingFang SC', sans-serif";
+      break;
+    default:
+      el.style.removeProperty('--font-family-base');
+      return;
+  }
+  
+  el.style.setProperty('--font-family-base', fontFamilyValue);
+}
+
 // 调整颜色亮度的辅助函数
 function adjustBrightness(color: string, percent: number): string {
   const num = parseInt(color.replace("#", ""), 16);

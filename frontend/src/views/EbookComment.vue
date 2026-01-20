@@ -1,61 +1,66 @@
 <template>
-  <el-breadcrumb :separator-icon="ArrowRight">
-    <el-breadcrumb-item :to="{ path: '/bought/ebook' }">电子书架</el-breadcrumb-item>
-    <el-breadcrumb-item>{{ breadcrumbTitle }}</el-breadcrumb-item>
-  </el-breadcrumb>
-
-  <!-- 简单的数据概览 -->
-  <div class="overview">
-    <el-tag type="info">总评论: {{ tableData.total }}</el-tag>
-    <el-tag type="success">平均评分: {{ averageScore.toFixed(1) }}</el-tag>
-  </div>
- 
-  <div 
-    class="waterfall-container" 
-    v-infinite-scroll="loadMore"
-    :infinite-scroll-disabled="loading || !hasMore"
-    :infinite-scroll-distance="10"
-    :infinite-scroll-immediate="false"
-  >
-    <div class="waterfall-column" v-for="colIndex in 3" :key="colIndex">
-      <el-card 
-        v-for="(item, index) in columns[`col${colIndex}`]" 
-        :key="item.note_id" 
-        class="waterfall-item" 
-        shadow="hover"
-      >
-        <template #header>
-          <div class="card-header">
-            <el-row :gutter="5" align="top">
-              <el-col :span="6">
-                <el-avatar :size="72" :src="item.notes_owner.avatar" fit="fill" />
-                <el-tag class="ml-2" type="info">{{ item.notes_owner.name }}</el-tag>
-              </el-col>
-              <el-col :span="18">
-                <el-alert v-if="item.notes_owner.slogan" :title="item.notes_owner.slogan" type="success"
-                  :closable="false" />
-                <h3 class="note-title">{{ item.note_title }}</h3>
-                <el-tag class="ml-2" type="success" v-if="item.notes_count?.like_count" round>
-                  👍🏻 {{ item.notes_count?.like_count }}
-                </el-tag>
-              </el-col>
-            </el-row>
-          </div>
-        </template>
-        <div class="card-content">
-          <span v-html="handleStyleNote(item.style_note_line)"></span>
-        </div>
-      </el-card>
+  <div class="ebook-comment-page">
+    <div class="page-header">
+      <el-breadcrumb :separator-icon="ArrowRight">
+        <el-breadcrumb-item :to="{ path: '/bought/ebook' }">电子书架</el-breadcrumb-item>
+        <el-breadcrumb-item>{{ breadcrumbTitle }}</el-breadcrumb-item>
+      </el-breadcrumb>
+      
+      <!-- 简单的数据概览 -->
+      <div class="overview">
+        <el-tag type="info" effect="plain" round>总评论: {{ tableData.total }}</el-tag>
+        <el-tag type="success" effect="plain" round>平均评分: {{ averageScore.toFixed(1) }}</el-tag>
+      </div>
     </div>
-  </div>
+ 
+    <div 
+      class="waterfall-container" 
+      v-infinite-scroll="loadMore"
+      :infinite-scroll-disabled="loading || !hasMore"
+      :infinite-scroll-distance="10"
+      :infinite-scroll-immediate="false"
+    >
+      <div class="waterfall-column" v-for="colIndex in 3" :key="colIndex">
+        <el-card 
+          v-for="(item, index) in columns[`col${colIndex}`]" 
+          :key="item.note_id" 
+          class="waterfall-item" 
+          shadow="hover"
+        >
+          <template #header>
+            <div class="card-header">
+              <div class="user-info">
+                <el-avatar :size="40" :src="item.notes_owner.avatar" />
+                <div class="user-meta">
+                  <span class="user-name">{{ item.notes_owner.name }}</span>
+                  <el-tag v-if="item.notes_owner.slogan" size="small" type="info" class="user-slogan" effect="plain">
+                    {{ item.notes_owner.slogan }}
+                  </el-tag>
+                </div>
+              </div>
+              <div class="note-meta">
+                <h3 class="note-title">{{ item.note_title }}</h3>
+                <div class="likes" v-if="item.notes_count?.like_count">
+                  👍 {{ item.notes_count?.like_count }}
+                </div>
+              </div>
+            </div>
+          </template>
+          <div class="card-content">
+            <span v-html="handleStyleNote(item.style_note_line)"></span>
+          </div>
+        </el-card>
+      </div>
+    </div>
 
-  <div v-if="loading" class="loading-container">
-    <el-icon class="is-loading"><Loading /></el-icon>
-    <span>加载中...</span>
-  </div>
-  
-  <div v-if="!hasMore && tableData.list.length > 0" class="no-more">
-    没有更多数据了
+    <div v-if="loading" class="loading-container">
+      <el-icon class="is-loading"><Loading /></el-icon>
+      <span>加载中...</span>
+    </div>
+    
+    <div v-if="!hasMore && tableData.list.length > 0" class="no-more">
+      没有更多数据了
+    </div>
   </div>
 </template>
 
@@ -234,18 +239,36 @@ const handleStyleNote = (style_note_line: string) => {
 </script>
 
 <style scoped lang="scss">
+.ebook-comment-page {
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 24px;
+  background: var(--fill-color-light);
+  
+  /* 隐藏滚动条但保留功能 */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
 .overview {
-  margin: 20px;
+  margin-top: 16px;
   .el-tag {
-    margin-right: 10px;
+    margin-right: 12px;
   }
 }
 
 .waterfall-container {
   display: flex;
   gap: 20px;
-  padding: 20px;
-  min-height: 100vh;
+  align-items: flex-start;
   
   @media screen and (max-width: 1200px) {
     gap: 15px;
@@ -269,55 +292,87 @@ const handleStyleNote = (style_note_line: string) => {
 
 .waterfall-item {
   width: 100%;
+  border: none;
+  border-radius: 12px;
+  background: var(--card-bg);
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s ease;
   
-  .card-header,
-  .card-content {
-    text-align: left;
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medium);
+  }
+  
+  :deep(.el-card__header) {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color-light);
+  }
+  
+  :deep(.el-card__body) {
+    padding: 16px;
   }
 }
 
-.note-title {
-  margin: 10px 0;
-  font-size: 16px;
-  color: #303133;
-}
-
-.el-tag {
-  margin-right: 5px;
-  text-align: center;
+.card-header {
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    
+    .user-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-start;
+    }
+    
+    .user-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    
+    .user-slogan {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+  
+  .note-meta {
+    .note-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+    
+    .likes {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+  }
 }
 
 .card-content {
-  color: #606266;
+  color: var(--text-regular);
   line-height: 1.6;
+  font-size: 14px;
   
-  p {
+  :deep(p) {
     margin: 8px 0;
   }
   
-  ul, ol {
+  :deep(ul), :deep(ol) {
     padding-left: 20px;
     margin: 8px 0;
   }
-}
-
-.el-avatar {
-  margin-bottom: 8px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.el-alert {
-  margin-bottom: 10px;
-}
-
-.el-card {
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
-  transition: box-shadow 0.3s ease;
   
-  &:hover {
-    box-shadow: 0 4px 16px 0 rgba(0,0,0,0.2);
+  :deep(li) {
+    margin: 4px 0;
   }
 }
 
@@ -326,7 +381,7 @@ const handleStyleNote = (style_note_line: string) => {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  color: #909399;
+  color: var(--text-secondary);
   
   .el-icon {
     margin-right: 8px;
@@ -337,7 +392,7 @@ const handleStyleNote = (style_note_line: string) => {
 .no-more {
   text-align: center;
   padding: 20px;
-  color: #909399;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 </style>

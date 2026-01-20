@@ -1,21 +1,23 @@
 <template>
-    <div v-if="topicList.list.length>0">
-        <p style="text-align: left; font-size: 20px; font-weight: bold"><span style="color:#ff6b00"># </span>推荐话题</p>
-        <div class="topic">
+    <div class="topic-container" v-if="topicList.list.length>0">
+        <div class="topic-header">
+            <h3 class="section-title"><span class="highlight">#</span> 推荐话题</h3>
+        </div>
+        <div class="topic-list-wrapper">
             <ul v-infinite-scroll="loadTopic"
-                class="infinite-list"
-                style="overflow-y: auto; max-height: 800px;"
+                class="topic-list"
                 :infinite-scroll-disabled="infLoadingTopic"
                 infinite-scroll-distance="10">
-                <li v-for="i in topicList.list"  class="infinite-list-item">
-                    <el-button text class="topic-item" @click="sendTopicDetail(i)">
-                        <div class="title">
-                            <span style="color:#ff6b00">#</span>{{i.name}}
-                            <el-badge :value="i.tag==1?'新':i.tag==2?'热':''" class="badge-item" :type="i.tag==2?'warning':'danger'">
-                            </el-badge>
+                <li v-for="i in topicList.list" :key="i.notes_topic_id" class="topic-list-item" @click="sendTopicDetail(i)">
+                    <div class="item-content">
+                        <div class="item-title">
+                            <span class="hash">#</span>
+                            <span class="text">{{i.name}}</span>
+                            <el-tag v-if="i.tag==1" size="small" type="danger" effect="plain" class="badge">新</el-tag>
+                            <el-tag v-if="i.tag==2" size="small" type="warning" effect="plain" class="badge">热</el-tag>
                         </div>
-                        <div class="intro">{{i.intro}}</div>
-                    </el-button>
+                        <div class="item-intro">{{i.intro}}</div>
+                    </div>
                 </li>
             </ul>
         </div>
@@ -75,74 +77,103 @@ const getTopicAll =async () => {
 }
 
 const sendTopicDetail = (row: any) => {
-    // console.log(row)
     emits("sendDetail", row)
 }
 </script>
 
-<style scoped lang="scss">
-.topic {
+<style scoped>
+.topic-container {
     height: 100%;
-    border: 1px solid var(--el-border-color);
-    border-radius:8px;
-}
-.topic-item {
-    min-height: 110px;
-    height: auto;
-    padding: 16px;
-    text-align: left;
-}
-/* 深度选择器（样式穿透）*/
-:deep(.el-button>span) {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-    text-align: left;
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-soft);
+    overflow: hidden;
 }
-.topic-item .title {
-    font-size: large;
-    font-weight: bold;
-    text-align: left;
-    margin-bottom: 10px;
-    word-wrap: break-word;
-    word-break: break-all;
+
+.topic-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-soft);
+    background: var(--card-bg);
+}
+
+.section-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.highlight {
+    color: var(--accent-color);
+}
+
+.topic-list-wrapper {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.topic-list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.topic-list-item {
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid var(--border-lighter);
+}
+
+.topic-list-item:last-child {
+    border-bottom: none;
+}
+
+.topic-list-item:hover {
+    background-color: var(--fill-color-light);
+}
+
+.item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.item-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
     line-height: 1.4;
 }
-.topic-item .intro{
-    white-space: pre-wrap;
-    font-weight:normal;
-    text-align: left;
-    line-height: 1.6;
-    word-wrap: break-word;
-    word-break: break-all;
-}
-ul {
-    padding: 0;
-    margin: 0;
-    text-align: left;
-    list-style: none;
+
+.hash {
+    color: var(--accent-color);
+    font-weight: normal;
 }
 
-.infinite-list {
-    height: 90%;
-    padding: 0;
-    margin: 0;
-    text-align: left;
-    list-style: none;
-}
-.infinite-list .infinite-list-item {
-    margin: 1%;
-    color: #606266;
-    border-bottom: 1px dashed var(--el-border-color);
-    padding: 0;
-}
-.infinite-list .infinite-list-item:last-child {
-    margin-bottom: 0;
+.badge {
+    margin-left: 4px;
+    height: 18px;
+    padding: 0 6px;
+    font-size: 11px;
 }
 
-.infinite-list .infinite-list-item+.list-item {
-    margin-top: 0;
+.item-intro {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
-
 </style>

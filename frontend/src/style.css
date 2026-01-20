@@ -78,6 +78,13 @@
     --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.36);
     --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.48);
     
+    /* 语义化颜色变量 - 暗色模式 */
+    --primary-color: var(--accent-color);
+    --success-color: #67c23a;
+    --warning-color: #e6a23c;
+    --danger-color: #f56c6c;
+    --info-color: #909399;
+
     /* 动态主题色变量 - 在暗色模式下使用更柔和的主题色 */
     --accent-color-dark: var(--accent-color-dark, var(--accent-color));
     --accent-hover-dark: var(--accent-hover-dark, var(--accent-hover));
@@ -108,20 +115,11 @@ html {
 body {
     margin: 0;
     color: var(--text-color-secondary);
-    font-family: "JetBrainsMono", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto",
-    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    "sans-serif";
+    font-family: var(--font-family-base);
     line-height: 1.5;
     padding: 0;
     background-color: var(--bg-color);
     transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-@font-face {
-    font-family: "JetBrainsMono";
-    font-style: normal;
-    font-weight: 400;
-    src: url("assets/fonts/JetBrainsMono-Regular.woff2") format("woff2");
 }
 
 #app {

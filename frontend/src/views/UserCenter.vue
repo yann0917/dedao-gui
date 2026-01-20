@@ -231,7 +231,17 @@ getOdobUserInfo()
 .user-center {
     padding: 24px;
     background: var(--fill-color-light);
-    min-height: calc(100vh - 60px);
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+    box-sizing: border-box;
+    
+    /* 隐藏滚动条但保留功能 - 清新风格 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+}
+
+.user-center::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
 }
 
 .user-card {

@@ -24,7 +24,7 @@
                 <p class="author-info" v-html="ebookInfo.author_info?.replaceAll('\n','<br/>')"></p><br />
                 <span class="price">{{ ebookInfo.price }}元</span>
                 <el-tag class="ml-2" type="warning" v-if="ebookInfo.is_vip_book==1" round>
-                  <el-icon><HotWater /></el-icon>会员免费</el-tag>
+                  会员免费</el-tag>
                 <el-tag class="ml-2" type="info" v-if="ebookInfo.read_time">阅读总时长：{{secondToHour(ebookInfo.read_time)}}</el-tag>
                 <el-button v-if="ebookInfo.is_on_bookshelf==false" class="primary-action" @click="ebookShelfAdd(ebookInfo.enid)">
                   <el-icon><Plus /></el-icon>加入书架

@@ -2,7 +2,7 @@
   <div class="setting-container">
     <div class="setting-header">
       <h1>系统设置</h1>
-      <p class="text-gray-500">管理您的下载路径、工具配置和界面偏好</p>
+      <p class="subtitle">管理您的下载路径、工具配置和界面偏好</p>
     </div>
 
     <div class="setting-content">
@@ -30,7 +30,7 @@
                 浏览
               </el-button>
             </div>
-            <div class="text-gray-400 text-sm mt-1">
+            <div class="form-tip">
               <el-icon><InfoFilled /></el-icon>
               <span>设置下载文件的默认保存位置</span>
             </div>
@@ -49,13 +49,11 @@
         
         <el-form :model="form" label-position="top">
           <el-form-item>
-            <el-card class="info-card" shadow="never">
-              <template #header>
-                <div class="info-header">
-                  <el-icon><InfoFilled /></el-icon>
-                  <span>下载功能说明</span>
-                </div>
-              </template>
+            <div class="info-card">
+              <div class="info-header">
+                <el-icon><InfoFilled /></el-icon>
+                <span>下载功能说明</span>
+              </div>
               <ul class="info-list">
                 <li>
                   <div class="info-item">
@@ -82,7 +80,7 @@
                   </div>
                 </li>
               </ul>
-            </el-card>
+            </div>
           </el-form-item>
 
           <el-form-item label="ffmpeg 可执行文件路径">
@@ -98,7 +96,7 @@
                 浏览
               </el-button>
             </div>
-            <div class="text-gray-400 text-sm mt-1">
+            <div class="form-tip">
               <el-icon><InfoFilled /></el-icon>
               <span>音频需要借助 <el-link href="https://ffmpeg.org" target="_blank" type="primary">ffmpeg</el-link> 合成，安装后终端执行 whereis ffmpeg 查找路径</span>
             </div>
@@ -117,7 +115,7 @@
                 浏览
               </el-button>
             </div>
-            <div class="text-gray-400 text-sm mt-1">
+            <div class="form-tip">
               <el-icon><InfoFilled /></el-icon>
               <span>电子书转 PDF 需要借助 <el-link href="https://wkhtmltopdf.org/downloads.html" target="_blank" type="primary">wkhtmltopdf</el-link>，安装后终端执行 whereis wkhtmltopdf 查找路径</span>
             </div>
@@ -146,8 +144,20 @@
               />
               <div class="theme-preview">
                 <div class="color-preview" :style="{ backgroundColor: form.systemColor }"></div>
-                <span>{{ form.systemColor }}</span>
+                <span class="color-value">{{ form.systemColor }}</span>
               </div>
+            </div>
+          </el-form-item>
+
+          <el-form-item label="字体设置">
+            <el-radio-group v-model="form.fontFamily" @change="setFontFamily(form.fontFamily)">
+              <el-radio label="default" border>默认 (PingFang SC)</el-radio>
+              <el-radio label="jetbrains" border>JetBrains Mono</el-radio>
+              <el-radio label="wenkai" border>霞鹜文楷 (LXGW WenKai)</el-radio>
+            </el-radio-group>
+            <div class="form-tip">
+              <el-icon><InfoFilled /></el-icon>
+              <span>选择您喜欢的界面字体风格</span>
             </div>
           </el-form-item>
         </el-form>
@@ -155,8 +165,8 @@
 
       <!-- 操作按钮 -->
       <div class="action-buttons">
-        <el-button type="primary" @click="onSubmit" :icon="Check" size="large">保存设置</el-button>
         <el-button @click="resetForm" :icon="RefreshLeft" size="large">重置</el-button>
+        <el-button type="primary" @click="onSubmit" :icon="Check" size="large">保存设置</el-button>
       </div>
     </div>
   </div>
@@ -179,7 +189,7 @@ import {
 import { settingStore } from "../stores/setting"
 import { themeStore } from "../stores/theme"
 import { OpenDirectoryDialog } from "../../wailsjs/go/backend/App"
-import { setThemeColor } from "../utils/utils"
+import { setThemeColor, setFontFamily } from "../utils/utils"
 import { ElMessage } from 'element-plus'
 
 const store = settingStore()
@@ -208,6 +218,7 @@ const form = reactive({
   systemColor: themeStoreInstance.color || store.getColor || '#ff6b00',
   ffmpegDir: store.getFfmpegDirDir,
   wkhtmltopdfDir: store.getWkDir,
+  fontFamily: store.setting.fontFamily || 'default',
 })
 
 // 保存原始设置值用于重置
@@ -216,6 +227,7 @@ const originalSettings = {
   systemColor: themeStoreInstance.color || store.getColor || '#ff6b00',
   ffmpegDir: store.getFfmpegDirDir,
   wkhtmltopdfDir: store.getWkDir,
+  fontFamily: store.setting.fontFamily || 'default',
 }
 
 const openDialogDir = async (title: string) => {
@@ -258,6 +270,8 @@ const resetForm = () => {
   
   // 重新应用主题色
   setThemeColor(form.systemColor)
+  // 重新应用字体
+  setFontFamily(form.fontFamily)
   
   ElMessage({
     message: '已重置为上次保存的设置',
@@ -273,9 +287,11 @@ const onSubmit = () => {
   store.setting.theme = form.systemColor
   store.setting.ffmpegDir = form.ffmpegDir
   store.setting.wkhtmltopdfDir = form.wkhtmltopdfDir
+  store.setting.fontFamily = form.fontFamily
   
   // 更新主题存储
   themeStoreInstance.setThemeColor(form.systemColor)
+  setFontFamily(form.fontFamily)
   
   // 更新原始设置，用于重置
   Object.assign(originalSettings, {
@@ -283,6 +299,7 @@ const onSubmit = () => {
     systemColor: form.systemColor,
     ffmpegDir: form.ffmpegDir,
     wkhtmltopdfDir: form.wkhtmltopdfDir,
+    fontFamily: form.fontFamily,
   })
   
   ElMessage({
@@ -294,32 +311,45 @@ const onSubmit = () => {
 
 <style scoped>
 .setting-container {
-  padding: 20px;
-  max-width: 800px;
+  padding: 32px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
 .setting-header {
-  margin-bottom: 24px;
+  margin-bottom: 32px;
   text-align: left;
 }
 
 .setting-header h1 {
-  font-size: 24px;
-  margin-bottom: 8px;
+  font-size: 28px;
+  margin: 0 0 8px 0;
   font-weight: 600;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin: 0;
 }
 
 .setting-content {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
 .setting-card {
-  margin-bottom: 10px;
-  border-radius: 8px;
-  transition: all 0.3s;
+  border-radius: 16px;
+  border: 1px solid var(--border-soft);
+  background-color: var(--card-bg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.setting-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
 }
 
 .card-header {
@@ -327,15 +357,17 @@ const onSubmit = () => {
   align-items: center;
   font-size: 16px;
   font-weight: 600;
+  color: var(--text-primary);
 }
 
 .card-header .el-icon {
   margin-right: 8px;
+  font-size: 18px;
 }
 
 .dir-input-wrapper {
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
 .dir-input-wrapper .el-input {
@@ -351,71 +383,60 @@ const onSubmit = () => {
 .theme-preview {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  padding: 8px 12px;
+  background-color: var(--fill-color);
+  border-radius: 8px;
 }
 
 .color-preview {
-  width: 80px;
-  height: 40px;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.download-notes {
-  padding: 10px 0;
-  font-size: 13px;
-}
-
-.download-notes p {
-  margin: 5px 0;
+.color-value {
+  font-family: monospace;
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
 .action-buttons {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 16px;
+  margin-top: 16px;
+  padding-bottom: 32px;
 }
 
-/* 工具提示文本样式 */
-.text-gray-400 {
-  color: #9ca3af;
-}
-
-.text-gray-500 {
-  color: #6b7280;
-}
-
-.text-sm {
-  font-size: 14px;
-}
-
-.mt-1 {
-  margin-top: 4px;
-}
-
-/* 信息图标与文本对齐 */
-.text-gray-400 {
+.form-tip {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  margin-top: 8px;
 }
 
 .info-card {
-  background-color: #f8f9fa;
-  margin-bottom: 15px;
+  background-color: var(--fill-color);
+  border-radius: 8px;
+  padding: 16px;
 }
 
 .info-header {
   display: flex;
   align-items: center;
-  font-size: 16px;
-  color: #606266;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
 }
 
 .info-header .el-icon {
   margin-right: 8px;
-  color: #409EFF;
+  color: var(--primary-color);
 }
 
 .info-list {
@@ -434,17 +455,39 @@ const onSubmit = () => {
 
 .info-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .info-item .el-icon {
   margin-right: 10px;
-  color: #67c23a;
+  margin-top: 3px;
+  color: var(--success-color);
   flex-shrink: 0;
 }
 
 .info-item .el-icon.connection-icon,
 .info-item .el-icon.document-icon {
-  color: #409EFF;
+  color: var(--primary-color);
+}
+
+@media (max-width: 600px) {
+  .setting-container {
+    padding: 20px;
+  }
+  
+  .dir-input-wrapper {
+    flex-direction: column;
+  }
+  
+  .action-buttons {
+    flex-direction: column-reverse;
+  }
+  
+  .action-buttons .el-button {
+    width: 100%;
+  }
 }
 </style>

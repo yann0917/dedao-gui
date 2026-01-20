@@ -1,63 +1,67 @@
 <template>
-    <div v-if="groupMode.active" style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px;">
-        <div style="display:flex; align-items:center; gap: 8px;">
-            <el-button type="primary" link @click="exitGroup">返回</el-button>
-            <span>{{ groupMode.title }}</span>
+    <div class="course-container">
+        <div v-if="groupMode.active" class="group-header">
+            <el-button type="primary" link @click="exitGroup">
+                <el-icon class="el-icon--left"><ArrowLeft /></el-icon>返回
+            </el-button>
+            <span class="group-title">{{ groupMode.title }}</span>
         </div>
-    </div>
-    <el-table :data="tableData.list" v-loading="loading" height="97%" style="width: 100%"
-        :cell-style="{ textAlign: 'left' }" :header-cell-style="{ textAlign: 'left' }"
-        table-layout="auto">
-        <!-- <el-table-column prop="class_id" label="ID" width="80" /> -->
-        <el-table-column prop="title" label="标题" width="280">
-            <template #default="scope">
-                <div style="display:flex; align-items:center; gap: 8px;">
-                    <span>{{ scope.row.title }}</span>
-                    <el-tag v-if="scope.row.is_group" type="info" size="small">分组</el-tag>
-                    <span v-if="scope.row.is_group">共{{ scope.row.course_num || 0 }}本</span>
-                    <el-button v-if="scope.row.is_group" type="primary" link @click.stop="enterGroup(scope.row)">进入</el-button>
+
+        <div v-loading="initLoading" class="course-grid-container" v-infinite-scroll="loadMore" :infinite-scroll-disabled="disabled" :infinite-scroll-immediate="false">
+            <div v-if="tableData.list && tableData.list.length > 0" class="course-grid">
+                <div v-for="item in tableData.list" :key="item.id" class="course-card" @click="item.is_group ? enterGroup(item) : gotoArticleList(item)">
+                    <div class="card-cover">
+                        <el-image 
+                            v-if="item.icon" 
+                            :src="item.icon" 
+                            fit="cover"
+                            loading="lazy"
+                        >
+                            <template #placeholder>
+                                <div class="image-placeholder">
+                                    <el-icon><Picture /></el-icon>
+                                </div>
+                            </template>
+                        </el-image>
+                        <div v-else class="no-cover">
+                            <el-icon v-if="item.is_group" :size="40"><Folder /></el-icon>
+                            <span v-else>无封面</span>
+                        </div>
+                        
+                        <!-- 悬停遮罩层 (仅非分组显示操作) -->
+                        <div v-if="!item.is_group" class="card-overlay" @click.stop>
+                            <div class="overlay-actions">
+                                <el-button circle type="primary" :icon="View" @click="handleProd(item.enid)" title="详情" />
+                                <el-button circle type="success" :icon="Download" @click="openDownloadDialog(item)" title="下载" />
+                            </div>
+                        </div>
+                        
+                        <!-- 分组标识 -->
+                        <div v-if="item.is_group" class="group-badge">
+                            <el-icon><Folder /></el-icon>
+                            <span>分组</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-content">
+                        <h3 class="card-title" :title="item.title">{{ item.title }}</h3>
+                        <div class="card-meta">
+                            <span v-if="item.is_group" class="meta-info">{{ item.course_num || 0 }} 本课程</span>
+                            <span v-else class="meta-info">已更 {{ item.publish_num || 0 }}/{{ item.course_num || 0 }}</span>
+                            
+                            <span v-if="!item.is_group" class="meta-progress">{{ item.progress || 0 }}%</span>
+                        </div>
+                        <div v-if="!item.is_group" class="progress-bar">
+                             <div class="progress-fill" :style="{ width: (item.progress || 0) + '%' }"></div>
+                        </div>
+                    </div>
                 </div>
-            </template>
-        </el-table-column>
-        <el-table-column prop="icon" label="封面" width="80">
-            <template #default="scope">
-                <el-image
-                    v-if="scope.row.icon"
-                    :src="scope.row.icon"
-                    :preview-teleported="true"
-                    :preview-src-list="[scope.row.icon]"
-                    style="width: 32px;"
-                />
-                <span v-else>-</span>
-            </template>
-        </el-table-column>
-        <el-table-column prop="intro" label="简介" width="280" />
-
-        <el-table-column prop="price" label="价格" width="100" />
-
-        <el-table-column prop="publish_num" label="已更新" width="100" >
-            <template #default="scope">
-                <span v-if="!scope.row.is_group">{{ scope.row.publish_num || 0 }}/{{ scope.row.course_num || 0 }}</span>
-                <span v-else>-</span>
-            </template>
-        </el-table-column>
-        <el-table-column prop="progress" label="已学%" width="80" />
-        <el-table-column fixed="right" label="操作" width="240">
-            <template #default="scope">
-                <template v-if="!scope.row.is_group">
-                    <el-button icon="list" size="small" type="primary" link @click="gotoArticleList(scope.row)">章节列表
-                    </el-button>
-                    <el-button icon="view" size="small" type="primary" link @click="handleProd(scope.row.enid)">详情
-                    </el-button>
-                    <el-button icon="download" size="small" type="primary" link @click="openDownloadDialog(scope.row)">下载
-                    </el-button>
-                </template>
-
-            </template>
-        </el-table-column>
-    </el-table>
+            </div>
+            <el-empty v-else description="暂无课程" />
+        </div>
     
-    <pagination :key="paginationKey" :total="total" @pageChange="handleChangePage"></pagination>
+    </div>
+
     <course-info v-if="dialogVisible" :enid= "prodEnid" :dialog-visible="dialogVisible" @close="closeDialog"></course-info>
     <download-dialog
         v-if="dialogDownloadVisible"
@@ -71,14 +75,14 @@
 </template>
   
 <script lang="ts" setup>
-import { ref, reactive, onMounted } from 'vue'
-import { ElTable, ElMessage } from 'element-plus'
+import { ref, reactive, onMounted, computed } from 'vue'
+import { ElMessage } from 'element-plus'
+import { ArrowLeft, View, Download, Picture, Folder } from '@element-plus/icons-vue'
 import {CourseList, CourseCategory, CourseGroupList, SetDir} from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import { userStore } from '../stores/user';
 import { settingStore } from '../stores/setting';
 import { useAppRouter } from '../composables/useRouter';
-import Pagination from '../components/Pagination.vue'
 import CourseInfo from '../components/CourseInfo.vue'
 import DownloadDialog from "../components/DownloadDialog.vue";
 import { Local } from '../utils/storage';
@@ -87,12 +91,13 @@ const store = userStore()
 const setStore = settingStore()
 const { pushLogin, pushCourseDetail, pushSetting } = useAppRouter()
 
-const loading = ref(true)
+const loading = ref(false)
+const initLoading = ref(true)
 const page = ref(1)
 const total = ref(0)
 const outerTotal = ref(0)
-const pageSize = ref(15)
-const paginationKey = ref(0)
+const pageSize = ref(20) // Increase page size for better scrolling experience
+const lastPageSize = ref(20)
 const dialogVisible = ref(false)
 const prodEnid = ref("")
 
@@ -133,26 +138,51 @@ onMounted(() => {
     })
 })
 
-// 分页
-const handleChangePage = (item: any) => {
-    page.value = item.page
-    pageSize.value = item.pageSize
-    getTableData()
+const noMore = computed(() => {
+    const currentCount = tableData.list ? tableData.list.length : 0
+    if (groupMode.active) {
+        return currentCount >= (tableData.total || 0)
+    }
+    if (outerTotal.value > 0) {
+        return currentCount >= outerTotal.value
+    }
+    return lastPageSize.value < pageSize.value
+})
+
+const disabled = computed(() => loading.value || noMore.value)
+
+const loadMore = () => {
+    if (disabled.value) return
+    page.value += 1
+    getTableData(true)
 }
 
-
-const getTableData = async () => {
+const getTableData = async (append = false) => {
     loading.value = true
+    if (!append) initLoading.value = true
+    
     const fetcher = groupMode.active
         ? CourseGroupList("bauhinia", "study", groupMode.groupId, page.value, pageSize.value)
         : CourseList("bauhinia", "study", page.value, pageSize.value)
 
     await fetcher.then((table) => {
         loading.value = false
-        Object.assign(tableData, table)
+        initLoading.value = false
+        
+        const fetchedList = table.list || []
+        lastPageSize.value = fetchedList.length
+        
+        if (append) {
+            if (fetchedList.length > 0) {
+                tableData.list.push(...fetchedList)
+            }
+        } else {
+            Object.assign(tableData, table)
+        }
         total.value = groupMode.active ? (table.total || 0) : outerTotal.value
     }).catch((error) => {
         loading.value = false
+        initLoading.value = false
         ElMessage({
             message: error,
             type: 'warning'
@@ -182,7 +212,6 @@ const enterGroup = (row: any) => {
     groupMode.groupId = groupId
     groupMode.title = String(row?.title || '')
     page.value = 1
-    paginationKey.value += 1
     getTableData()
 }
 
@@ -192,7 +221,6 @@ const exitGroup = () => {
     groupMode.title = ''
     page.value = 1
     total.value = outerTotal.value
-    paginationKey.value += 1
     getTableData()
 }
 
@@ -234,24 +262,187 @@ const closeDownloadDialog = () => {
 </script>
   
 <style scoped>
-.card-header.el-row {
+.course-container {
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-.el-row {
-    margin-bottom: 10px;
+.group-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-top: 10px;
 }
 
-.el-row:last-child {
-    margin-bottom: 0;
+.group-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
-.el-col {
-    border-radius: 4px;
+.course-grid-container {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 20px;
+    /* 隐藏滚动条但保留功能 - 清新风格 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
 }
-.el-tag {
-  margin-right: 5px;
-    /* height: auto; */
-  text-align: center;
+
+.course-grid-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    padding: 4px; /* 防止阴影被切 */
+}
+
+.course-card {
+    background: var(--card-bg, #fff);
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft, 0 2px 12px rgba(0, 0, 0, 0.08));
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    border: 1px solid var(--border-soft, #ebeef5);
+    display: flex;
+    flex-direction: column;
+}
+
+.course-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medium, 0 8px 24px rgba(0, 0, 0, 0.12));
+    border-color: transparent;
+}
+
+.card-cover {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    background-color: var(--fill-color-light, #f5f7fa);
+    overflow: hidden;
+}
+
+.card-cover .el-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.course-card:hover .card-cover .el-image {
+    transform: scale(1.05);
+}
+
+.image-placeholder, .no-cover {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    gap: 8px;
+}
+
+.card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(2px);
+}
+
+.course-card:hover .card-overlay {
+    opacity: 1;
+}
+
+.overlay-actions {
+    display: flex;
+    gap: 16px;
+    transform: translateY(10px);
+    transition: transform 0.3s ease;
+}
+
+.course-card:hover .overlay-actions {
+    transform: translateY(0);
+}
+
+.group-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    backdrop-filter: blur(4px);
+}
+
+.card-content {
+    padding: 12px 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-title {
+    margin: 0 0 8px;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--text-primary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-weight: 600;
+}
+
+.card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.meta-progress {
+    color: var(--accent-color, #ff6b00);
+    font-weight: 500;
+}
+
+.progress-bar {
+    height: 4px;
+    background: var(--fill-color, #f0f2f5);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent-color, #ff6b00);
+    border-radius: 2px;
+    transition: width 0.3s ease;
 }
 </style>

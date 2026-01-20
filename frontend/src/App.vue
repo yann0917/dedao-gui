@@ -6,13 +6,17 @@ import { ElConfigProvider } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { themeStore } from './stores/theme'
+import { settingStore } from './stores/setting'
 import { playerStore } from './stores/player'
 import { AudioDetailAlias } from '../wailsjs/go/backend/App'
+import { setFontFamily } from './utils/utils'
 
 // 初始化主题
 const store = themeStore()
+const sStore = settingStore()
 onMounted(() => {
   store.initTheme()
+  setFontFamily(sStore.setting.fontFamily || 'default')
 })
 
 const pStore = playerStore()
@@ -171,7 +175,7 @@ body {
 }
 
 .el-main {
-  overflow-y: scroll;
+  overflow: hidden;
   color: var(--text-color-secondary);
   width: 100%;
   height: 100%;

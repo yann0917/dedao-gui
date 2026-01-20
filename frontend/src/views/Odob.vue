@@ -1,157 +1,118 @@
 <template>
-    <div v-if="groupMode.active" style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px;">
-        <div style="display:flex; align-items:center; gap: 8px;">
-            <el-button type="primary" link @click="exitGroup">返回</el-button>
-            <span>{{ groupMode.title }}</span>
+    <div class="odob-container">
+        <div v-if="groupMode.active" class="group-header">
+            <el-button type="primary" link @click="exitGroup">
+                <el-icon class="el-icon--left"><ArrowLeft /></el-icon>返回
+            </el-button>
+            <span class="group-title">{{ groupMode.title }}</span>
         </div>
-    </div>
-    <el-table 
-        :data="tableData.list" 
-        v-loading="loading" 
-        height="97%" 
-        width="100%" 
-        class="custom-table"
-        table-layout="auto"
-    >
-        <!-- <el-table-column prop="id" label="ID" width="100"/> -->
-        <el-table-column prop="title" label="标题" width="280">
-            <template #default="scope">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span>{{ scope.row.title }}</span>
-                    <el-tag v-if="scope.row.type === 1013" type="warning" size="small">名家讲书</el-tag>
-                    <el-tag v-if="scope.row.is_group" type="info" size="small">分组</el-tag>
-                    <span v-if="scope.row.is_group">共{{ scope.row.course_num || 0 }}本</span>
-                    <el-button v-if="scope.row.is_group" type="primary" link @click.stop="enterGroup(scope.row)">进入</el-button>
+
+        <div v-loading="initLoading" class="odob-grid-container" v-infinite-scroll="loadMore" :infinite-scroll-disabled="disabled" :infinite-scroll-immediate="false">
+            <div v-if="tableData.list && tableData.list.length > 0" class="odob-grid">
+                <div v-for="item in tableData.list" :key="item.id" class="odob-card" @click="item.is_group ? enterGroup(item) : null">
+                    <div class="card-cover">
+                        <el-image 
+                            v-if="item.icon" 
+                            :src="item.icon" 
+                            fit="cover"
+                            loading="lazy"
+                        >
+                            <template #placeholder>
+                                <div class="image-placeholder">
+                                    <el-icon><Picture /></el-icon>
+                                </div>
+                            </template>
+                        </el-image>
+                        <div v-else class="no-cover">
+                            <el-icon v-if="item.is_group" :size="40"><Folder /></el-icon>
+                            <span v-else>无封面</span>
+                        </div>
+                        
+                        <!-- 悬停遮罩层 (仅非分组显示操作) -->
+                        <div v-if="!item.is_group" class="card-overlay" @click.stop>
+                            <div class="overlay-actions">
+                                <el-tooltip content="播放" :show-after="500">
+                                    <el-button circle type="primary" :icon="VideoPlay" @click="handlePlay(item)" />
+                                </el-tooltip>
+                                <el-tooltip content="文稿" :show-after="500">
+                                    <el-button circle type="success" :icon="Memo" @click="gotoArticleDetail(item)" />
+                                </el-tooltip>
+                                <el-tooltip content="详情" :show-after="500">
+                                    <el-button circle type="info" :icon="View" @click="handleProd(item)" />
+                                </el-tooltip>
+                                <el-tooltip content="下载" :show-after="500">
+                                    <el-button circle type="warning" :icon="DownloadIcon" @click="openDownloadDialog(item)" />
+                                </el-tooltip>
+                            </div>
+                        </div>
+                        
+                        <!-- 标签标识 -->
+                        <div class="card-badges">
+                            <el-tag v-if="item.type === 1013" type="warning" size="small" effect="dark">名家讲书</el-tag>
+                            <el-tag v-if="item.is_group" type="info" size="small" effect="dark">分组</el-tag>
+                        </div>
+                    </div>
+                    
+                    <div class="card-content">
+                        <h3 class="card-title" :title="item.title">{{ item.title }}</h3>
+                        <div class="card-meta">
+                            <span class="meta-info">
+                                <el-icon><Clock /></el-icon>
+                                {{ secondToHour(item.duration) }}
+                            </span>
+                            <span v-if="item.is_group" class="meta-info">共 {{ item.course_num || 0 }} 本</span>
+                        </div>
+                        <div class="card-intro" v-if="item.intro">
+                            {{ item.intro.length > 40 ? item.intro.substring(0, 40) + '...' : item.intro }}
+                        </div>
+                    </div>
                 </div>
-            </template>
-        </el-table-column>
-        <el-table-column prop="icon" label="封面" width="80">
-            <template #default="scope">
-                <el-image
-                    v-if="scope.row.icon"
-                    :src="scope.row.icon"
-                    :preview-teleported="true"
-                    :preview-src-list="[scope.row.icon]"
-                    style="width: 32px;"
-                />
-                <span v-else>-</span>
-            </template>
-        </el-table-column>
-        <el-table-column prop="duration" label="时长" width="100">
-            <template #default="scope">
-                {{ secondToHour(scope.row.duration) }}
-            </template>
-        </el-table-column>
-        <el-table-column prop="intro" label="简介" width="300">
-            <template #default="scope">
-                <el-popover title="简介" trigger="hover" placement="top" :width="480"
-                            :disabled="(scope.row.intro || '').length <= 30"
-                            :content="scope.row.intro || ''">
-                    <template #reference>
-                        <span slot="reference" v-if="scope.row.intro && scope.row.intro.length <= 30">{{
-                            scope.row.intro
-                            }}</span>
-                        <span slot="reference" v-if="scope.row.intro && scope.row.intro.length > 30">{{
-                            scope.row.intro.substring(0,
-                                30)
-                            + "..."
-                            }}</span>
-                    </template>
-                </el-popover>
-            </template>
-        </el-table-column>
-        <el-table-column prop="progress" label="已学%" width="100"/>
+            </div>
+            <el-empty v-else description="暂无内容" />
+        </div>
+    
+    
+    </div>
 
-        <el-table-column fixed="right" label="操作" width="240">
-            <template #default="scope">
-                <template v-if="!scope.row.is_group">
-                    <el-tooltip content="播放">
-                    <el-button icon="VideoPlay" size="small" type="primary" link @click="handlePlay(scope.row)">
-                    </el-button>
-                    </el-tooltip>
-                    <el-tooltip content="文稿">
-                    <el-button icon="Memo" size="small" type="primary" link @click="gotoArticleDetail(scope.row)">
-                    </el-button>
-                    </el-tooltip>
-                    <el-tooltip content="详情">
-                    <el-button icon="view" size="small" type="primary" link @click="handleProd(scope.row)">
-                    </el-button>
-                  </el-tooltip>
-                  <el-tooltip content="下载">
-                    <el-button icon="download" size="small" type="primary" link @click="openDownloadDialog(scope.row)">
-                    </el-button>
-                    </el-tooltip>
-                </template>
-
-            </template>
-        </el-table-column>
-    </el-table>
-    <Pagination :key="paginationKey" :total="total" @pageChange="handleChangePage"></Pagination>
     <audio-info v-if="dialogVisible" :enid="prodEnid" :dialog-visible="dialogVisible" @close="closeDialog"></audio-info>
     <outside-info v-if="outsideVisible" :enid="prodEnid" :dialog-visible="outsideVisible" @close="closeDialog"></outside-info>
 
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="60%" :before-close="closeDialog">
-        <el-space wrap>
-            <el-card v-for="i in 1" :key="i" class="box-card" width="100%">
-                <template #header>
-                    <div class="card-header">
-                        <el-row :gutter="5">
-                            <el-col :span="4">
-                                <el-row>
-                                    <el-avatar :size="84" :src="courseInfo.class_info.lecturer_avatar" left fit="fill"/>
-                                </el-row>
-                                <el-row>
-                                    <el-tag type="success">{{ courseInfo.class_info.lecturer_name }}</el-tag>
-                                </el-row>
-                            </el-col>
-                            <el-col :span="18">
-                                <p style="text-align:left">{{ courseInfo.class_info.lecturer_intro }}</p>
-                            </el-col>
-                        </el-row>
-                    </div>
-                </template>
-                <div style="text-align:left">
-                    <span v-html="courseInfo.class_info.highlight?.replaceAll('\n', '<br/>')"></span>
-                </div>
-
-            </el-card>
-        </el-space>
-
-    </el-dialog>
-
-    <el-dialog v-model="dialogDownloadVisible" title="请选择下载格式" align-center center width="30%">
-        <el-form >
-            <el-form-item label="下载格式" label-width="80px">
-                <el-select v-model="downloadType" placeholder="请选择下载格式">
+    <el-dialog v-model="dialogDownloadVisible" title="请选择下载格式" align-center center width="400px" class="download-dialog">
+        <el-form label-position="top">
+            <el-form-item label="下载格式">
+                <el-select v-model="downloadType" placeholder="请选择下载格式" style="width: 100%">
                     <el-option v-for="item in downloadTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
             </el-form-item>
-            <el-progress v-show="percentage"
-                :percentage="percentage"
-                status="success"
-                :stroke-width="20"
-                :text-inside="true"
-            ><span>{{content}}</span></el-progress>
+            <div v-if="percentage > 0" class="download-progress">
+                <div class="progress-text">{{ content }}</div>
+                <el-progress 
+                    :percentage="percentage" 
+                    :stroke-width="10" 
+                    status="success"
+                    striped
+                    striped-flow
+                />
+            </div>
         </el-form>
         <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="closeDownloadDialog">取消</el-button>
-        <el-button type="primary" @click="download(downloadId, downloadType)">
-          确认
-        </el-button>
-      </span>
+            <span class="dialog-footer">
+                <el-button @click="closeDownloadDialog">取消</el-button>
+                <el-button type="primary" @click="download(downloadId, downloadType)" :loading="percentage > 0 && percentage < 100">
+                    {{ percentage > 0 && percentage < 100 ? '下载中' : '开始下载' }}
+                </el-button>
+            </span>
         </template>
-
     </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, computed } from 'vue'
 import 'element-plus/es/components/message/style/css'
 import { ElMessage } from 'element-plus'
+import { ArrowLeft, VideoPlay, Memo, View, Download as DownloadIcon, Picture, Folder, Clock } from '@element-plus/icons-vue'
 import { AudioDetailAlias, CourseCategory, CourseGroupList, CourseList, OdobDownload, SetDir } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
-import Pagination from '../components/Pagination.vue'
 import AudioInfo from '../components/AudioInfo.vue'
 import OutsideInfo from '../components/OutsideInfo.vue'
 import { userStore } from '../stores/user'
@@ -168,12 +129,13 @@ const pStore = playerStore()
 const store = userStore()
 const setStore = settingStore()
 const { pushOdobDetail, pushLogin, pushSetting } = useAppRouter()
-const loading = ref(true)
+const loading = ref(false)
+const initLoading = ref(true)
 const page = ref(1)
 const total = ref(0)
 const outerTotal = ref(0)
-const pageSize = ref(15)
-const paginationKey = ref(0)
+const pageSize = ref(20) // Increased for scrolling
+const lastPageSize = ref(20)
 const dialogVisible = ref(false)
 const outsideVisible = ref(false)
 const prodEnid = ref("")
@@ -279,24 +241,50 @@ onMounted(() => {
     })
 
 })
-// 分页
-const handleChangePage = (item: any) => {
-    page.value = item.page
-    pageSize.value = item.pageSize
-    getTableData()
+
+const noMore = computed(() => {
+    const currentCount = tableData.list ? tableData.list.length : 0
+    if (groupMode.active) {
+        return currentCount >= (tableData.total || 0)
+    }
+    if (outerTotal.value > 0) {
+        return currentCount >= outerTotal.value
+    }
+    return lastPageSize.value < pageSize.value
+})
+
+const disabled = computed(() => loading.value || noMore.value)
+
+const loadMore = () => {
+    if (disabled.value) return
+    page.value += 1
+    getTableData(true)
 }
 
-const getTableData = async () => {
+const getTableData = async (append = false) => {
     loading.value = true
+    if (!append) initLoading.value = true
     const fetcher = groupMode.active
         ? CourseGroupList("odob", "study", groupMode.groupId, page.value, pageSize.value)
         : CourseList("odob", "study", page.value, pageSize.value)
     await fetcher.then((table) => {
         loading.value = false
-        Object.assign(tableData, table)
+        initLoading.value = false
+        
+        const fetchedList = table.list || []
+        lastPageSize.value = fetchedList.length
+        
+        if (append) {
+            if (fetchedList.length > 0) {
+                tableData.list.push(...fetchedList)
+            }
+        } else {
+            Object.assign(tableData, table)
+        }
         total.value = groupMode.active ? (table.total || 0) : outerTotal.value
     }).catch((error) => {
         loading.value = false
+        initLoading.value = false
         ElMessage({
             message: error,
             type: 'warning'
@@ -321,7 +309,6 @@ const enterGroup = (row: any) => {
     groupMode.groupId = groupId
     groupMode.title = String(row?.title || '')
     page.value = 1
-    paginationKey.value += 1
     getTableData()
 }
 
@@ -331,7 +318,6 @@ const exitGroup = () => {
     groupMode.title = ''
     page.value = 1
     total.value = outerTotal.value
-    paginationKey.value += 1
     getTableData()
 }
 
@@ -409,80 +395,205 @@ const handleProd = (row: any) => {
 </script>
 
 <style scoped>
-/* 自定义表格样式 */
-.custom-table {
-  text-align: left;
+.odob-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
 }
 
-.custom-table :deep(.el-table__cell) {
-  text-align: left;
-  height: 50px;
+.group-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 16px;
 }
 
-.custom-table :deep(.el-table__header .el-table__cell) {
-  text-align: left;
-  font-weight: 500;
-  background-color: var(--fill-color);
-  color: var(--text-primary);
+.group-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
-.custom-table :deep(.el-table__body .el-table__cell) {
-  text-align: left;
-  background-color: var(--card-bg);
-  color: var(--text-primary);
-  border-color: var(--border-soft);
+.odob-grid-container {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0; /* Important for flex child scrolling */
+    padding-bottom: 20px;
+    
+    /* 隐藏滚动条但保留功能 - 清新风格 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
 }
 
-.custom-table :deep(.el-table__row:hover .el-table__cell) {
-  background-color: var(--fill-color);
-  color: var(--text-primary);
+.odob-grid-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
 }
 
-/* 暗色模式下的表格样式 */
-.theme-dark .custom-table :deep(.el-table__header .el-table__cell) {
-  background-color: var(--fill-color) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-soft) !important;
+.odob-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    padding: 4px;
 }
 
-.theme-dark .custom-table :deep(.el-table__body .el-table__cell) {
-  background-color: var(--card-bg) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-soft) !important;
+.odob-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    cursor: default;
+    border: 1px solid var(--border-soft);
+    display: flex;
+    flex-direction: column;
 }
 
-.theme-dark .custom-table :deep(.el-table__row:hover .el-table__cell) {
-  background-color: var(--fill-color) !important;
-  color: var(--text-primary) !important;
+.odob-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medium);
+    border-color: var(--accent-color);
 }
 
-
-/* 表格标签样式 */
-.custom-table :deep(.el-tag) {
-  background-color: var(--fill-color);
-  border-color: var(--border-soft);
-  color: var(--text-primary);
+.card-cover {
+    position: relative;
+    width: 100%;
+    padding-top: 100%; /* 1:1 Aspect Ratio */
+    background-color: var(--fill-color);
+    overflow: hidden;
 }
 
-/* 表格图片样式 */
-.custom-table :deep(.el-image) {
-  border-radius: 4px;
-  border: 1px solid var(--border-soft);
+.card-cover .el-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease;
 }
 
-/* 表格弹出层样式 */
-.custom-table :deep(.el-popover) {
-  background-color: var(--card-bg);
-  border-color: var(--border-soft);
-  color: var(--text-primary);
+.odob-card:hover .card-cover .el-image {
+    transform: scale(1.05);
 }
 
-.custom-table :deep(.el-popover .el-popover__title) {
-  color: var(--text-primary);
+.image-placeholder, .no-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    background-color: var(--fill-color);
 }
 
-.custom-table :deep(.el-popover .el-popover__content) {
-  color: var(--text-secondary);
+.card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(4px);
 }
+
+.odob-card:hover .card-overlay {
+    opacity: 1;
+}
+
+.overlay-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 10px;
+}
+
+.overlay-actions .el-button {
+    margin: 0 !important;
+    transform: scale(0.9);
+    transition: transform 0.2s;
+}
+
+.overlay-actions .el-button:hover {
+    transform: scale(1.1);
+}
+
+.card-badges {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 2;
+}
+
+.card-content {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    height: 44px; /* Fixed height for 2 lines */
+}
+
+.card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.meta-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.card-intro {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    margin-top: auto; /* Push to bottom */
+}
+
+.download-progress {
+    margin-top: 16px;
+}
+
+.progress-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    text-align: center;
+}
+
+/* Responsive adjustments removed to enforce 5 columns */
 </style>
-  

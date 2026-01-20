@@ -4,24 +4,26 @@
             <el-breadcrumb-item :to="{ name: ROUTE_NAMES.COURSE }">课程列表</el-breadcrumb-item>
             <el-breadcrumb-item>{{ breadcrumbTitle }}</el-breadcrumb-item>
         </el-breadcrumb>
-        <el-button 
-            type="primary" 
-            link 
-            @click="showCourseDetail"
-            class="detail-btn"
-        >
-            课程详情
-            <el-icon class="el-icon--right"><InfoFilled /></el-icon>
-        </el-button>
-        <el-button 
-            type="primary" 
-            link 
-            @click="toggleSort"
-            class="sort-btn"
-        >
-            {{ isReverse ? '正序' : '倒序' }}
-            <el-icon class="el-icon--right"><Sort /></el-icon>
-        </el-button>
+        <div class="breadcrumb-actions">
+            <el-button 
+                type="primary" 
+                link 
+                @click="showCourseDetail"
+                class="action-btn"
+            >
+                <el-icon><InfoFilled /></el-icon>
+                课程详情
+            </el-button>
+            <el-button 
+                type="primary" 
+                link 
+                @click="toggleSort"
+                class="action-btn"
+            >
+                <el-icon><Sort /></el-icon>
+                {{ isReverse ? '正序' : '倒序' }}
+            </el-button>
+        </div>
     </div>
     <div
         class="infinite-list-wrapper"
@@ -31,61 +33,69 @@
         @scroll="onScroll"
     >
         <ul class="article-list">
-            <li v-for="item in tableData.article_list" :key="item.id" class="article-card">
-                <el-card shadow="hover" class="article-el-card">
-                    <div class="card-content">
-                        <div class="card-header">
-                            <el-tooltip
-                                effect="dark"
-                                :content="item.title"
-                                placement="top"
-                                :show-after="500"
-                            >
-                                <span class="card-title">{{ item.title }}</span>
-                            </el-tooltip>
-                            <el-tag v-if="isLearned(item)" type="success" size="small">已学习</el-tag>
-                        </div>
+            <li v-for="item in tableData.article_list" :key="item.id" class="article-card-wrapper">
+                <div class="article-card" @click="handlePlay(item)">
+                    <div class="card-cover">
                         <el-image 
                             :src="item.logo" 
                             class="card-image"
                             fit="cover"
-                            :preview-teleported="true"
-                            :preview-src-list="[item.logo]"
-                        />
-                        <div class="card-meta-row">
-                            <span class="card-meta">
+                            loading="lazy"
+                        >
+                            <template #placeholder>
+                                <div class="image-placeholder">
+                                    <el-icon><Picture /></el-icon>
+                                </div>
+                            </template>
+                        </el-image>
+                        <div class="card-overlay" @click.stop>
+                            <div class="overlay-actions">
+                                <el-tooltip content="播放" :show-after="500">
+                                    <el-button circle type="primary" :icon="VideoPlay" @click="handlePlay(item)" v-if="item.audio_alias_ids.length || item.video_status"/>
+                                </el-tooltip>
+                                <el-tooltip content="文稿" :show-after="500">
+                                    <el-button circle type="success" :icon="Memo" @click="gotoArticleDetail(item)" />
+                                </el-tooltip>
+                                <el-tooltip content="下载" :show-after="500" v-if="canDownload(item)">
+                                    <el-button circle type="warning" :icon="Download" @click="openDownloadDialog(item)" />
+                                </el-tooltip>
+                            </div>
+                        </div>
+                        <div class="card-badges">
+                            <el-tag v-if="isLearned(item)" type="success" size="small" effect="dark">已学</el-tag>
+                        </div>
+                    </div>
+                    
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h3 class="card-title" :title="item.title">{{ item.title }}</h3>
+                        </div>
+                        
+                        <div class="card-meta">
+                            <span class="meta-item">
                                 <el-icon><Clock /></el-icon>
                                 {{ item.video_status == 1 ? secondToHour(item.video?.[0]?.duration !== undefined ? item.video[0].duration : 0) : (item.audio?.duration ? secondToHour(item.audio.duration) : '') }}
                             </span>
-                            <span class="card-meta">
+                            <span class="meta-item">
                                 <el-icon><User /></el-icon>
                                 {{ item.cur_learn_count }}
                             </span>
-                            <span class="card-meta">
+                        </div>
+                        
+                        <div class="card-footer">
+                            <span class="publish-time">
                                 <el-icon><Calendar /></el-icon>
                                 {{ item.publish_time ? timestampToDate(item.publish_time) : '' }}
                             </span>
                         </div>
-                        <div class="card-actions">
-                            <el-button icon="VideoPlay" size="small" type="primary" link @click="handlePlay(item)"
-                                       v-if="item.audio_alias_ids.length || item.video_status">播放
-                            </el-button>
-                            <el-button icon="Memo" size="small" type="primary" link @click="gotoArticleDetail(item)">文稿</el-button>
-                            <el-button
-                              icon="download"
-                              size="small"
-                              type="primary"
-                              link
-                              v-if="canDownload(item)"
-                              @click="openDownloadDialog(item)"
-                            >下载</el-button>
-                        </div>
                     </div>
-                </el-card>
+                </div>
             </li>
         </ul>
-        <div v-if="loading" class="loading" style="text-align:center;padding:12px;">加载中...</div>
-        <div v-if="finished && hasScrolled" class="finished" style="text-align:center;padding:12px;color:#999;">没有更多了</div>
+        <div v-if="loading" class="loading-state">
+            <el-icon class="is-loading"><Loading /></el-icon> 加载中...
+        </div>
+        <div v-if="finished && hasScrolled" class="finished-state">没有更多了</div>
     </div>
     <download-dialog
             v-if="dialogDownloadVisible"
@@ -110,7 +120,7 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import {ArrowRight} from '@element-plus/icons-vue'
+import { ArrowRight, VideoPlay, Memo, Download, Picture, Loading } from '@element-plus/icons-vue'
 import {ArticleList, SetDir} from '../../wailsjs/go/backend/App'
 import {services} from '../../wailsjs/go/models'
 import {useRoute} from 'vue-router'
@@ -201,6 +211,11 @@ onMounted(() => {
         },
         {immediate: true}
     )
+    window.addEventListener('player:needMore', onNeedMoreForPlayer as any)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('player:needMore', onNeedMoreForPlayer as any)
 })
 
 const buildTrack = (row: any): PlayerTrack | null => {
@@ -299,14 +314,6 @@ const onNeedMoreForPlayer = async (ev: any) => {
     await loadMoreArticles()
 }
 
-onMounted(() => {
-    window.addEventListener('player:needMore', onNeedMoreForPlayer as any)
-})
-
-onUnmounted(() => {
-    window.removeEventListener('player:needMore', onNeedMoreForPlayer as any)
-})
-
 const openDialog = () => {
     dialogVisible.value = true
 }
@@ -384,101 +391,219 @@ const gotoArticleVideo = (row: any) => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-right: 20px;
+    padding: 24px 32px 16px 32px;
+    background: var(--bg-color);
 }
-.sort-btn {
+
+.breadcrumb-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     font-size: 14px;
+    color: var(--text-secondary);
+    transition: color 0.2s;
 }
+
+.action-btn:hover {
+    color: var(--primary-color);
+}
+
 .infinite-list-wrapper {
-    height: calc(100vh - 120px);
+    height: calc(100vh - 140px);
     overflow-y: auto;
+    padding: 0 32px 32px 32px;
+    
+    /* 隐藏滚动条但保留功能 - 清新风格 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
 }
+
+.infinite-list-wrapper::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
 .article-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 24px;
-  padding: 0;
-  margin: 0;
-  list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
 }
+
+.article-card-wrapper {
+    /* Wrapper for layout control if needed */
+}
+
 .article-card {
-  /* 让卡片高度自适应内容 */
+    background: var(--card-bg);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    border: 1px solid var(--border-soft);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    cursor: pointer;
 }
-.article-el-card {
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  transition: box-shadow 0.2s;
+
+.article-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medium);
+    border-color: var(--accent-color);
 }
-.article-el-card:hover {
-  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+
+.card-cover {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    background-color: var(--fill-color);
+    overflow: hidden;
 }
-.card-content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-height: 160px;
-}
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-.card-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1f2937;
-  line-height: 1.5;
-  flex: 1;
-  
-  /* Multi-line truncation */
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 8px;
-  height: 48px; /* Ensure consistent height for alignment */
-}
+
 .card-image {
-  width: 100%;
-  height: 192px; /* 16:9 aspect ratio approx or fixed height */
-  border-radius: 8px;
-  display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease;
 }
-.card-meta-row {
-  display: flex;
-  justify-content: space-between;
-  color: #6b7280;
-  font-size: 13px;
-  align-items: center;
-  margin-top: 8px;
+
+.article-card:hover .card-image {
+    transform: scale(1.05);
 }
+
+.image-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    background-color: var(--fill-color);
+}
+
+.card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.article-card:hover .card-overlay {
+    opacity: 1;
+}
+
+.overlay-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.overlay-actions .el-button {
+    margin: 0 !important;
+    transform: scale(0.9);
+    transition: transform 0.2s;
+}
+
+.overlay-actions .el-button:hover {
+    transform: scale(1.1);
+}
+
+.card-badges {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+}
+
+.card-content {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    margin-bottom: 12px;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    height: 48px;
+}
+
 .card-meta {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.card-meta i {
-  font-size: 16px;
-  vertical-align: middle;
-}
-.card-actions {
-  margin-top: auto;
-  display: flex;
-  gap: 16px;
-  justify-content: flex-end;
-}
-@media (max-width: 600px) {
-  .article-list {
-    grid-template-columns: 1fr;
-  }
-  .card-title {
-    font-size: 17px;
-  }
-  .card-meta-row {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-secondary);
     font-size: 13px;
-  }
+    margin-bottom: 12px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.card-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid var(--border-soft);
+    padding-top: 12px;
+}
+
+.publish-time {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.loading-state, .finished-state {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+@media (max-width: 600px) {
+    .article-list {
+        grid-template-columns: 1fr;
+    }
 }
 </style>

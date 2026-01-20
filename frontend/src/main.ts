@@ -9,6 +9,8 @@ import { themeStore } from './stores/theme'
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css' //样式
 import 'element-plus/dist/index.css'
+import './assets/css/font.css' // 字体样式
+import './assets/css/global.css' // 全局自定义样式
 
 const app = createApp(App)
 const pinia = createPinia()

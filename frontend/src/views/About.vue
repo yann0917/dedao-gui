@@ -1,17 +1,20 @@
 <template>
-  <!-- <div class="theme-color-popper"> -->
-    <el-drawer v-model="drawer" title="I am the title" :with-header="false">
-      <span>With default value</span>
-    <el-color-picker v-model="systemColor" :predefine="predefineColors" show-alpha @change="setThemeColor('')" />
-  </el-drawer>
-  <!-- </div> -->
+  <div class="about-page">
+    <div class="about-content">
+      <h2>Theme Settings</h2>
+      <p>Customize your experience</p>
+      <div class="color-picker-section">
+        <span>System Color: </span>
+        <el-color-picker v-model="systemColor" :predefine="predefineColors" show-alpha @change="setThemeColor('')" />
+      </div>
+    </div>
+  </div>
 </template>
-  
+
 <script lang="ts" setup>
 import { ref } from 'vue';
 import {setThemeColor} from '../utils/utils'
 
-const drawer = ref(true)
 const systemColor = ref('rgba(19, 206, 102, 0.8)')
 const predefineColors = ref([
   '#ff4500',
@@ -31,12 +34,40 @@ const predefineColors = ref([
 ])
 
 </script>
-<style  scoped lang="scss">
-.theme-color-popper {
-  display: block;
+<style scoped>
+.about-page {
+  padding: 40px;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.about-content {
+  background: var(--card-bg);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+  min-width: 300px;
+}
+
+h2 {
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+p {
+  color: var(--text-secondary);
+  margin-bottom: 30px;
+}
+
+.color-picker-section {
+  display: flex;
   align-items: center;
-  width: 230px;
-  padding: 20px;
-  background-color: greenyellow;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-regular);
 }
 </style>

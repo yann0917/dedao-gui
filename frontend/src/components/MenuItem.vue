@@ -11,8 +11,7 @@
 				<menu-item v-if="!children.meta?.hideMenu" :menu="children" :path="`${menuPath}/${children.path}`" />
 			</template>
 		</el-sub-menu>
-		<router-link v-else :to="menuPath">
-			<el-menu-item :index="menuPath">
+			<el-menu-item v-else :index="menuPath">
 				<el-icon v-if="props.menu.meta?.icon">
 					<component :is="props.menu.meta.icon"></component>
 				</el-icon>
@@ -24,7 +23,6 @@
 					}}</span>
 				</template>
 			</el-menu-item>
-		</router-link>
 	</template>
 </template>
 
@@ -52,7 +50,4 @@ const menuPath = computed(() => {
 })
 </script>
 <style scoped>
-	a{
-		text-decoration: none;
-	}
 </style>

@@ -34,9 +34,9 @@
                   <p class="author-info" v-html="audioInfo.detail.agency_detail.intro?.replaceAll('\n','<br/>')"></p><br />
                   <span class="price">{{ audioInfo.detail.audio_price }}元</span>
                   <el-tag class="ml-2" type="warning" v-if="audioInfo.detail.is_vip == true" round>
-                    <el-icon><HotWater /></el-icon>会员免费</el-tag>
+                    会员免费</el-tag>
                   <el-tag class="ml-2" type="info" v-if="audioInfo.detail.in_bookrack == true" round>
-                    <el-icon><HotWater /></el-icon>已加入书架</el-tag>
+                    已加入书架</el-tag>
                   <el-tag class="ml-2" type="success" v-if="audioInfo.detail.tag?.length >0" round>
                     {{ audioInfo.detail.tag.join(",") }}</el-tag>
                 </el-row>

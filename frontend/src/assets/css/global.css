@@ -1,0 +1,185 @@
+/* Global CSS Variables - Fresh Efficiency Theme */
+:root {
+  /* Fonts */
+  --font-family-base: 'PingFang SC', 'Helvetica Neue', Helvetica, 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  --font-family-mono: 'JetBrainsMono', ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --font-family-wenkai: "LXGW WenKai Lite", sans-serif;
+
+  /* Colors */
+  --primary-color: #409EFF;
+  --accent-color: #FF6B00;
+  --success-color: #67C23A;
+  --warning-color: #E6A23C;
+  --danger-color: #F56C6C;
+  
+  /* Backgrounds */
+  --bg-color: #f5f7fa;
+  --card-bg-light: #ffffff;
+  --card-bg-dark: #1d1e1f;
+  
+  /* Text */
+  --text-primary: #303133;
+  --text-regular: #606266;
+  --text-secondary: #909399;
+  --text-placeholder: #C0C4CC;
+  
+  /* Fill */
+  --fill-color: #ecf5ff;
+  --fill-color-light: #f5f7fa;
+  --fill-color-dark: #e6e8eb;
+  
+  /* Element Plus Overrides */
+  --el-menu-bg-color: var(--card-bg);
+  --el-menu-text-color: var(--text-primary);
+  --el-menu-hover-bg-color: var(--fill-color-light);
+  --el-menu-active-color: var(--primary-color);
+  --el-color-primary: var(--primary-color);
+  --el-bg-color: var(--bg-color);
+  --el-bg-color-overlay: var(--card-bg);
+  --el-fill-color-light: var(--fill-color-light);
+
+  /* Aliases for compatibility */
+  --card-bg: var(--card-bg-light);
+  --card-hover-bg: #ffffff;
+  --menu-bg: var(--card-bg-light);
+  --menu-hover-bg: var(--fill-color-light);
+  
+  --text-tertiary: #C0C4CC;
+  
+  /* Borders & Shadows */
+  --border-radius-base: 12px;
+  --border-radius-small: 8px;
+  --border-radius-round: 20px;
+  --border-soft: #EBEEF5;
+  
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-medium: 0 6px 16px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+  
+  /* Transitions */
+  --transition-base: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  --transition-fast: all 0.2s ease-in-out;
+}
+
+/* Dark Mode Variables */
+html.theme-dark {
+  --bg-color: #141414;
+  --card-bg-light: #1d1e1f;
+  --card-hover-bg: #2b2d30;
+  --fill-color: #2a3d54;
+  --fill-color-light: #262727;
+  --fill-color-dark: #1f2022;
+  
+  --text-primary: #E5EAF3;
+  --text-regular: #A3A6AD;
+  --text-secondary: #8D9095;
+  --text-tertiary: #6C6E72;
+  --text-placeholder: #6C6E72;
+  
+  --border-soft: #4C4D4F;
+  
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 6px 16px rgba(0, 0, 0, 0.4);
+  --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+body {
+  font-family: var(--font-family-base);
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global Scrollbar Styling - Hidden for cleanliness */
+::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+/* Element Plus Component Overrides for "Fresh Efficiency" Look */
+
+/* Buttons */
+.el-button {
+  border-radius: var(--border-radius-small);
+  font-weight: 500;
+  transition: var(--transition-fast);
+}
+
+.el-button:not(.is-circle) {
+  padding: 8px 16px;
+}
+
+/* Cards */
+.el-card {
+  border-radius: var(--border-radius-base);
+  border: none !important; /* Remove default border */
+  box-shadow: var(--shadow-soft) !important;
+  background-color: var(--card-bg-light);
+  transition: var(--transition-base);
+  overflow: visible !important; /* Allow hover effects to pop out if needed */
+}
+
+/* Menus */
+.el-menu {
+  border-right: none !important;
+  background-color: transparent !important;
+}
+
+.el-menu-item {
+  border-radius: var(--border-radius-small);
+  margin: 4px 8px;
+  height: 48px;
+  line-height: 48px;
+}
+
+.el-menu-item.is-active {
+  background-color: var(--fill-color-light) !important;
+  color: var(--accent-color) !important;
+  font-weight: 600;
+}
+
+.el-menu-item:hover {
+  background-color: var(--fill-color-light) !important;
+}
+
+/* Dialogs */
+.el-dialog {
+  border-radius: var(--border-radius-base);
+  box-shadow: var(--shadow-hover) !important;
+  overflow: hidden; /* Ensure content respects border radius */
+}
+
+.el-dialog__header {
+  padding: 20px;
+  margin-right: 0;
+  border-bottom: 1px solid var(--fill-color-light);
+}
+
+.el-dialog__footer {
+  padding: 20px;
+  border-top: 1px solid var(--fill-color-light);
+}
+
+/* Inputs */
+.el-input__wrapper {
+  border-radius: var(--border-radius-small);
+  box-shadow: 0 0 0 1px var(--text-placeholder) inset !important;
+}
+
+.el-input__wrapper:hover {
+  box-shadow: 0 0 0 1px var(--text-secondary) inset !important;
+}
+
+.el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1px var(--primary-color) inset !important;
+}
+
+/* Tags */
+.el-tag {
+  border-radius: 4px;
+  border: none;
+}

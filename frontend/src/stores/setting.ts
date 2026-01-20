@@ -9,6 +9,7 @@ export const settingStore = defineStore("setting", {
                 color: "",
                 ffmpegDir: "",
                 wkhtmltopdfDir: "",
+                fontFamily: "default", // default, jetbrains, wenkai
             },
         }
     },

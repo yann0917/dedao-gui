@@ -250,11 +250,19 @@ onUnmounted(() => {
 
 <style scoped>
 .veplayer-page {
-  height: 100%;
+  height: calc(100vh - 60px);
   display: flex;
   flex-direction: column;
   padding: 12px 0;
   box-sizing: border-box;
+  overflow-y: auto;
+  /* 隐藏滚动条但保留功能 - 清新风格 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.veplayer-page::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
 .veplayer-header {
@@ -272,6 +280,7 @@ onUnmounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--text-primary);
 }
 
 .veplayer-body {

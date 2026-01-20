@@ -768,7 +768,11 @@ const refreshAlgoData = () => {
 .category {
   padding: 24px;
   background: var(--fill-color-light);
-  min-height: calc(100vh - 60px);
+  height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .filters {
@@ -777,6 +781,7 @@ const refreshAlgoData = () => {
   padding: 20px;
   margin-bottom: 24px;
   box-shadow: var(--shadow-soft);
+  flex-shrink: 0;
 }
 
 .filter-container {
@@ -807,6 +812,8 @@ const refreshAlgoData = () => {
     border-radius: 16px;
     transition: all 0.3s ease;
     color: var(--text-secondary);
+    background: transparent;
+    border: none;
 
     &:hover {
       color: var(--accent-color);
@@ -837,6 +844,10 @@ const refreshAlgoData = () => {
   border-radius: 12px;
   padding: 24px;
   box-shadow: var(--shadow-soft);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Important for nested flex scrolling */
 }
 
 .result-header {
@@ -844,6 +855,7 @@ const refreshAlgoData = () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  flex-shrink: 0;
 
   .result-count {
     font-size: 16px;
@@ -879,16 +891,33 @@ const refreshAlgoData = () => {
 .content-divider {
   margin: 16px 0;
   border-color: var(--border-soft);
+  flex-shrink: 0;
 }
 
 .content-list {
+  flex: 1;
+  overflow: hidden;
+  margin: 0 -12px; /* Compensate for scrollbar padding if needed, or just keep it simple */
+  padding: 0 12px;
+  
   .infinite-list {
+    height: 100%;
+    overflow-y: auto;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 24px;
     padding: 0;
     margin: 0;
     list-style: none;
+    padding-bottom: 20px;
+
+    /* 隐藏滚动条但保留功能 - 清新风格 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+  }
+  
+  .infinite-list::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
   }
 }
 
@@ -896,9 +925,13 @@ const refreshAlgoData = () => {
   .content-card {
     cursor: pointer;
     transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 
     &:hover {
       transform: translateY(-4px);
+      box-shadow: var(--shadow-medium);
     }
   }
 }
@@ -906,38 +939,46 @@ const refreshAlgoData = () => {
 .card-content {
   display: flex;
   gap: 16px;
+  flex: 1;
 }
 
 .content-cover {
-  width: 112px;
-  height: 150px;
+  width: 100px;
+  height: 133px;
   object-fit: cover;
   border-radius: 8px;
   background: var(--fill-color-light);
+  flex-shrink: 0;
 }
 
 .content-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   text-align: left;
+  min-width: 0; /* Prevent flex overflow */
 }
 
 .content-title {
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-primary);
   margin: 0;
   line-height: 1.4;
   text-align: left;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .content-intro {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-secondary);
   margin: 0;
-  line-height: 1.6;
+  line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -947,15 +988,18 @@ const refreshAlgoData = () => {
 }
 
 .meta-info {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-tertiary);
   margin-top: auto;
   text-align: left;
 
   .lecturer, .author {
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .episode-count {
@@ -968,13 +1012,16 @@ const refreshAlgoData = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 8px;
+  margin-top: 4px;
   text-align: left;
 
   .rating {
     text-align: left;
+    display: flex;
+    align-items: center;
+    
     .no-rating {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text-tertiary);
     }
   }
@@ -990,16 +1037,22 @@ const refreshAlgoData = () => {
   border-radius: 12px;
   border: none;
   overflow: hidden;
+  background: var(--card-bg);
 
   .el-card__body {
     padding: 16px;
     text-align: left;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
   }
 }
 
 :deep(.el-rate) {
   display: inline-flex;
   align-items: center;
+  height: 20px;
   
   .el-rate__text {
     color: var(--accent-color);
@@ -1011,25 +1064,29 @@ const refreshAlgoData = () => {
   align-items: center;
   justify-content: flex-end;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-soft);
 }
 
 .card-actions :deep(.el-button) {
   font-weight: 500;
+  margin: 0;
 }
 
 .card-actions :deep(.el-button.is-link) {
-  padding: 0;
+  padding: 4px 8px;
   height: auto;
+  border-radius: 4px;
 }
 
 .card-actions :deep(.el-button.is-link:hover) {
-  transform: translateY(-1px);
+  background-color: var(--fill-color);
 }
 
 .card-actions :deep(.el-tag) {
-  border-radius: 999px;
+  border-radius: 4px;
 }
 
 /* 暗色主题适配 */
@@ -1094,22 +1151,22 @@ const refreshAlgoData = () => {
   color: var(--accent-color) !important;
 }
 
+.theme-dark .card-actions :deep(.el-button.is-link:hover) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
 /* 确保选中按钮在暗色主题下可见 */
 .theme-dark .filter-btn.active-btn {
   color: var(--accent-color) !important;
   background: rgba(255, 107, 0, 0.15) !important;
-  border: 1px solid var(--accent-color) !important;
 }
 
 .theme-dark .filter-btn {
   color: var(--text-secondary) !important;
-  background: transparent !important;
-  border: 1px solid transparent !important;
 }
 
 .theme-dark .filter-btn:hover {
   color: var(--accent-color) !important;
   background: rgba(255, 107, 0, 0.05) !important;
-  border: 1px solid var(--accent-color) !important;
 }
 </style>
