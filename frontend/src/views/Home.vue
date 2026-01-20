@@ -163,7 +163,7 @@
                   shadow="hover"
                   v-for="item in courseContentList.product_list"
                 >
-                <div @click="handleProd(item.product_enid, item.product_type)">
+                <div @click="handleClassProd(item)">
                   <img
                     :src="ossProcess(item.horizontal_image)"
                     :alt="item.title"
@@ -186,7 +186,11 @@
                     </p>
                   </div>
                   <div class="bottom">
-                    <el-button text class="button">立即学习</el-button>
+                    <el-button
+                      text
+                      class="button"
+                      @click.stop="handleClassProd(item)"
+                    >立即学习</el-button>
                   </div>
                 </div>
                 </el-card>
@@ -299,6 +303,7 @@ import {
   SunflowerLabelList,
   SunflowerLabelContent,
   SunflowerResourceList,
+  ArticleList,
   UserInfo,
 } from "../../wailsjs/go/backend/App";
 import { services } from "../../wailsjs/go/models";
@@ -445,6 +450,16 @@ const handleFreeProd = (item: any) => {
     enid: item.enid, 
     title: item.name 
   });
+};
+
+const handleClassProd = async (item: services.ProductSimple) => {
+  const enid = String(item?.product_enid ?? "").trim();
+  if (!enid) return;
+  if (item?.product_type != 66) {
+    courseVisible.value = false;
+    return;
+  };
+  pushByName(ROUTE_NAMES.ARTICLE_LIST, { id: enid }, { enid, title: item.title });
 };
 
 const handleLabel = (

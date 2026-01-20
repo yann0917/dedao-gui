@@ -1,5 +1,7 @@
 package services
 
+import "strings"
+
 // ArticleDetail article content
 // GET query params token,sign,appid
 type ArticleDetail struct {
@@ -178,10 +180,37 @@ func (s *Service) ArticleList(id, chapterID string, count, maxID int, reverse bo
 		return
 	}
 	defer body.Close()
-	if err = handleJSONParse(body, &list); err != nil {
+	if err = handleJSONParse(body, &list); err == nil {
+		return
+	}
+
+	if !shouldFallbackToFreeArticleList(err) {
+		return
+	}
+
+	freeBody, freeErr := s.reqFreeArticleList(id, chapterID, count, maxID, reverse)
+	if freeErr != nil {
+		return list, freeErr
+	}
+	defer freeBody.Close()
+	if err = handleJSONParse(freeBody, &list); err != nil {
 		return
 	}
 	return
+}
+
+func shouldFallbackToFreeArticleList(err error) bool {
+	if err == nil {
+		return false
+	}
+	msg := err.Error()
+	if strings.Contains(msg, "401 Unauthorized") ||
+		strings.Contains(msg, "404 NotFound") ||
+		strings.Contains(msg, "400 BadRequest") ||
+		strings.Contains(msg, "496 NoCertificate") {
+		return false
+	}
+	return strings.Contains(msg, "errMsg:")
 }
 
 // ArticleInfo get article info

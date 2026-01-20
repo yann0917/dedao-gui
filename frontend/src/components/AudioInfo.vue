@@ -1,5 +1,11 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="75%" :before-close="closeDialog">
+  <el-dialog
+    v-model="dialogVisible"
+    width="75%"
+    :before-close="closeDialog"
+    class="info-dialog audio-info-dialog"
+    destroy-on-close
+  >
     <template #header="{titleId, titleClass }">
       <div class="my-header">
         <h4 :id="titleId" :class="titleClass">{{audioInfo.detail.title}}</h4>
@@ -21,12 +27,12 @@
                   </el-col>
                   <el-col :span="16">
                     <p style="margin: 0;font-size: medium;">{{ audioInfo.detail.agency_detail.qcg_member_name }}</p>
-                    <span style="color: #909399;">解读书本{{ audioInfo.detail.agency_detail.book_count }}本 | 被学习{{ audioInfo.detail.agency_detail.uv }}次</span>
+                    <span class="meta-text">解读书本{{ audioInfo.detail.agency_detail.book_count }}本 | 被学习{{ audioInfo.detail.agency_detail.uv }}次</span>
                   </el-col>
                 </el-row>
                 <el-row :gutter="0" >
                   <p class="author-info" v-html="audioInfo.detail.agency_detail.intro?.replaceAll('\n','<br/>')"></p><br />
-                  <span style="color:#ff6b00">{{ audioInfo.detail.audio_price }}元</span>
+                  <span class="price">{{ audioInfo.detail.audio_price }}元</span>
                   <el-tag class="ml-2" type="warning" v-if="audioInfo.detail.is_vip == true" round>
                     <el-icon><HotWater /></el-icon>会员免费</el-tag>
                   <el-tag class="ml-2" type="info" v-if="audioInfo.detail.in_bookrack == true" round>
@@ -65,7 +71,7 @@
         <div class="book-intro" style="text-align:left">
           <div v-for="item in audioInfo.detail.topic_summary" :key="item.id">
               <h3>{{ item.title}}</h3>
-              <p v-html="item.sub_title?.replaceAll('\n','<br/>')" style="color: #909399;"></p>
+              <p class="meta-text" v-html="item.sub_title?.replaceAll('\n','<br/>')"></p>
           </div>
         </div>
       </el-card>
@@ -78,11 +84,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { AudioDetail } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
-import { repeat } from 'lodash'
 import { secondToHour,timestampToDate } from '../utils/utils'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
 const dialogVisible = ref(false)
 
 let audioInfo = reactive(new services.AudioInfoResp)
@@ -106,7 +108,6 @@ onMounted(() => {
 
 const getAudioInfo = async (enid: string) => {
   await AudioDetail(enid).then((info) => {
-    console.log(info)
     Object.assign(audioInfo, info)
     openDialog()
   }).catch((error) => {
@@ -128,7 +129,42 @@ const closeDialog = () => {
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.audio-info-dialog {
+  :deep(.el-dialog__header) {
+    margin-right: 0;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 0;
+  }
+}
+
+.my-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  h4 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
+  }
+}
+
+.meta-text {
+  color: var(--text-tertiary) !important;
+}
+
+.price {
+  color: var(--accent-color) !important;
+  font-weight: 600;
+}
+
 .card-header.el-row {
   height: 100%;
 }
@@ -162,13 +198,18 @@ const closeDialog = () => {
 .section-info{
   display: flex;
   flex-wrap: wrap;
+  margin: 20px 0;
 }
 .section-info .item-content {
   position: relative;
   text-align: center;
   min-width: 24%;
   margin-bottom: 15px;
-  border-left: 1px solid #d8d8d8;
+  border-left: 1px solid var(--border-soft);
+
+  &:first-child {
+    border-left: none;
+  }
 }
 .item-content span {
   display: block;
@@ -176,13 +217,13 @@ const closeDialog = () => {
 
 .item-content .info-value {
   font-size: 16px;
-  color: #333;
+  color: var(--text-primary);
   letter-spacing: 0;
   line-height: 28px;
 }
 
 .item-content .info-text {
-  color: #666;
+  color: var(--text-secondary);
   line-height: 16px;
   font-size: 12px;
   letter-spacing: 0;
@@ -199,8 +240,8 @@ const closeDialog = () => {
     /* height: 32px; */
     border-radius: 8px;
     font-weight: bold;
-    border-color: #ff6b00;
-    background-color: #ff6b00;
-    color: #fff;
+    border-color: var(--accent-color);
+    background-color: var(--accent-color);
+    color: #fff !important;
 }
 </style>

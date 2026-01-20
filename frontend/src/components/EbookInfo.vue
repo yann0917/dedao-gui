@@ -1,5 +1,11 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="75%" :before-close="closeDialog">
+  <el-dialog
+    v-model="dialogVisible"
+    width="75%"
+    :before-close="closeDialog"
+    class="info-dialog ebook-info-dialog"
+    destroy-on-close
+  >
     <template #header="{titleId, titleClass }">
       <div class="my-header">
         <h4 :id="titleId" :class="titleClass">{{ebookInfo.operating_title}}</h4>
@@ -14,13 +20,13 @@
               <el-col :span="6">
                 <el-image :src="ebookInfo.cover" fit="cover" />
               </el-col>
-              <el-col :span="18" style="text-align:left; padding-left: 15px;">
+              <el-col :span="18" class="card-main">
                 <p class="author-info" v-html="ebookInfo.author_info?.replaceAll('\n','<br/>')"></p><br />
-                <span style="color:#ff6b00">{{ ebookInfo.price }}元</span>
+                <span class="price">{{ ebookInfo.price }}元</span>
                 <el-tag class="ml-2" type="warning" v-if="ebookInfo.is_vip_book==1" round>
                   <el-icon><HotWater /></el-icon>会员免费</el-tag>
                 <el-tag class="ml-2" type="info" v-if="ebookInfo.read_time">阅读总时长：{{secondToHour(ebookInfo.read_time)}}</el-tag>
-                <el-button v-if="ebookInfo.is_on_bookshelf==false" @click="ebookShelfAdd(ebookInfo.enid)">
+                <el-button v-if="ebookInfo.is_on_bookshelf==false" class="primary-action" @click="ebookShelfAdd(ebookInfo.enid)">
                   <el-icon><Plus /></el-icon>加入书架
                 </el-button>
                 <el-button v-if="ebookInfo.is_on_bookshelf==true" @click="ebookShelfRemove(ebookInfo.enid)" type="danger">
@@ -202,7 +208,33 @@ const gotoCommentList = (row: any) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.ebook-info-dialog {
+  :deep(.el-dialog__header) {
+    margin-right: 0;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 0;
+  }
+}
+
+.my-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  h4 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
+  }
+}
+
 .card-header.el-row {
   height: 100%;
 }
@@ -234,6 +266,16 @@ const gotoCommentList = (row: any) => {
   text-align: center;
 }
 
+.card-main {
+  text-align: left;
+  padding-left: 15px;
+}
+
+.price {
+  color: var(--accent-color) !important;
+  font-weight: 600;
+}
+
 .section-info {
   display: flex;
   flex-wrap: wrap;
@@ -245,8 +287,8 @@ const gotoCommentList = (row: any) => {
   text-align: center;
   min-width: 24%;
   margin-bottom: 15px;
-  border-left: 1px solid #d8d8d8;
-  
+  border-left: 1px solid var(--border-soft);
+
   &:first-child {
     border-left: none;
   }
@@ -258,14 +300,14 @@ const gotoCommentList = (row: any) => {
 
 .item-content .info-value {
   font-size: 16px;
-  color: #333;
+  color: var(--text-primary);
   letter-spacing: 0;
   line-height: 28px;
   font-weight: 500;
 }
 
 .item-content .info-text {
-  color: #666;
+  color: var(--text-secondary);
   line-height: 16px;
   font-size: 12px;
   letter-spacing: 0;
@@ -278,17 +320,17 @@ const gotoCommentList = (row: any) => {
   background-position: 35%;
 }
 
-.card-header .el-button {
+.card-header .primary-action {
   border-radius: 8px;
   font-weight: bold;
-  border-color: #ff6b00;
-  background-color: #ff6b00;
-  color: #fff;
+  border-color: var(--accent-color);
+  background-color: var(--accent-color);
+  color: #fff !important;
   transition: all 0.3s ease;
   
   &:hover {
-    background-color: #ff8533;
-    border-color: #ff8533;
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
     transform: translateY(-2px);
   }
 }
@@ -296,7 +338,7 @@ const gotoCommentList = (row: any) => {
 .book-intro {
   h1 {
     font-size: 18px;
-    color: #333;
+    color: var(--text-primary) !important;
     margin: 16px 0 8px;
     
     &:first-child {
@@ -305,14 +347,10 @@ const gotoCommentList = (row: any) => {
   }
   
   p {
-    color: #666;
+    color: var(--text-secondary) !important;
     margin: 0 0 16px;
     line-height: 1.8;
   }
-}
-
-:deep(.el-dialog__header) {
-  padding: 20px 20px 0;
 }
 
 :deep(.el-alert) {
@@ -323,10 +361,10 @@ const gotoCommentList = (row: any) => {
   .scrollbar-catalog-item {
     display: block;
     padding: 4px 0;
-    color: #666;
+    color: var(--text-secondary);
     
     &:hover {
-      background-color: #f5f7fa;
+      background-color: var(--fill-color);
     }
   }
 }

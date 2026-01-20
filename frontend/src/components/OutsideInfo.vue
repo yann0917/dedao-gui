@@ -1,5 +1,11 @@
 <template>
-    <el-dialog v-model="dialogVisible" width="75%" :before-close="closeDialog">
+    <el-dialog
+        v-model="dialogVisible"
+        width="75%"
+        :before-close="closeDialog"
+        class="info-dialog outside-info-dialog"
+        destroy-on-close
+    >
         <template #header="{ titleId, titleClass }">
             <div class="my-header">
                 <h4 :id="titleId" :class="titleClass">{{ outsideInfo.spu.title }}</h4>
@@ -52,21 +58,21 @@
                 <el-divider content-position="left">课程列表</el-divider>
                 <div class="course-list" style="text-align:left">
                     <div v-for="(item, index) in outsideInfo.items" :key="index" class="course-item">
-                        <el-row :gutter="16" align="middle" style="margin-bottom: 12px; padding: 8px; border: 1px solid #f0f0f0; border-radius: 8px;">
+                        <el-row :gutter="16" align="middle" class="course-row">
                             <el-col :span="4">
-                                <el-image :src="item.icon" fit="cover" style="width: 60px; height: 80px; border-radius: 4px;" />
+                                <el-image :src="item.icon" fit="cover" class="course-cover" />
                             </el-col>
                             <el-col :span="16">
-                                <h5 style="margin: 0 0 8px 0; font-size: 14px; color: #333;">{{ item.title }}</h5>
-                                <p style="margin: 0; font-size: 12px; color: #666; line-height: 1.4;">{{ item.summary }}</p>
-                                <div style="margin-top: 8px; display: flex; gap: 12px; font-size: 11px; color: #999;">
+                                <h5 class="course-title card-title">{{ item.title }}</h5>
+                                <p class="course-summary card-description">{{ item.summary }}</p>
+                                <div class="course-meta">
                                     <span v-if="item.extra?.publish_time">
                                         <el-icon><Clock /></el-icon>
-                                        {{ formatPublishTime(item.extra.publish_time) }}
+                                        <span class="card-meta">{{ formatPublishTime(item.extra.publish_time) }}</span>
                                     </span>
                                     <span v-if="item.extra?.duration">
                                         <el-icon><VideoPlay /></el-icon>
-                                        {{ formatDuration(item.extra.duration) }}
+                                        <span class="card-meta">{{ formatDuration(item.extra.duration) }}</span>
                                     </span>
                                 </div>
                             </el-col>
@@ -188,7 +194,7 @@ const formatDuration = (duration: number) => {
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .my-header {
   display: flex;
   flex-direction: column;
@@ -198,7 +204,9 @@ const formatDuration = (duration: number) => {
 .my-header h4 {
   margin: 0;
   font-size: 20px;
-  color: #333;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
 }
 
 .book-tag {
@@ -221,22 +229,33 @@ const formatDuration = (duration: number) => {
   margin-bottom: 0;
 }
 
-:deep(.el-dialog__header) {
-  padding: 20px 20px 0;
+.outside-info-dialog {
+  :deep(.el-dialog__header) {
+    margin-right: 0;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 0;
+  }
 }
 
-:deep(.el-alert) {
+.outside-info-dialog {
+  :deep(.el-alert) {
   margin-bottom: 8px;
+  }
 }
 
 .course-item .el-icon {
   margin-right: 4px;
   font-size: 12px;
+  color: var(--text-tertiary) !important;
 }
 
 .course-intro {
   line-height: 1.6;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .intro-paragraph {
@@ -251,5 +270,47 @@ const formatDuration = (duration: number) => {
 
 .intro-paragraph p:last-child {
   margin-bottom: 0;
+}
+
+.course-row {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: var(--card-bg);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.course-row:hover {
+  background: var(--card-hover-bg);
+  border-color: var(--accent-color);
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-1px);
+}
+
+.course-cover {
+  width: 60px;
+  height: 80px;
+  border-radius: 6px;
+}
+
+.course-title {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.course-summary {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.course-meta {
+  margin-top: 8px;
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--text-tertiary) !important;
 }
 </style>

@@ -134,17 +134,52 @@
                 </div>
               </div>
               <div class="card-actions">
+                <el-button
+                  v-if="canShowOdobDownload(item)"
+                  @click="openOdobDownloadDialog(item, $event)"
+                  size="small"
+                  type="primary"
+                  link
+                >
+                  <el-icon><Download /></el-icon>下载
+                </el-button>
+                <el-tag
+                  v-if="item.item_type === 13 && item.product_type === 13 && item.in_bookrack"
+                  size="small"
+                  type="info"
+                  effect="plain"
+                >已加入书架</el-tag>
+                <el-button
+                  v-if="item.item_type === 13 && item.product_type === 13 && !item.in_bookrack"
+                  @click="odobShelfAdd(item.id_out, item, $event)"
+                  size="small"
+                  type="primary"
+                  link
+                >
+                  <el-icon><Plus /></el-icon>加入书架
+                </el-button>
+                <el-button
+                  v-if="canShowEbookDownload(item)"
+                  @click="openEbookDownloadDialog(item, $event)"
+                  size="small"
+                  type="primary"
+                  link
+                >
+                  <el-icon><Download /></el-icon>下载
+                </el-button>
                 <!-- 电子书加入书架按钮 -->
                 <el-button v-if="item.item_type === 2 && !item.is_on_bookshelf" 
                            @click="ebookShelfAdd(item.id_out, $event)" 
                            size="small" 
-                           type="primary">
+                           type="primary"
+                           link>
                   <el-icon><Plus /></el-icon>加入书架
                 </el-button>
                 <el-button v-if="item.item_type === 2 && item.is_on_bookshelf" 
                            @click="ebookShelfRemove(item.id_out, $event)" 
                            size="small" 
-                           type="danger">
+                           type="danger"
+                           link>
                   <el-icon><Delete /></el-icon>移出书架
                 </el-button>
               </div>
@@ -158,19 +193,62 @@
     <CourseInfo v-if="courseVisible" :enid="prodEnid" :dialog-visible="courseVisible" @close="closeDialog" />
     <AudioInfo v-if="audioVisible" :enid="prodEnid" :dialog-visible="audioVisible" @close="closeDialog" />
     <OutsideInfo v-if="outsideVisible" :enid="prodEnid" :dialog-visible="outsideVisible" @close="closeDialog" />
+
+    <download-dialog
+      v-if="ebookDownloadVisible"
+      :dialog-visible="ebookDownloadVisible"
+      :download-type-options="ebookDownloadTypeOptions"
+      :prod-type="2"
+      :download-id="ebookDownloadId"
+      :en-id="ebookDownloadEnId"
+      @close="closeEbookDownloadDialog"
+    />
+
+    <el-dialog v-model="odobDownloadVisible" title="请选择下载格式" align-center center width="30%">
+      <el-form>
+        <el-form-item label="下载格式" label-width="80px">
+          <el-select v-model="odobDownloadType" placeholder="请选择下载格式">
+            <el-option
+              v-for="opt in odobDownloadTypeOptions"
+              :key="opt.value"
+              :label="opt.label"
+              :value="opt.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-progress
+          v-show="odobDownloadPct"
+          :percentage="odobDownloadPct"
+          status="success"
+          :stroke-width="20"
+          :text-inside="true"
+        >
+          <span>{{ odobDownloadContent }}</span>
+        </el-progress>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="closeOdobDownloadDialog">取消</el-button>
+          <el-button type="primary" @click="downloadOdob">确认</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onBeforeMount, onMounted, watch} from "vue";
-import { ElTable, ElMessage, ElMessageBox } from "element-plus";
+import { ref, reactive, onMounted } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
 import {
-  SearchHot,
   AlgoFilter,
   AlgoProduct,
   EbookShelfAdd,
   EbookShelfRemove,
-  OutsideDetail,
+  EbookUserInfo,
+  OdobShelfAdd,
+  OdobUserInfo,
+  SetDir,
+  OdobDownload,
 } from "../../wailsjs/go/backend/App";
 import { services } from "../../wailsjs/go/models";
 import { useRoute, useRouter } from "vue-router";
@@ -178,15 +256,17 @@ import EbookInfo  from '../components/EbookInfo.vue';
 import CourseInfo from "../components/CourseInfo.vue";
 import AudioInfo from "../components/AudioInfo.vue";
 import OutsideInfo from "../components/OutsideInfo.vue";
-import { Plus, Delete } from '@element-plus/icons-vue';
+import DownloadDialog from "../components/DownloadDialog.vue";
+import { settingStore } from "../stores/setting";
+import { EventsOff, EventsOn } from "../../wailsjs/runtime/runtime";
+import { Plus, Delete, Download } from '@element-plus/icons-vue';
 
 const route = useRoute();
 const router = useRouter();
+const setStore = settingStore()
 
 const loading = ref(true);
 const page = ref(0);
-const total = ref(0);
-const pageSize = ref(4);
 
 const ebookVisible = ref(false);
 const courseVisible = ref(false);
@@ -198,6 +278,32 @@ const idxProd = ref(0);
 const idxLabel = ref(0);
 const idxSubLabel = ref(0);
 const infLoadingProd = ref(false);
+
+const isEbookVip = ref(false)
+const isOdobVip = ref(false)
+const vipLoaded = reactive({ ebook: false, odob: false })
+const vipLoading = reactive({ ebook: false, odob: false })
+
+const ebookDownloadVisible = ref(false)
+const ebookDownloadId = ref(0)
+const ebookDownloadEnId = ref('')
+const ebookDownloadTypeOptions = [
+  { value: 1, label: "HTML" },
+  { value: 2, label: "PDF" },
+  { value: 3, label: "EPUB" }
+]
+
+const odobDownloadVisible = ref(false)
+const odobDownloadType = ref(1)
+const odobDownloadId = ref(0)
+const odobDownloadData = reactive(new services.Course())
+const odobDownloadTypeOptions = [
+  { value: 1, label: "MP3" },
+  { value: 2, label: "PDF" },
+  { value: 3, label: "Markdown" }
+]
+const odobDownloadPct = ref(0)
+const odobDownloadContent = ref('')
 
 let filter = reactive(new services.AlgoFilterResp());
 let product = reactive(new services.AlgoProductResp());
@@ -216,6 +322,42 @@ const productType = ref();
 const labelId = ref();
 let param = new services.AlgoFilterParam();
 
+const ensureVipForProductType = async (pt: unknown) => {
+  const ptStr = String(pt ?? '').trim()
+  const ptValues = ptStr
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean)
+
+  if (ptValues.includes('2')) {
+    if (vipLoaded.ebook || vipLoading.ebook) return
+    vipLoading.ebook = true
+    try {
+      const info = await EbookUserInfo()
+      isEbookVip.value = !!(info as any)?.is_vip
+    } catch (e) {
+      isEbookVip.value = false
+    } finally {
+      vipLoaded.ebook = true
+      vipLoading.ebook = false
+    }
+  }
+
+  if (ptValues.includes('13') || ptValues.includes('1013')) {
+    if (vipLoaded.odob || vipLoading.odob) return
+    vipLoading.odob = true
+    try {
+      const info = await OdobUserInfo()
+      isOdobVip.value = !!(info as any)?.user?.is_vip
+    } catch (e) {
+      isOdobVip.value = false
+    } finally {
+      vipLoaded.odob = true
+      vipLoading.odob = false
+    }
+  }
+}
+
 onMounted(() => {
     enid.value = route.query.enid;
     name.value = route.query.name;
@@ -233,19 +375,20 @@ onMounted(() => {
     param.page_size = 18;
     param.product_types = productType.value;
     param.sort_strategy = "HOT";
+    void ensureVipForProductType(productType.value)
     getAlgoFilter(param)
         .then(() => {
-            productTypes.options?.forEach((item,index)=> {
+            productTypes.options?.forEach((item: services.Option, index: number)=> {
                 if (item.value == productType.value) {
                     idxProd.value = index;
                 }
             })
-            navigations.options?.forEach((item, index) => {
+            navigations.options?.forEach((item: services.Option, index: number) => {
                 if (item.value == enid.value) {
                     idxLabel.value = index;
                     if (item.sub_options != undefined && item.sub_options?.length > 0) {
-                        let subOption = JSON.parse(JSON.stringify(item.sub_options));
-                        subOption.forEach((item,index)=>{
+                        const subOption: services.Option[] = JSON.parse(JSON.stringify(item.sub_options));
+                        subOption.forEach((item: services.Option, index: number)=>{
                             if (item.value == labelId.value) {
                                 idxSubLabel.value = index;
                             }
@@ -275,6 +418,7 @@ const handleFilter = (item: services.Option, idx: number, nType: number) => {
         idxProd.value = idx;
 
         param.product_types = item.value;
+        void ensureVipForProductType(item.value)
         param.classfc_name = item.name;
         param.navigation_id = "";
         param.label_id = "";
@@ -286,8 +430,8 @@ const handleFilter = (item: services.Option, idx: number, nType: number) => {
         param.label_id = "";
         subOptions.splice(0, subOptions.length)
         if (item.sub_options != undefined && item.sub_options?.length > 0) {
-          let subOption = JSON.parse(JSON.stringify(item.sub_options));
-          subOption.forEach((item)=>{
+          const subOption: services.Option[] = JSON.parse(JSON.stringify(item.sub_options));
+          subOption.forEach((item: services.Option) => {
             subOptions.push(item)
           })
         }
@@ -391,10 +535,6 @@ const handleProd = (enid:string, iType:number, pType:number)=>{
     audioVisible.value = true
   }
 }
-
-const openDialog = () => {
-    ebookVisible.value = true
-}
 const closeDialog = () => {
   ebookVisible.value = false
   courseVisible.value = false
@@ -409,6 +549,142 @@ const handleSort = (item: services.Option) => {
   product_list.product_list = [];
   getAlgoProduct(param);
 };
+
+const ensureDownloadDirReady = async () => {
+  if (setStore.getDownloadDir == "") {
+    ElMessage({
+      message: '请设置文件保存目录',
+      type: 'warning'
+    })
+    router.push('/user/setting')
+    return false
+  }
+
+  try {
+    await SetDir([setStore.getDownloadDir, setStore.getFfmpegDirDir, setStore.getWkDir])
+    return true
+  } catch (error) {
+    ElMessage({
+      message: String(error),
+      type: 'warning'
+    })
+    return false
+  }
+}
+
+const canShowEbookDownload = (item: any) => {
+  return item?.item_type === 2 && isEbookVip.value
+}
+
+const canShowOdobDownload = (item: any) => {
+  return item?.item_type === 13 && item?.product_type === 13 && isOdobVip.value
+}
+
+const openEbookDownloadDialog = async (item: any, event?: Event) => {
+  if (event) event.stopPropagation()
+  ebookDownloadId.value = Number(item?.id ?? 0)
+  ebookDownloadEnId.value = String(item?.id_out ?? '')
+  ebookDownloadVisible.value = true
+
+  const ok = await ensureDownloadDirReady()
+  if (!ok) return
+}
+
+const closeEbookDownloadDialog = () => {
+  ebookDownloadVisible.value = false
+}
+
+const openOdobDownloadDialog = async (item: any, event?: Event) => {
+  if (event) event.stopPropagation()
+  const id = Number(item?.id ?? 0)
+  const enid = String(item?.id_out ?? '').trim()
+  const title = String(item?.name ?? '')
+  const aliasId = String(item?.alias_id ?? '').trim()
+
+  if (!enid || !aliasId) {
+    ElMessage({
+      message: '缺少下载所需的信息',
+      type: 'warning'
+    })
+    return
+  }
+
+  odobDownloadId.value = id
+  Object.assign(odobDownloadData, {
+    id,
+    enid,
+    title,
+    icon: String(item?.index_img ?? ''),
+    duration: Number(item?.duration ?? 0),
+    has_play_auth: !!item?.has_play_auth,
+    audio_detail: {
+      alias_id: aliasId,
+      duration: Number(item?.duration ?? 0),
+      size: 0,
+    },
+  })
+
+  odobDownloadVisible.value = true
+  const ok = await ensureDownloadDirReady()
+  if (!ok) return
+}
+
+const closeOdobDownloadDialog = () => {
+  odobDownloadType.value = 1
+  odobDownloadVisible.value = false
+  odobDownloadPct.value = 0
+  odobDownloadContent.value = ''
+  EventsOff("odobDownload")
+}
+
+const downloadOdob = async () => {
+  odobDownloadContent.value = '下载中...'
+  EventsOn("odobDownload", (data: any) => {
+    if (!data) return
+    odobDownloadPct.value = Number(data?.pct ?? 0)
+    odobDownloadContent.value = String(data?.value ?? '') + '下载中...'
+  })
+
+  try {
+    await OdobDownload(odobDownloadId.value, odobDownloadType.value, odobDownloadData as any)
+  } catch (error) {
+    ElMessage({
+      message: String(error),
+      type: 'warning'
+    })
+  } finally {
+    closeOdobDownloadDialog()
+  }
+}
+
+const odobShelfAdd = async (enid: string, item: any, event?: Event) => {
+  if (event) {
+    event.stopPropagation()
+  }
+
+  const key = String(enid ?? '').trim()
+  if (!key) {
+    ElMessage({
+      message: '缺少加入书架所需的信息',
+      type: 'warning'
+    })
+    return
+  }
+
+  try {
+    await OdobShelfAdd([key])
+    item.in_bookrack = true
+    ElMessage({
+      message: '已加入书架',
+      type: 'success'
+    })
+  } catch (error) {
+    ElMessage({
+      message: String(error),
+      type: 'warning'
+    })
+  }
+}
 
 const ebookShelfAdd = async (enid: string, event?: Event) => {
   // 阻止事件冒泡，避免触发父级 el-card 的点击事件
@@ -730,24 +1006,30 @@ const refreshAlgoData = () => {
   }
 }
 
-.card-actions .el-button {
-  border-radius: 8px;
-  font-weight: bold;
-  border-color: var(--accent-color);
-  background-color: var(--accent-color);
-  color: #fff;
-  transition: all 0.3s ease;
+.card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
 }
 
-.card-actions .el-button:hover {
-  background-color: var(--accent-hover);
-  border-color: var(--accent-hover);
-  transform: translateY(-2px);
+.card-actions :deep(.el-button) {
+  font-weight: 500;
 }
 
-.card-actions .el-button:not(.is-disabled) {
-  border-color: var(--accent-color);
-  background-color: var(--accent-color);
+.card-actions :deep(.el-button.is-link) {
+  padding: 0;
+  height: auto;
+}
+
+.card-actions :deep(.el-button.is-link:hover) {
+  transform: translateY(-1px);
+}
+
+.card-actions :deep(.el-tag) {
+  border-radius: 999px;
 }
 
 /* 暗色主题适配 */
@@ -808,15 +1090,8 @@ const refreshAlgoData = () => {
   color: var(--accent-color) !important;
 }
 
-.theme-dark .card-actions .el-button {
-  border-color: var(--accent-color) !important;
-  background-color: var(--accent-color) !important;
-  color: #fff !important;
-}
-
-.theme-dark .card-actions .el-button:hover {
-  background-color: var(--accent-hover) !important;
-  border-color: var(--accent-hover) !important;
+.theme-dark .card-actions :deep(.el-button.is-link) {
+  color: var(--accent-color) !important;
 }
 
 /* 确保选中按钮在暗色主题下可见 */

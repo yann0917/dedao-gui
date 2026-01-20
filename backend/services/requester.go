@@ -155,6 +155,23 @@ func (s *Service) reqArticleList(ID, chapterID string, count, maxID int, reverse
 	return handleHTTPResponse(resp, err)
 }
 
+// reqFreeArticleList 请求免费试听文章列表
+// chapterID = "" 获取所有的文章列表，否则只获取该章节的文章列表
+func (s *Service) reqFreeArticleList(ID, chapterID string, count, maxID int, reverse bool) (io.ReadCloser, error) {
+	resp, err := s.client.R().
+		SetBody(map[string]interface{}{
+			"chapter_id":      chapterID,
+			"count":           count,
+			"detail_id":       ID,
+			"max_id":          maxID,
+			"max_order_num":   0,
+			"reverse":         reverse,
+			"since_id":        0,
+			"since_order_num": 0,
+		}).Post("/pc/bauhinia/pc/class/free_article_list")
+	return handleHTTPResponse(resp, err)
+}
+
 // reqArticleCommentList 请求文章热门留言列表
 // enId 文章 ID
 // sort like-最热 create-最新

@@ -43,6 +43,7 @@
                             >
                                 <span class="card-title">{{ item.title }}</span>
                             </el-tooltip>
+                            <el-tag v-if="isLearned(item)" type="success" size="small">已学习</el-tag>
                         </div>
                         <el-image 
                             :src="item.logo" 
@@ -70,7 +71,14 @@
                                        v-if="item.audio_alias_ids.length || item.video_status">播放
                             </el-button>
                             <el-button icon="Memo" size="small" type="primary" link @click="gotoArticleDetail(item)">文稿</el-button>
-                            <el-button icon="download" size="small" type="primary" link @click="openDownloadDialog(item)">下载</el-button>
+                            <el-button
+                              icon="download"
+                              size="small"
+                              type="primary"
+                              link
+                              v-if="canDownload(item)"
+                              @click="openDownloadDialog(item)"
+                            >下载</el-button>
                         </div>
                     </div>
                 </el-card>
@@ -207,6 +215,19 @@ const buildTrack = (row: any): PlayerTrack | null => {
     }
 }
 
+const isLearned = (row: services.ArticleIntro) => {
+    const isBuy = !!(row as any)?.is_buy
+    const isUserFreeTry = !!(row as any)?.is_user_free_try
+    const isRead = !!(row as any)?.is_read
+    return (!isBuy && isUserFreeTry) || (isBuy && isRead)
+}
+
+const canDownload = (row: services.ArticleIntro) => {
+    const isBuy = !!(row as any)?.is_buy
+    const isUserFreeTry = !!(row as any)?.is_user_free_try
+    return isBuy || (!isBuy && isUserFreeTry)
+}
+
 const handlePlay = (row: any) => {
     pStore.setContext({ key: `courseArticle:${String(enid.value ?? '')}`, title: String(breadcrumbTitle.value ?? '') })
     const queue = (tableData.article_list || []).map(buildTrack).filter((t): t is PlayerTrack => !!t)
@@ -246,6 +267,8 @@ const loadMoreArticles = async () => {
     try {
         // 使用 maxId 分页
         const res = await ArticleList(enid.value, "", pageSize.value, maxId.value, isReverse.value)
+        console.log("xxxxxxxxxxxxxxxx")
+        console.log(res)
         // 如果返回数据为空，直接 finished
         if (!res.article_list || res.article_list.length === 0) {
             finished.value = true
