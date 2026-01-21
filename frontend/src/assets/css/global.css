@@ -37,6 +37,7 @@
   --el-bg-color: var(--bg-color);
   --el-bg-color-overlay: var(--card-bg);
   --el-fill-color-light: var(--fill-color-light);
+  --el-font-family: var(--font-family-base);
 
   /* Aliases for compatibility */
   --card-bg: var(--card-bg-light);
@@ -59,6 +60,11 @@
   /* Transitions */
   --transition-base: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   --transition-fast: all 0.2s ease-in-out;
+}
+
+/* Force override Element Plus font family */
+.el-button, .el-input, .el-select, .el-menu, .el-dialog, .el-message, .el-notification, .el-tag, .el-table {
+  font-family: var(--font-family-base) !important;
 }
 
 /* Dark Mode Variables */

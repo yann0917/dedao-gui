@@ -118,11 +118,6 @@
                 </div>
               </div>
           </div>
-          
-           <!-- Topic Tag -->
-           <div class="note-topic-tag" v-if="item.topic?.topic_name">
-             <el-tag round size="small">#{{ item.topic.topic_name }}</el-tag>
-           </div>
         </div>
 
         <!-- Actions -->
@@ -309,6 +304,7 @@ const handleComb = (list: services.Comb[]) => {
     padding: 24px;
     border-radius: 12px;
     box-shadow: var(--shadow-soft);
+    text-align: left;
 }
 
 .topic-cover {
@@ -383,6 +379,10 @@ const handleComb = (list: services.Comb[]) => {
     width: 100%;
     height: 2px;
     background: var(--el-color-primary);
+}
+
+.notes-list-container {
+    text-align: left;
 }
 
 .note-item {
@@ -584,10 +584,6 @@ const handleComb = (list: services.Comb[]) => {
 
 .action-item:hover {
     color: var(--el-color-primary);
-}
-
-.note-topic-tag {
-    margin-top: 8px;
 }
 
 @media (max-width: 768px) {

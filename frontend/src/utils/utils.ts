@@ -99,10 +99,12 @@ export function setFontFamily(font: string) {
       break;
     default:
       el.style.removeProperty('--font-family-base');
+      el.style.removeProperty('--el-font-family');
       return;
   }
   
   el.style.setProperty('--font-family-base', fontFamilyValue);
+  el.style.setProperty('--el-font-family', fontFamilyValue);
 }
 
 // 调整颜色亮度的辅助函数
