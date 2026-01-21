@@ -35,6 +35,7 @@
 * 课程可生成PDF，文稿生成 Markdown 文档，也可生成 mp3 文件
 * 每天听本书可下载音频，文稿生成 pdf、 Markdown 文档
 * 电子书可下载 pdf，html, epub 等格式
+* 免费专区的课程如：《每天听本书》，《文明》，《长谈》等，可下载音频，文稿生成 pdf、 Markdown 文档
 * 可查看学习圈内容，暂时无法下载
 * UI亮色/暗色主题切换
 
@@ -72,15 +73,17 @@ wails 构建需要安装以下依赖：
 
 ### 功能截图如下
 
-![](image/Snipaste_2023-04-16_21-11-23.png)
-![](image/Snipaste_2023-04-17_00-01-03.png)
-![](image/Snipaste_2023-04-16_21-09-18.png)
-![](image/Snipaste_2023-02-21_19-13-26.png)
-![](image/Snipaste_2023-02-21_19-14-14.png)
-![](image/Snipaste_2023-02-21_19-14-27.png)
-![](image/Snipaste_2023-02-21_19-15-12.png)
-![](image/Snipaste_2023-02-21_19-15-44.png)
-![](image/Snipaste_2023-02-21_19-25-03.png)
+![](image/Snipaste_2026-01-21_15-22-11.jpg)
+![](image/Snipaste_2026-01-21_15-22-47.jpg)
+![](image/Snipaste_2026-01-21_15-23-09.jpg)
+![](image/Snipaste_2026-01-21_15-23-22.jpg)
+![](image/Snipaste_2026-01-21_15-23-33.jpg)
+![](image/Snipaste_2026-01-21_15-31-02.jpg)
+![](image/Snipaste_2026-01-21_15-33-17.jpg)
+![](image/Snipaste_2026-01-21_15-23-47.jpg)
+![](image/Snipaste_2026-01-21_15-24-28.jpg)
+![](image/Snipaste_2026-01-21_15-25-23.jpg)
+![](image/Snipaste_2026-01-21_15-26-03.jpg)
 
 ## Stargazers over time
 

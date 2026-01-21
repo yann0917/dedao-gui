@@ -73,7 +73,7 @@ func TestCourseType(t *testing.T) {
 }
 
 func TestCourseList(t *testing.T) {
-	result, err := service.CourseList("bauhinia", "study", 1, 10)
+	result, err := service.CourseList("bauhinia", "study", "all", 1, 10)
 	if err != nil {
 		fmt.Printf("err:=%#v \n", err)
 	}

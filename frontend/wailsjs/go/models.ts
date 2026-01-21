@@ -2520,6 +2520,22 @@ export namespace services {
 	}
 	
 	
+	export class GroupBook {
+	    id: number;
+	    title: string;
+	    icon: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new GroupBook(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.title = source["title"];
+	        this.icon = source["icon"];
+	    }
+	}
 	export class EbookExtInfo {
 	    is_tts_switch: boolean;
 	
@@ -2675,6 +2691,7 @@ export namespace services {
 	    is_self_build_group: boolean;
 	    group_type: number;
 	    label_id: number;
+	    group_books?: GroupBook[];
 	
 	    static createFrom(source: any = {}) {
 	        return new Course(source);
@@ -2736,6 +2753,7 @@ export namespace services {
 	        this.is_self_build_group = source["is_self_build_group"];
 	        this.group_type = source["group_type"];
 	        this.label_id = source["label_id"];
+	        this.group_books = this.convertValues(source["group_books"], GroupBook);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -3221,6 +3239,7 @@ export namespace services {
 	        this.upgrade_tips = source["upgrade_tips"];
 	    }
 	}
+	
 	export class HTab {
 	    id: number;
 	    title: string;
@@ -3735,6 +3754,95 @@ export namespace services {
 		    return a;
 		}
 	}
+	export class NavbarChild {
+	    name: string;
+	    count: number;
+	    filter: string;
+	    show_count: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new NavbarChild(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.count = source["count"];
+	        this.filter = source["filter"];
+	        this.show_count = source["show_count"];
+	    }
+	}
+	export class NavbarItem {
+	    id: number;
+	    name: string;
+	    category: string;
+	    channel_type: string;
+	    item_type: string;
+	    children: NavbarChild[];
+	
+	    static createFrom(source: any = {}) {
+	        return new NavbarItem(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	        this.category = source["category"];
+	        this.channel_type = source["channel_type"];
+	        this.item_type = source["item_type"];
+	        this.children = this.convertValues(source["children"], NavbarChild);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class NavbarData {
+	    list: NavbarItem[];
+	
+	    static createFrom(source: any = {}) {
+	        return new NavbarData(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.list = this.convertValues(source["list"], NavbarItem);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
 	export class Navigation {
 	    enid: string;
 	    id: number;

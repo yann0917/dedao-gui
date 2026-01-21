@@ -121,7 +121,7 @@ const handleChangePage = (item: any) => {
 
 
 const getTableData = async () => {
-    await CourseList("compass", "study", page.value, pageSize.value).then((table) => {
+    await CourseList("compass", "study", "all", page.value, pageSize.value).then((table) => {
         loading.value = false
         Object.assign(tableData, table)
         console.log(tableData)

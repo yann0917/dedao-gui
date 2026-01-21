@@ -7,12 +7,43 @@
             <span class="group-title">{{ groupMode.title }}</span>
         </div>
 
+        <div v-if="filterOptions.length > 0 && !groupMode.active" class="filter-container">
+            <el-radio-group v-model="currentFilter" @change="handleFilterChange" size="small">
+                <el-radio-button 
+                    v-for="item in filterOptions" 
+                    :key="item.filter" 
+                    :label="item.filter"
+                >
+                    {{ item.name }}
+                    <span v-if="item.show_count">({{ item.count }})</span>
+                </el-radio-button>
+            </el-radio-group>
+        </div>
+
         <div v-loading="initLoading" class="odob-grid-container" v-infinite-scroll="loadMore" :infinite-scroll-disabled="disabled" :infinite-scroll-immediate="false">
             <div v-if="tableData.list && tableData.list.length > 0" class="odob-grid">
                 <div v-for="item in tableData.list" :key="item.id" class="odob-card" @click="item.is_group ? enterGroup(item) : null">
                     <div class="card-cover">
+                        <!-- 分组封面拼图 -->
+                        <div v-if="item.is_group && item.group_books && item.group_books.length > 0" class="group-cover-grid">
+                            <div v-for="(book, index) in item.group_books.slice(0, 4)" :key="book.id || index" class="group-grid-item">
+                                <el-image :src="book.icon" fit="cover" loading="lazy" class="grid-image">
+                                    <template #error>
+                                        <div class="grid-placeholder">
+                                            <el-icon><Picture /></el-icon>
+                                        </div>
+                                    </template>
+                                </el-image>
+                            </div>
+                            <div v-for="n in (4 - Math.min(item.group_books.length, 4))" :key="'ph-'+n" class="group-grid-item">
+                                <div class="grid-placeholder bg-gray">
+                                    <el-icon><Picture /></el-icon>
+                                </div>
+                            </div>
+                        </div>
+
                         <el-image 
-                            v-if="item.icon" 
+                            v-else-if="item.icon" 
                             :src="item.icon" 
                             fit="cover"
                             loading="lazy"
@@ -29,7 +60,7 @@
                         </div>
                         
                         <!-- 悬停遮罩层 (仅非分组显示操作) -->
-                        <div v-if="!item.is_group" class="card-overlay" @click.stop>
+                        <div v-if="!item.is_group" class="card-overlay" @click.stop="handlePlay(item)">
                             <div class="overlay-actions">
                                 <el-tooltip content="播放" :show-after="500">
                                     <el-button circle type="primary" :icon="VideoPlay" @click="handlePlay(item)" />
@@ -77,33 +108,15 @@
     <audio-info v-if="dialogVisible" :enid="prodEnid" :dialog-visible="dialogVisible" @close="closeDialog"></audio-info>
     <outside-info v-if="outsideVisible" :enid="prodEnid" :dialog-visible="outsideVisible" @close="closeDialog"></outside-info>
 
-    <el-dialog v-model="dialogDownloadVisible" title="请选择下载格式" align-center center width="400px" class="download-dialog">
-        <el-form label-position="top">
-            <el-form-item label="下载格式">
-                <el-select v-model="downloadType" placeholder="请选择下载格式" style="width: 100%">
-                    <el-option v-for="item in downloadTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
-            </el-form-item>
-            <div v-if="percentage > 0" class="download-progress">
-                <div class="progress-text">{{ content }}</div>
-                <el-progress 
-                    :percentage="percentage" 
-                    :stroke-width="10" 
-                    status="success"
-                    striped
-                    striped-flow
-                />
-            </div>
-        </el-form>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="closeDownloadDialog">取消</el-button>
-                <el-button type="primary" @click="download(downloadId, downloadType)" :loading="percentage > 0 && percentage < 100">
-                    {{ percentage > 0 && percentage < 100 ? '下载中' : '开始下载' }}
-                </el-button>
-            </span>
-        </template>
-    </el-dialog>
+    <download-dialog
+        v-if="dialogDownloadVisible"
+        :dialog-visible="dialogDownloadVisible"
+        :download-id="downloadId"
+        :prod-type="3"
+        :download-type-options="downloadTypeOptions"
+        :download-data="downloadData"
+        @close="closeDownloadDialog"
+    />
 </template>
 
 <script lang="ts" setup>
@@ -111,10 +124,11 @@ import { onMounted, reactive, ref, computed } from 'vue'
 import 'element-plus/es/components/message/style/css'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft, VideoPlay, Memo, View, Download as DownloadIcon, Picture, Folder, Clock } from '@element-plus/icons-vue'
-import { AudioDetailAlias, CourseCategory, CourseGroupList, CourseList, OdobDownload, SetDir } from '../../wailsjs/go/backend/App'
+import { AudioDetailAlias, CourseCategory, CourseGroupList, CourseList, OdobDownload, SetDir, GetNavbar } from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import AudioInfo from '../components/AudioInfo.vue'
 import OutsideInfo from '../components/OutsideInfo.vue'
+import DownloadDialog from '../components/DownloadDialog.vue'
 import { userStore } from '../stores/user'
 import { settingStore } from '../stores/setting'
 import { Local } from '../utils/storage'
@@ -139,6 +153,8 @@ const lastPageSize = ref(20)
 const dialogVisible = ref(false)
 const outsideVisible = ref(false)
 const prodEnid = ref("")
+const filterOptions = ref<any[]>([])
+const currentFilter = ref('all')
 
 const groupMode = reactive({
     active: false,
@@ -147,15 +163,11 @@ const groupMode = reactive({
 })
 
 const dialogDownloadVisible = ref(false)
-const downloadType = ref(1)
 const downloadId = ref(0)
 let downloadData = reactive(new services.Course)
 const downloadTypeOptions = [
     {value: 1, label: "MP3"}, {value: 2, label: "PDF"}, {value: 3, label: "Markdown"}
 ]
-
-let percentage=ref(0)
-let content=ref('')
 
 const aliasSrcCache = new Map<string, { src: string; poster?: string }>()
 const aliasPending = new Map<string, Promise<{ src: string; poster?: string }>>()
@@ -239,13 +251,32 @@ onMounted(() => {
         Local.remove("cookies")
         Local.remove("userStore")
     })
-
+    
+    GetNavbar().then((res: any) => {
+        if (res && res.list) {
+            const opts: any[] = []
+            res.list.forEach((item: any) => {
+                if (item.category === "odob" && item.children) {
+                    opts.push(...item.children)
+                }
+            })
+            filterOptions.value = opts
+        }
+    })
+    getTableData()
 })
 
 const noMore = computed(() => {
     const currentCount = tableData.list ? tableData.list.length : 0
-    if (groupMode.active) {
-        return currentCount >= (tableData.total || 0)
+    if (groupMode.active || currentFilter.value !== 'all') {
+        const total = tableData.total || 0
+        if (total > 0) {
+            return currentCount >= total
+        }
+        if (tableData.is_more === 0) {
+            return true
+        }
+        return lastPageSize.value < pageSize.value
     }
     if (outerTotal.value > 0) {
         return currentCount >= outerTotal.value
@@ -261,12 +292,30 @@ const loadMore = () => {
     getTableData(true)
 }
 
+const handleFilterChange = () => {
+    console.log('Odob filter changed:', currentFilter.value)
+    if (groupMode.active) {
+        groupMode.active = false
+        groupMode.groupId = 0
+        groupMode.title = ''
+    }
+    page.value = 1
+    tableData.list = [] 
+    getTableData()
+}
+
 const getTableData = async (append = false) => {
+    console.log('Odob getTableData:', { append, currentFilter: currentFilter.value, groupMode: groupMode.active })
     loading.value = true
     if (!append) initLoading.value = true
-    const fetcher = groupMode.active
-        ? CourseGroupList("odob", "study", groupMode.groupId, page.value, pageSize.value)
-        : CourseList("odob", "study", page.value, pageSize.value)
+    
+    let fetcher;
+    if (groupMode.active) {
+        fetcher = CourseGroupList("odob", "study", currentFilter.value,groupMode.groupId, page.value, pageSize.value)
+    } else {
+        fetcher = CourseList("odob", "study", currentFilter.value, page.value, pageSize.value)
+    }
+
     await fetcher.then((table) => {
         loading.value = false
         initLoading.value = false
@@ -281,7 +330,12 @@ const getTableData = async (append = false) => {
         } else {
             Object.assign(tableData, table)
         }
-        total.value = groupMode.active ? (table.total || 0) : outerTotal.value
+        
+        if (groupMode.active || currentFilter.value !== 'all') {
+            total.value = table.total || 0
+        } else {
+            total.value = outerTotal.value
+        }
     }).catch((error) => {
         loading.value = false
         initLoading.value = false
@@ -303,12 +357,15 @@ const closeDialog = () => {
 getTableData()
 
 const enterGroup = (row: any) => {
-    const groupId = Number(row?.group_id || 0)
+    const groupId = Number(row?.group_id || row?.id || 0)
+
     if (!groupId) return
+
     groupMode.active = true
     groupMode.groupId = groupId
     groupMode.title = String(row?.title || '')
     page.value = 1
+    tableData.list = []
     getTableData()
 }
 
@@ -346,35 +403,8 @@ const openDownloadDialog = (row: any) => {
     }
 }
 const closeDownloadDialog = () => {
-    downloadType.value = 1
     dialogDownloadVisible.value = false
-    percentage.value = 0
-    content.value = ''
-    EventsOff("odobDownload")
 }
-
-const download = async (id: number, dType: number) => {
-    content.value = '下载中...'
-    EventsOn("odobDownload",  data=>{
-        if (data) {
-            console.log(data)
-            percentage.value = data.pct
-            content.value = data.value + '下载中...'
-        }
-    })
-
-    await OdobDownload(id, dType, downloadData).then((info) => {
-        console.log(info)
-    }).catch((error) => {
-        ElMessage({
-            message: error,
-            type: 'warning'
-        })
-    })
-    closeDownloadDialog()
-    return
-}
-
 
 const gotoArticleDetail = (row: any) => {
     const id = row.audio_detail.alias_id
@@ -413,6 +443,20 @@ const handleProd = (row: any) => {
     font-size: 18px;
     font-weight: 600;
     color: var(--text-primary);
+}
+
+.filter-container {
+    margin-bottom: 20px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 4px;
+}
+.filter-container::-webkit-scrollbar {
+    height: 4px;
+}
+.filter-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 2px;
 }
 
 .odob-grid-container {
@@ -536,6 +580,47 @@ const handleProd = (row: any) => {
     flex-direction: column;
     gap: 6px;
     z-index: 2;
+}
+
+.group-cover-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+    background: var(--fill-color-light, #f5f7fa);
+}
+
+.group-grid-item {
+    position: relative;
+    overflow: hidden;
+    background: var(--fill-color-light, #f5f7fa);
+    width: 100%;
+    height: 100%;
+}
+
+.grid-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.grid-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary, #909399);
+    background: var(--fill-color-light, #f5f7fa);
+}
+
+.bg-gray {
+    background: var(--fill-color, #f0f2f5);
 }
 
 .card-content {

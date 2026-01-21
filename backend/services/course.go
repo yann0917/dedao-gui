@@ -61,8 +61,14 @@ type Course struct {
 	IsSelfBuildGroup bool             `json:"is_self_build_group"`
 	GroupType        int              `json:"group_type"`
 	LabelID          int              `json:"label_id"`
+	GroupBooks       []GroupBook      `json:"group_books,omitempty"`
 }
 
+type GroupBook struct {
+	ID    int    `json:"id"`
+	Title string `json:"title"`
+	Icon  string `json:"icon"`
+}
 type WendaExtInfo struct {
 	AnswerID int `json:"answer_id"`
 }
@@ -544,8 +550,8 @@ type TopicPkgOdobDetails struct {
 }
 
 // CourseList get course list by page
-func (s *Service) CourseList(category, order string, page, limit int) (list *CourseList, err error) {
-	body, err := s.reqCourseList(category, order, page, limit)
+func (s *Service) CourseList(category, order, filter string, page, limit int) (list *CourseList, err error) {
+	body, err := s.reqCourseList(category, order, filter, page, limit)
 	if err != nil {
 		return
 	}
@@ -579,7 +585,7 @@ func (s *Service) CourseListAll(category, order string) (list *CourseList, err e
 	page := int(math.Ceil(float64(count) / limit))
 	var lists []Course
 	for i := 1; i <= page; i++ {
-		list, err = s.CourseList(category, order, i, int(limit))
+		list, err = s.CourseList(category, order, "all", i, int(limit))
 		if err != nil {
 			return
 		}
@@ -626,8 +632,8 @@ func (s *Service) CourseDetail(category string, id int) (detail *Course, err err
 
 // CourseGroupList fetches a single page of items within a specific group.
 // 获取分组内的课程列表（单页）
-func (s *Service) CourseGroupList(category, order string, groupID, page, limit int) (response *CourseList, err error) {
-	body, err := s.reqCourseGroupList(category, order, groupID, page, limit)
+func (s *Service) CourseGroupList(category, order, filter string, groupID, page, limit int) (response *CourseList, err error) {
+	body, err := s.reqCourseGroupList(category, order, filter, groupID, page, limit)
 	if err != nil {
 		return
 	}
@@ -641,8 +647,8 @@ func (s *Service) CourseGroupList(category, order string, groupID, page, limit i
 // CourseGroupListAll fetches all items within a specific group across all pages.
 // It handles pagination automatically and aggregates results.
 // 获取分组内的所有课程列表（自动处理分页）
-func (s *Service) CourseGroupListAll(category, order string, groupID int) (data *CourseList, err error) {
-	resp, err := s.CourseGroupList(category, order, groupID, 1, 18)
+func (s *Service) CourseGroupListAll(category, order, filter string, groupID int) (data *CourseList, err error) {
+	resp, err := s.CourseGroupList(category, order, filter, groupID, 1, 18)
 	if err != nil {
 		return
 	}
@@ -662,7 +668,7 @@ func (s *Service) CourseGroupListAll(category, order string, groupID int) (data 
 
 	// 获取剩余页面数据
 	for page := 2; page <= totalPages; page++ {
-		pageResp, err := s.CourseGroupList(category, order, groupID, page, limit)
+		pageResp, err := s.CourseGroupList(category, order, filter, groupID, page, limit)
 		if err != nil {
 			return data, err
 		}

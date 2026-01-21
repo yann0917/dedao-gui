@@ -54,16 +54,16 @@ export function CourseDownload(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['CourseDownload'](arg1, arg2, arg3, arg4);
 }
 
-export function CourseGroupList(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['backend']['App']['CourseGroupList'](arg1, arg2, arg3, arg4, arg5);
+export function CourseGroupList(arg1, arg2, arg3, arg4, arg5, arg6) {
+  return window['go']['backend']['App']['CourseGroupList'](arg1, arg2, arg3, arg4, arg5, arg6);
 }
 
 export function CourseInfo(arg1) {
   return window['go']['backend']['App']['CourseInfo'](arg1);
 }
 
-export function CourseList(arg1, arg2, arg3, arg4) {
-  return window['go']['backend']['App']['CourseList'](arg1, arg2, arg3, arg4);
+export function CourseList(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['backend']['App']['CourseList'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function EbookCommentList(arg1, arg2, arg3) {
@@ -96,6 +96,10 @@ export function GetArticleIntro(arg1, arg2) {
 
 export function GetHomeInitialState() {
   return window['go']['backend']['App']['GetHomeInitialState']();
+}
+
+export function GetNavbar() {
+  return window['go']['backend']['App']['GetNavbar']();
 }
 
 export function GetQrcode() {

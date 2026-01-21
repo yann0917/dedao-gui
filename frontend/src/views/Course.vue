@@ -1,5 +1,17 @@
 <template>
     <div class="course-container">
+        <div v-if="filterOptions.length > 0 && !groupMode.active" class="filter-container">
+            <el-radio-group v-model="currentFilter" @change="handleFilterChange" size="small">
+                <el-radio-button 
+                    v-for="item in filterOptions" 
+                    :key="item.filter" 
+                    :label="item.filter"
+                >
+                    {{ item.name }}
+                    <span v-if="item.show_count">({{ item.count }})</span>
+                </el-radio-button>
+            </el-radio-group>
+        </div>
         <div v-if="groupMode.active" class="group-header">
             <el-button type="primary" link @click="exitGroup">
                 <el-icon class="el-icon--left"><ArrowLeft /></el-icon>返回
@@ -11,8 +23,26 @@
             <div v-if="tableData.list && tableData.list.length > 0" class="course-grid">
                 <div v-for="item in tableData.list" :key="item.id" class="course-card" @click="item.is_group ? enterGroup(item) : gotoArticleList(item)">
                     <div class="card-cover">
+                        <!-- 分组封面拼图 -->
+                        <div v-if="item.is_group && item.group_books && item.group_books.length > 0" class="group-cover-grid">
+                            <div v-for="(book, index) in item.group_books.slice(0, 4)" :key="book.id || index" class="group-grid-item">
+                                <el-image :src="book.icon" fit="cover" loading="lazy" class="grid-image">
+                                    <template #error>
+                                        <div class="grid-placeholder">
+                                            <el-icon><Picture /></el-icon>
+                                        </div>
+                                    </template>
+                                </el-image>
+                            </div>
+                            <div v-for="n in (4 - Math.min(item.group_books.length, 4))" :key="'ph-'+n" class="group-grid-item">
+                                <div class="grid-placeholder bg-gray">
+                                    <el-icon><Picture /></el-icon>
+                                </div>
+                            </div>
+                        </div>
+
                         <el-image 
-                            v-if="item.icon" 
+                            v-else-if="item.icon" 
                             :src="item.icon" 
                             fit="cover"
                             loading="lazy"
@@ -78,7 +108,7 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft, View, Download, Picture, Folder } from '@element-plus/icons-vue'
-import {CourseList, CourseCategory, CourseGroupList, SetDir} from '../../wailsjs/go/backend/App'
+import {CourseList, CourseCategory, CourseGroupList, SetDir, GetNavbar} from '../../wailsjs/go/backend/App'
 import { services } from '../../wailsjs/go/models'
 import { userStore } from '../stores/user';
 import { settingStore } from '../stores/setting';
@@ -98,6 +128,10 @@ const total = ref(0)
 const outerTotal = ref(0)
 const pageSize = ref(20) // Increase page size for better scrolling experience
 const lastPageSize = ref(20)
+const searchInfo = ref({})
+const currentFilter = ref('all')
+const filterOptions = ref<any[]>([])
+
 const dialogVisible = ref(false)
 const prodEnid = ref("")
 
@@ -121,6 +155,18 @@ courseInfo.class_info = new services.ClassInfo
 courseInfo.intro_article = new services.ArticleIntro
 
 onMounted(() => {
+    GetNavbar().then((res: any) => {
+        if (res && res.list) {
+            const opts: any[] = []
+            res.list.forEach((item: any) => {
+                if (item.category === "bauhinia" && item.children) {
+                    opts.push(...item.children)
+                }
+            })
+            filterOptions.value = opts
+        }
+    })
+
     CourseCategory().then(result => {
         result.forEach((item, key) => {
             if (item.category == "bauhinia") {
@@ -140,8 +186,15 @@ onMounted(() => {
 
 const noMore = computed(() => {
     const currentCount = tableData.list ? tableData.list.length : 0
-    if (groupMode.active) {
-        return currentCount >= (tableData.total || 0)
+    if (groupMode.active || currentFilter.value !== 'all') {
+        const total = tableData.total || 0
+        if (total > 0) {
+            return currentCount >= total
+        }
+        if (tableData.is_more === 0) {
+            return true
+        }
+        return lastPageSize.value < pageSize.value
     }
     if (outerTotal.value > 0) {
         return currentCount >= outerTotal.value
@@ -157,13 +210,29 @@ const loadMore = () => {
     getTableData(true)
 }
 
+const handleFilterChange = () => {
+    console.log('Course filter changed:', currentFilter.value)
+    if (currentFilter.value === "all") {
+        groupMode.active = false
+        groupMode.groupId = 0
+        groupMode.title = ''
+    }
+    page.value = 1
+    tableData.list = [] // Clear list to avoid confusion
+    getTableData()
+}
+
 const getTableData = async (append = false) => {
+    console.log('Course getTableData:', { append, currentFilter: currentFilter.value, groupMode: groupMode.active })
     loading.value = true
     if (!append) initLoading.value = true
     
-    const fetcher = groupMode.active
-        ? CourseGroupList("bauhinia", "study", groupMode.groupId, page.value, pageSize.value)
-        : CourseList("bauhinia", "study", page.value, pageSize.value)
+    let fetcher;
+    if (groupMode.active) {
+        fetcher = CourseGroupList("bauhinia", "study", currentFilter.value,groupMode.groupId, page.value, pageSize.value)
+    } else {
+        fetcher = CourseList("bauhinia", "study", currentFilter.value, page.value, pageSize.value)
+    }
 
     await fetcher.then((table) => {
         loading.value = false
@@ -179,7 +248,12 @@ const getTableData = async (append = false) => {
         } else {
             Object.assign(tableData, table)
         }
-        total.value = groupMode.active ? (table.total || 0) : outerTotal.value
+        
+        if (groupMode.active || currentFilter.value !== 'all') {
+            total.value = table.total || 0
+        } else {
+            total.value = outerTotal.value
+        }
     }).catch((error) => {
         loading.value = false
         initLoading.value = false
@@ -206,12 +280,15 @@ const gotoArticleList = (row: any) => {
 }
 
 const enterGroup = (row: any) => {
-    const groupId = Number(row?.group_id || 0)
+    const groupId = Number(row?.group_id || row?.id || 0)
+
     if (!groupId) return
+
     groupMode.active = true
     groupMode.groupId = groupId
     groupMode.title = String(row?.title || '')
     page.value = 1
+    tableData.list = [] 
     getTableData()
 }
 
@@ -282,6 +359,20 @@ const closeDownloadDialog = () => {
     font-size: 18px;
     font-weight: 600;
     color: var(--text-primary);
+}
+
+.filter-container {
+    margin-bottom: 20px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 4px;
+}
+.filter-container::-webkit-scrollbar {
+    height: 4px;
+}
+.filter-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 2px;
 }
 
 .course-grid-container {
@@ -396,6 +487,44 @@ const closeDownloadDialog = () => {
     align-items: center;
     gap: 4px;
     backdrop-filter: blur(4px);
+}
+
+.group-cover-grid {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+    background: var(--fill-color-light, #f5f7fa);
+}
+
+.group-grid-item {
+    position: relative;
+    overflow: hidden;
+    background: var(--fill-color-light, #f5f7fa);
+    width: 100%;
+    height: 100%;
+}
+
+.grid-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.grid-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary, #909399);
+    background: var(--fill-color-light, #f5f7fa);
+}
+
+.bg-gray {
+    background: var(--fill-color, #f0f2f5);
 }
 
 .card-content {

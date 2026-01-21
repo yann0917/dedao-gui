@@ -81,12 +81,18 @@ func (s *Service) reqCourseType() (io.ReadCloser, error) {
 	return handleHTTPResponse(resp, err)
 }
 
+// reqNavbar 请求导航栏配置
+func (s *Service) reqNavbar() (io.ReadCloser, error) {
+	resp, err := s.client.R().Get("/api/hades/v1/navbar/get")
+	return handleHTTPResponse(resp, err)
+}
+
 // reqCourseList 请求课程列表
-func (s *Service) reqCourseList(category, order string, page, limit int) (io.ReadCloser, error) {
+func (s *Service) reqCourseList(category, order, filter string, page, limit int) (io.ReadCloser, error) {
 	resp, err := s.client.R().SetBody(map[string]interface{}{
 		"category":        category,
 		"display_group":   true,
-		"filter":          "all",
+		"filter":          filter,
 		"group_id":        0,
 		"order":           order,
 		"filter_complete": 0,
@@ -100,11 +106,11 @@ func (s *Service) reqCourseList(category, order string, page, limit int) (io.Rea
 // reqCourseGroupList makes an HTTP request to fetch items within a specific group.
 // It uses the /api/hades/v2/product/group/list endpoint with display_group=false to prevent nesting.
 // 请求分组内的课程列表
-func (s *Service) reqCourseGroupList(category, order string, groupID, page, limit int) (io.ReadCloser, error) {
+func (s *Service) reqCourseGroupList(category, order, filter string, groupID, page, limit int) (io.ReadCloser, error) {
 	resp, err := s.client.R().SetBody(map[string]interface{}{
 		"category":        category,
 		"display_group":   false, // Prevent nested groups
-		"filter":          "group",
+		"filter":          filter,
 		"group_id":        groupID,
 		"order":           order,
 		"filter_complete": 0,

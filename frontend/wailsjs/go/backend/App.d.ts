@@ -30,11 +30,11 @@ export function CourseCategory():Promise<Array<services.CourseCategory>>;
 
 export function CourseDownload(arg1:number,arg2:number,arg3:number,arg4:string):Promise<void>;
 
-export function CourseGroupList(arg1:string,arg2:string,arg3:number,arg4:number,arg5:number):Promise<services.CourseList>;
+export function CourseGroupList(arg1:string,arg2:string,arg3:string,arg4:number,arg5:number,arg6:number):Promise<services.CourseList>;
 
 export function CourseInfo(arg1:string):Promise<services.CourseInfo>;
 
-export function CourseList(arg1:string,arg2:string,arg3:number,arg4:number):Promise<services.CourseList>;
+export function CourseList(arg1:string,arg2:string,arg3:string,arg4:number,arg5:number):Promise<services.CourseList>;
 
 export function EbookCommentList(arg1:string,arg2:number,arg3:number):Promise<services.EbookCommentList>;
 
@@ -51,6 +51,8 @@ export function EbookUserInfo():Promise<services.EbookVIPInfo>;
 export function GetArticleIntro(arg1:number,arg2:string):Promise<services.ArticleIntro>;
 
 export function GetHomeInitialState():Promise<services.HomeInitState>;
+
+export function GetNavbar():Promise<services.NavbarData>;
 
 export function GetQrcode():Promise<backend.QrCodeResp>;
 

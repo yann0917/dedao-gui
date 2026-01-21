@@ -10,16 +10,22 @@ func CourseType() (list *services.CourseCategoryList, err error) {
 	return
 }
 
-func CourseList(category, order string, page, limit int) (list *services.CourseList, err error) {
-	list, err = getService().CourseList(category, order, page, limit)
+// GetNavbar 获取导航配置
+func GetNavbar() (data *services.NavbarData, err error) {
+	data, err = getService().GetNavbar()
+	return
+}
+
+func CourseList(category, order, filter string, page, limit int) (list *services.CourseList, err error) {
+	list, err = getService().CourseList(category, order, filter, page, limit)
 	if err != nil {
 		return
 	}
 	return
 }
 
-func CourseGroupList(category, order string, groupID, page, limit int) (list *services.CourseList, err error) {
-	list, err = getService().CourseGroupList(category, order, groupID, page, limit)
+func CourseGroupList(category, order, filter string, groupID, page, limit int) (list *services.CourseList, err error) {
+	list, err = getService().CourseGroupList(category, order, filter, groupID, page, limit)
 	if err != nil {
 		return
 	}
