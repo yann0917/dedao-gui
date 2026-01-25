@@ -142,6 +142,10 @@ export function OpenDirectoryDialog(arg1) {
   return window['go']['backend']['App']['OpenDirectoryDialog'](arg1);
 }
 
+export function OpenFileDialog(arg1) {
+  return window['go']['backend']['App']['OpenFileDialog'](arg1);
+}
+
 export function OutsideDetail(arg1) {
   return window['go']['backend']['App']['OutsideDetail'](arg1);
 }

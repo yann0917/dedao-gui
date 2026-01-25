@@ -74,6 +74,8 @@ export function OnSecondInstanceLaunch(arg1:options.SecondInstanceData):Promise<
 
 export function OpenDirectoryDialog(arg1:string):Promise<string>;
 
+export function OpenFileDialog(arg1:string):Promise<string>;
+
 export function OutsideDetail(arg1:string):Promise<services.OutsideDetail>;
 
 export function SearchHot():Promise<services.SearchTot>;

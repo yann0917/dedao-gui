@@ -119,6 +119,12 @@ body {
   padding: 8px 16px;
 }
 
+.el-button:not(.el-button--primary):not(.el-button--success):not(.el-button--warning):not(.el-button--danger):not(.el-button--info):hover {
+  background-color: var(--fill-color-light);
+  border-color: var(--border-soft);
+  color: var(--text-primary);
+}
+
 /* Cards */
 .el-card {
   border-radius: var(--border-radius-base);

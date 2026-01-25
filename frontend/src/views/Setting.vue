@@ -119,6 +119,10 @@
               <el-icon><InfoFilled /></el-icon>
               <span>电子书转 PDF 需要借助 <el-link href="https://wkhtmltopdf.org/downloads.html" target="_blank" type="primary">wkhtmltopdf</el-link>，安装后终端执行 whereis wkhtmltopdf 查找路径</span>
             </div>
+            <div class="form-tip">
+              <el-icon><InfoFilled /></el-icon>
+              <span>macOS 里可用 ⌘+⇧+. 显示隐藏的路径，也可在输入框手动粘贴完整路径</span>
+            </div>
           </el-form-item>
         </el-form>
       </el-card>
@@ -188,7 +192,7 @@ import {
 } from '@element-plus/icons-vue'
 import { settingStore } from "../stores/setting"
 import { themeStore } from "../stores/theme"
-import { OpenDirectoryDialog } from "../../wailsjs/go/backend/App"
+import { OpenDirectoryDialog, OpenFileDialog } from "../../wailsjs/go/backend/App"
 import { setThemeColor, setFontFamily } from "../utils/utils"
 import { ElMessage } from 'element-plus'
 
@@ -244,7 +248,7 @@ const openDialogDir = async (title: string) => {
 
 const openToolPathDialog = async (title: string, toolType: string) => {
   try {
-    const result = await OpenDirectoryDialog(title)
+    const result = await OpenFileDialog(title)
     if (result) {
       if (toolType === 'ffmpeg') {
         form.ffmpegDir = result
@@ -371,7 +375,8 @@ const onSubmit = () => {
 }
 
 .dir-input-wrapper .el-input {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 420px;
 }
 
 .theme-color-container {
