@@ -53,6 +53,176 @@ export namespace backend {
 
 }
 
+export namespace downloadmgr {
+	
+	export class CreateTaskRequest {
+	    bizType: string;
+	    bizId: number;
+	    title: string;
+	    enId: string;
+	    articleId: number;
+	    downloadType: number;
+	    saveDir: string;
+	    priority: number;
+	    payloadJson: string;
+	    maxRetries: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new CreateTaskRequest(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.bizType = source["bizType"];
+	        this.bizId = source["bizId"];
+	        this.title = source["title"];
+	        this.enId = source["enId"];
+	        this.articleId = source["articleId"];
+	        this.downloadType = source["downloadType"];
+	        this.saveDir = source["saveDir"];
+	        this.priority = source["priority"];
+	        this.payloadJson = source["payloadJson"];
+	        this.maxRetries = source["maxRetries"];
+	    }
+	}
+	export class DownloadTask {
+	    id: string;
+	    bizType: string;
+	    bizId: number;
+	    title: string;
+	    enId: string;
+	    articleId: number;
+	    downloadType: number;
+	    status: string;
+	    priority: number;
+	    progress: number;
+	    current: number;
+	    total: number;
+	    currentName: string;
+	    saveDir: string;
+	    payloadJson: string;
+	    retryCount: number;
+	    maxRetries: number;
+	    // Go type: time
+	    nextRetryAt?: any;
+	    errorCode: string;
+	    errorMessage: string;
+	    // Go type: time
+	    startedAt?: any;
+	    // Go type: time
+	    finishedAt?: any;
+	    // Go type: time
+	    createdAt: any;
+	    // Go type: time
+	    updatedAt: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new DownloadTask(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.bizType = source["bizType"];
+	        this.bizId = source["bizId"];
+	        this.title = source["title"];
+	        this.enId = source["enId"];
+	        this.articleId = source["articleId"];
+	        this.downloadType = source["downloadType"];
+	        this.status = source["status"];
+	        this.priority = source["priority"];
+	        this.progress = source["progress"];
+	        this.current = source["current"];
+	        this.total = source["total"];
+	        this.currentName = source["currentName"];
+	        this.saveDir = source["saveDir"];
+	        this.payloadJson = source["payloadJson"];
+	        this.retryCount = source["retryCount"];
+	        this.maxRetries = source["maxRetries"];
+	        this.nextRetryAt = this.convertValues(source["nextRetryAt"], null);
+	        this.errorCode = source["errorCode"];
+	        this.errorMessage = source["errorMessage"];
+	        this.startedAt = this.convertValues(source["startedAt"], null);
+	        this.finishedAt = this.convertValues(source["finishedAt"], null);
+	        this.createdAt = this.convertValues(source["createdAt"], null);
+	        this.updatedAt = this.convertValues(source["updatedAt"], null);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ListTaskQuery {
+	    page: number;
+	    pageSize: number;
+	    status: string[];
+	    bizType: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new ListTaskQuery(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.page = source["page"];
+	        this.pageSize = source["pageSize"];
+	        this.status = source["status"];
+	        this.bizType = source["bizType"];
+	    }
+	}
+	export class ListTaskResult {
+	    list: DownloadTask[];
+	    total: number;
+	    page: number;
+	    pageSize: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ListTaskResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.list = this.convertValues(source["list"], DownloadTask);
+	        this.total = source["total"];
+	        this.page = source["page"];
+	        this.pageSize = source["pageSize"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+
+}
+
 export namespace options {
 	
 	export class SecondInstanceData {

@@ -258,7 +258,6 @@ import AudioInfo from "../components/AudioInfo.vue";
 import OutsideInfo from "../components/OutsideInfo.vue";
 import DownloadDialog from "../components/DownloadDialog.vue";
 import { settingStore } from "../stores/setting";
-import { EventsOff, EventsOn } from "../../wailsjs/runtime/runtime";
 import { Plus, Delete, Download } from '@element-plus/icons-vue';
 
 const route = useRoute();
@@ -634,19 +633,17 @@ const closeOdobDownloadDialog = () => {
   odobDownloadVisible.value = false
   odobDownloadPct.value = 0
   odobDownloadContent.value = ''
-  EventsOff("odobDownload")
 }
 
 const downloadOdob = async () => {
-  odobDownloadContent.value = '下载中...'
-  EventsOn("odobDownload", (data: any) => {
-    if (!data) return
-    odobDownloadPct.value = Number(data?.pct ?? 0)
-    odobDownloadContent.value = String(data?.value ?? '') + '下载中...'
-  })
-
+  odobDownloadContent.value = '正在提交任务...'
   try {
     await OdobDownload(odobDownloadId.value, odobDownloadType.value, odobDownloadData as any)
+    ElMessage({
+      message: '任务已加入下载队列',
+      type: 'success'
+    })
+    window.dispatchEvent(new CustomEvent('download-task:open'))
   } catch (error) {
     ElMessage({
       message: String(error),

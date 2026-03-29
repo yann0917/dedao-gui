@@ -52,7 +52,22 @@ func SetOutputDir(dir string) {
 	OutputDir = dir
 }
 
+func checkCanceled(ctx context.Context) error {
+	if ctx == nil {
+		return nil
+	}
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+		return nil
+	}
+}
+
 func (d *CourseDownload) Download() error {
+	if err := checkCanceled(d.Ctx); err != nil {
+		return err
+	}
 	course, err := getService().CourseInfo(d.EnId)
 	if err != nil {
 		return err
@@ -83,6 +98,9 @@ func (d *CourseDownload) Download() error {
 
 		total, curr := len(downloadData.Data), 0
 		for _, datum := range downloadData.Data {
+			if err := checkCanceled(d.Ctx); err != nil {
+				return err
+			}
 			var progress Progress
 			progress.ID = d.ID
 			progress.Total = total
@@ -103,6 +121,9 @@ func (d *CourseDownload) Download() error {
 			return errs[0]
 		}
 	case 2:
+		if err := checkCanceled(d.Ctx); err != nil {
+			return err
+		}
 		// 下载 PDF
 		downloadData := extractDownloadData(course, articles, d.AID, 2)
 
@@ -113,6 +134,9 @@ func (d *CourseDownload) Download() error {
 		return DownloadPdfCourse(downloadData.Data, path, d.Ctx)
 
 	case 3:
+		if err := checkCanceled(d.Ctx); err != nil {
+			return err
+		}
 		// 下载 Markdown
 		path, err := utils.Mkdir(OutputDir, utils.FileName(course.ClassInfo.Name, ""), "MD")
 		if err != nil {
@@ -125,6 +149,9 @@ func (d *CourseDownload) Download() error {
 }
 
 func (d *OdobDownload) Download() error {
+	if err := checkCanceled(d.Ctx); err != nil {
+		return err
+	}
 	fileName := "每天听本书"
 	switch d.DownloadType {
 	case 1:
@@ -140,6 +167,9 @@ func (d *OdobDownload) Download() error {
 		}
 		total, curr := len(downloadData.Data), 0
 		for _, datum := range downloadData.Data {
+			if err := checkCanceled(d.Ctx); err != nil {
+				return err
+			}
 			var progress Progress
 			progress.ID = d.ID
 			progress.Total = total
@@ -160,6 +190,9 @@ func (d *OdobDownload) Download() error {
 			return errors[0]
 		}
 	case 2:
+		if err := checkCanceled(d.Ctx); err != nil {
+			return err
+		}
 		path, err := utils.Mkdir(OutputDir, utils.FileName(fileName, ""), "PDF")
 		if err != nil {
 			return err
@@ -185,6 +218,9 @@ func (d *OdobDownload) Download() error {
 		runtime.EventsEmit(d.Ctx, "odobDownload", progress)
 		return utils.Md2Pdf(path, d.Data.Title, []byte(res))
 	case 3:
+		if err := checkCanceled(d.Ctx); err != nil {
+			return err
+		}
 		// 下载 Markdown
 		path, err := utils.Mkdir(OutputDir, utils.FileName(fileName, ""), "MD")
 		if err != nil {
@@ -197,7 +233,7 @@ func (d *OdobDownload) Download() error {
 		progress.Pct = 100 * 100 / progress.Total
 		progress.Value = d.Data.Title + ".md"
 		runtime.EventsEmit(d.Ctx, "odobDownload", progress)
-		if err := DownloadOdobMarkdown(d.Data, path); err != nil {
+		if err := DownloadOdobMarkdown(d.Data, path, d.Ctx); err != nil {
 			return err
 		}
 	}
@@ -205,6 +241,9 @@ func (d *OdobDownload) Download() error {
 }
 
 func (d *EBookDownload) Download() error {
+	if err := checkCanceled(d.Ctx); err != nil {
+		return err
+	}
 	detail, err := EbookDetail(d.EnID)
 	if err != nil {
 		return err
@@ -218,6 +257,9 @@ func (d *EBookDownload) Download() error {
 	}
 
 	title += "_" + detail.BookAuthor
+	if err = checkCanceled(d.Ctx); err != nil {
+		return err
+	}
 	info, svgContent, err := EbookPage(d.Ctx, detail.Enid)
 	if err != nil {
 		return err
@@ -235,16 +277,25 @@ func (d *EBookDownload) Download() error {
 	runtime.EventsEmit(d.Ctx, "ebookDownload", progress)
 	switch d.DownloadType {
 	case 1:
+		if err = checkCanceled(d.Ctx); err != nil {
+			return err
+		}
 		if err = utils.Svg2Html(OutputDir, title, svgContent, info.BookInfo.Toc); err != nil {
 			return err
 		}
 
 	case 2:
+		if err = checkCanceled(d.Ctx); err != nil {
+			return err
+		}
 		if err = utils.Svg2Pdf(OutputDir, title, svgContent, info.BookInfo.Toc); err != nil {
 			return err
 		}
 
 	case 3:
+		if err = checkCanceled(d.Ctx); err != nil {
+			return err
+		}
 		var opts utils.EpubOptions
 		opts.Title = title
 		opts.Author = detail.BookAuthor
@@ -546,6 +597,9 @@ func DownloadPdfCourse(list []downloader.Datum, path string, ctx context.Context
 
 	total, curr := len(list), 0
 	for _, v := range list {
+		if err := checkCanceled(ctx); err != nil {
+			return err
+		}
 		var progress Progress
 		progress.ID = v.ID
 		progress.Total = total
@@ -591,6 +645,9 @@ func DownloadPdfCourse(list []downloader.Datum, path string, ctx context.Context
 func DownloadMarkdown(list *services.ArticleList, aid int, path string, ctx context.Context) error {
 	total, curr := len(list.List), 0
 	for _, v := range list.List {
+		if err := checkCanceled(ctx); err != nil {
+			return err
+		}
 		var progress Progress
 		progress.ID = aid
 		progress.Total = total
@@ -652,7 +709,10 @@ func DownloadMarkdown(list *services.ArticleList, aid int, path string, ctx cont
 
 }
 
-func DownloadOdobMarkdown(info *services.Course, path string) error {
+func DownloadOdobMarkdown(info *services.Course, path string, ctx context.Context) error {
+	if err := checkCanceled(ctx); err != nil {
+		return err
+	}
 	aliasID := info.AudioDetail.AliasID
 	detail, err := OdobArticleDetail(aliasID)
 	if err != nil {
@@ -678,6 +738,9 @@ func DownloadOdobMarkdown(info *services.Course, path string) error {
 	}
 
 	res := ContentsToMarkdown(content)
+	if err = checkCanceled(ctx); err != nil {
+		return err
+	}
 
 	f, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {

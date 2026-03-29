@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, computed } from 'vue'
 import Menu from './components/Menu.vue'
 import GlobalAudioPlayer from './components/GlobalAudioPlayer.vue'
+import DownloadTaskPanel from './components/DownloadTaskPanel.vue'
 import { ElConfigProvider } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
@@ -94,6 +95,7 @@ const elementTheme = computed(() => store.isDark ? 'dark' : 'light')
         <router-view></router-view>
       </el-main>
       <GlobalAudioPlayer />
+      <DownloadTaskPanel />
       <!-- <el-footer>Footer</el-footer> -->
     </el-container>
   </el-config-provider>

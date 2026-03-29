@@ -26,6 +26,10 @@ export function AudioDetailAlias(arg1) {
   return window['go']['backend']['App']['AudioDetailAlias'](arg1);
 }
 
+export function CancelDownloadTask(arg1) {
+  return window['go']['backend']['App']['CancelDownloadTask'](arg1);
+}
+
 export function ChannelHomepage(arg1) {
   return window['go']['backend']['App']['ChannelHomepage'](arg1);
 }
@@ -46,6 +50,10 @@ export function CheckLogin(arg1, arg2) {
   return window['go']['backend']['App']['CheckLogin'](arg1, arg2);
 }
 
+export function ClearDownloadTasks(arg1) {
+  return window['go']['backend']['App']['ClearDownloadTasks'](arg1);
+}
+
 export function CourseCategory() {
   return window['go']['backend']['App']['CourseCategory']();
 }
@@ -64,6 +72,10 @@ export function CourseInfo(arg1) {
 
 export function CourseList(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['backend']['App']['CourseList'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function CreateDownloadTask(arg1) {
+  return window['go']['backend']['App']['CreateDownloadTask'](arg1);
 }
 
 export function EbookCommentList(arg1, arg2, arg3) {
@@ -94,6 +106,10 @@ export function GetArticleIntro(arg1, arg2) {
   return window['go']['backend']['App']['GetArticleIntro'](arg1, arg2);
 }
 
+export function GetDownloadTask(arg1) {
+  return window['go']['backend']['App']['GetDownloadTask'](arg1);
+}
+
 export function GetHomeInitialState() {
   return window['go']['backend']['App']['GetHomeInitialState']();
 }
@@ -112,6 +128,10 @@ export function GetVolcPlayAuthToken(arg1, arg2) {
 
 export function GetVolcPlayInfo(arg1) {
   return window['go']['backend']['App']['GetVolcPlayInfo'](arg1);
+}
+
+export function ListDownloadTasks(arg1) {
+  return window['go']['backend']['App']['ListDownloadTasks'](arg1);
 }
 
 export function Logout() {
@@ -148,6 +168,18 @@ export function OpenFileDialog(arg1) {
 
 export function OutsideDetail(arg1) {
   return window['go']['backend']['App']['OutsideDetail'](arg1);
+}
+
+export function PauseDownloadTask(arg1) {
+  return window['go']['backend']['App']['PauseDownloadTask'](arg1);
+}
+
+export function ResumeDownloadTask(arg1) {
+  return window['go']['backend']['App']['ResumeDownloadTask'](arg1);
+}
+
+export function RetryDownloadTask(arg1) {
+  return window['go']['backend']['App']['RetryDownloadTask'](arg1);
 }
 
 export function SearchHot() {

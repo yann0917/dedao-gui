@@ -25,18 +25,10 @@
                 </div>
             </div>
 
-            <div v-if="percentage > 0" class="download-status">
+            <div class="download-status">
                 <div class="status-header">
                     <span class="status-text">{{ content }}</span>
-                    <span class="status-percent">{{ percentage }}%</span>
                 </div>
-                <el-progress 
-                    :percentage="percentage"
-                    :stroke-width="8"
-                    :show-text="false"
-                    status="success"
-                    class="custom-progress"
-                />
             </div>
         </div>
 
@@ -44,7 +36,7 @@
             <div class="dialog-footer">
                 <el-button @click="closeDialog" :disabled="isDownloading">取消</el-button>
                 <el-button type="primary" @click="download()" :loading="isDownloading">
-                    {{ isDownloading ? '下载中...' : '开始下载' }}
+                    {{ isDownloading ? '提交中...' : '开始下载' }}
                 </el-button>
             </div>
         </template>
@@ -52,14 +44,12 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, computed, PropType} from "vue";
+import {onMounted, ref, PropType} from "vue";
 import {EbookDownload, CourseDownload, OdobDownload} from "../../wailsjs/go/backend/App";
 import {ElMessage} from "element-plus";
-import { EventsOn, EventsOff} from "../../wailsjs/runtime/runtime";
 import { Check } from '@element-plus/icons-vue'
 
-let percentage=ref(0)
-let content=ref('')
+let content=ref('任务将提交到下载队列，可在“下载任务”中查看进度')
 const isDownloading = ref(false)
 
 const dialogVisible = ref(false)
@@ -113,53 +103,31 @@ const openDialog = () => {
 }
 
 const closeDialog = () => {
-    if (isDownloading.value) {
-        return // Prevent closing while downloading unless explicitly handled? 
-               // Actually user might want to cancel/background it, but for now let's keep it simple.
-               // But the original code allowed closing. Let's allow closing but cleanup events.
-    }
-    EventsOff("courseDownload", "ebookDownload", "odobDownload")
-    percentage.value = 0
-    content.value = ''
-    isDownloading.value = false
+    content.value = '任务将提交到下载队列，可在“下载任务”中查看进度'
     emits("close")
 }
 
 const download = async () => {
     isDownloading.value = true
-    content.value = '准备下载...'
-    percentage.value = 0
+    content.value = '正在提交任务...'
     
     try {
         switch (props.prodType) {
             case 2: // Ebook
-                EventsOn("ebookDownload", data => {
-                    if (data) {
-                        percentage.value = data.pct
-                        content.value = data.value + ' 下载中...'
-                    }
-                })
                 await EbookDownload(props.downloadId, downloadType.value, props.enId)
                 break;
             case 66: // Course
-                EventsOn("courseDownload", data => {
-                    if (data) {
-                        percentage.value = data.pct
-                        content.value = data.value + ' 下载中...'
-                    }
-                })
                 await CourseDownload(props.downloadId, props.articleId, downloadType.value, props.enId)
                 break;
             case 3: // Odob
-                EventsOn("odobDownload", data => {
-                    if (data) {
-                        percentage.value = data.pct
-                        content.value = data.value + ' 下载中...'
-                    }
-                })
                 await OdobDownload(props.downloadId, downloadType.value, props.downloadData as any)
                 break;
         }
+        ElMessage({
+            message: '任务已加入下载队列',
+            type: 'success'
+        })
+        window.dispatchEvent(new CustomEvent('download-task:open'))
     } catch (error) {
         ElMessage({
             message: String(error),
@@ -239,7 +207,7 @@ const download = async () => {
 
 .status-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     margin-bottom: 8px;
     font-size: 13px;
 }
@@ -249,12 +217,7 @@ const download = async () => {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 80%;
-}
-
-.status-percent {
-    color: var(--primary-color, #409eff);
-    font-weight: 600;
+    max-width: 100%;
 }
 
 .dialog-footer {

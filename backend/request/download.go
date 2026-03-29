@@ -148,7 +148,10 @@ func (g *GetDownload) shouldSkip(ctx context.Context, task *DownloadTask) (skip 
 	fd, err := os.Open(task.Path + ".ok")
 	if err == nil {
 		_ = fd.Close()
-		return true
+		if _, statErr := os.Stat(task.Path); statErr == nil {
+			return true
+		}
+		_ = os.Remove(task.Path + ".ok")
 	}
 
 	// check target file size
