@@ -49,7 +49,7 @@ func EbookInfo(enID string) (info *services.EbookInfo, err error) {
 	return
 }
 
-func EbookPage(ctx context.Context, enID string) (info *services.EbookInfo, svgContent utils.SvgContents, err error) {
+func EbookPage(ctx context.Context, enID string, cb ProgressCallback) (info *services.EbookInfo, svgContent utils.SvgContents, err error) {
 	token, err1 := getService().EbookReadToken(enID)
 	if err1 != nil {
 		err = err1
@@ -83,6 +83,7 @@ func EbookPage(ctx context.Context, enID string) (info *services.EbookInfo, svgC
 			chapterMap.Delete(order.ChapterID)
 		}
 		runtime.EventsEmit(ctx, "ebookDownload", progress)
+		emitProgress(cb, progress)
 		wgp.Add()
 		go func(i int, order services.EbookOrders) {
 			defer func() {

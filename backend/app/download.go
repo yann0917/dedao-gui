@@ -18,12 +18,26 @@ import (
 
 var OutputDir = ""
 
+// ProgressCallback 下载过程进度回调。
+// 用于把下载器内部循环的细粒度进度（当前/总数/百分比/文件名）
+// 透传给上层任务管理器，从而写回 DB 与前端 DownloadTaskPanel。
+// 可空；为 nil 时调用方直接忽略。
+type ProgressCallback func(total, current, pct int, name string)
+
+// emitProgress 以 nil-safe 的方式调用进度回调。
+func emitProgress(cb ProgressCallback, p Progress) {
+	if cb != nil {
+		cb(p.Total, p.Current, p.Pct, p.Value)
+	}
+}
+
 type CourseDownload struct {
 	Ctx          context.Context
 	DownloadType int    // 1:mp3, 2:PDF文档, 3:markdown文档
 	ID           int    // 课程 id
 	AID          int    // 文章 id
 	EnId         string // 课程 enid
+	ProgressCB   ProgressCallback // 可空；下载任务管理器注入以接收实时进度
 }
 
 type OdobDownload struct {
@@ -31,6 +45,7 @@ type OdobDownload struct {
 	DownloadType int // 1:mp3, 2:PDF文档, 3:markdown文档
 	ID           int
 	Data         *services.Course
+	ProgressCB   ProgressCallback // 可空；下载任务管理器注入以接收实时进度
 }
 
 type EBookDownload struct {
@@ -38,6 +53,7 @@ type EBookDownload struct {
 	DownloadType int // 1:html, 2:PDF文档, 3:epub
 	ID           int
 	EnID         string
+	ProgressCB   ProgressCallback // 可空；下载任务管理器注入以接收实时进度
 }
 
 type Progress struct {
@@ -109,6 +125,7 @@ func (d *CourseDownload) Download() error {
 			progress.Pct = curr * 100 / progress.Total
 			progress.Value = datum.Title
 			runtime.EventsEmit(d.Ctx, "courseDownload", progress)
+			emitProgress(d.ProgressCB, progress)
 			if !datum.IsCanDL {
 				continue
 			}
@@ -131,7 +148,7 @@ func (d *CourseDownload) Download() error {
 		if err != nil {
 			return err
 		}
-		return DownloadPdfCourse(downloadData.Data, path, d.Ctx)
+		return DownloadPdfCourse(downloadData.Data, path, d.Ctx, d.ProgressCB)
 
 	case 3:
 		if err := checkCanceled(d.Ctx); err != nil {
@@ -142,7 +159,7 @@ func (d *CourseDownload) Download() error {
 		if err != nil {
 			return err
 		}
-		return DownloadMarkdown(articles, d.AID, path, d.Ctx)
+		return DownloadMarkdown(articles, d.AID, path, d.Ctx, d.ProgressCB)
 	}
 	return nil
 
@@ -178,6 +195,7 @@ func (d *OdobDownload) Download() error {
 			progress.Pct = curr * 100 / progress.Total
 			progress.Value = datum.Title + ".mp3"
 			runtime.EventsEmit(d.Ctx, "odobDownload", progress)
+			emitProgress(d.ProgressCB, progress)
 			if !datum.IsCanDL {
 				continue
 			}
@@ -216,6 +234,7 @@ func (d *OdobDownload) Download() error {
 		progress.Pct = 100 * 100 / progress.Total
 		progress.Value = d.Data.Title + ".pdf"
 		runtime.EventsEmit(d.Ctx, "odobDownload", progress)
+		emitProgress(d.ProgressCB, progress)
 		return utils.Md2Pdf(path, d.Data.Title, []byte(res))
 	case 3:
 		if err := checkCanceled(d.Ctx); err != nil {
@@ -233,6 +252,7 @@ func (d *OdobDownload) Download() error {
 		progress.Pct = 100 * 100 / progress.Total
 		progress.Value = d.Data.Title + ".md"
 		runtime.EventsEmit(d.Ctx, "odobDownload", progress)
+		emitProgress(d.ProgressCB, progress)
 		if err := DownloadOdobMarkdown(d.Data, path, d.Ctx); err != nil {
 			return err
 		}
@@ -260,7 +280,7 @@ func (d *EBookDownload) Download() error {
 	if err = checkCanceled(d.Ctx); err != nil {
 		return err
 	}
-	info, svgContent, err := EbookPage(d.Ctx, detail.Enid)
+	info, svgContent, err := EbookPage(d.Ctx, detail.Enid, d.ProgressCB)
 	if err != nil {
 		return err
 	}
@@ -275,6 +295,7 @@ func (d *EBookDownload) Download() error {
 	progress.Pct = 100
 	progress.Value = "正在生成" + dType[d.DownloadType] + "文件"
 	runtime.EventsEmit(d.Ctx, "ebookDownload", progress)
+	emitProgress(d.ProgressCB, progress)
 	switch d.DownloadType {
 	case 1:
 		if err = checkCanceled(d.Ctx); err != nil {
@@ -592,7 +613,7 @@ func getMdHeader(level int) string {
 	return ""
 }
 
-func DownloadPdfCourse(list []downloader.Datum, path string, ctx context.Context) error {
+func DownloadPdfCourse(list []downloader.Datum, path string, ctx context.Context, cb ProgressCallback) error {
 	name, fileName := "", ""
 
 	total, curr := len(list), 0
@@ -608,6 +629,7 @@ func DownloadPdfCourse(list []downloader.Datum, path string, ctx context.Context
 		progress.Pct = curr * 100 / progress.Total
 		progress.Value = v.Title
 		runtime.EventsEmit(ctx, "courseDownload", progress)
+		emitProgress(cb, progress)
 		detail, err := ArticleDetail(v.Enid)
 		if err != nil {
 			fmt.Println(err.Error())
@@ -642,7 +664,7 @@ func DownloadPdfCourse(list []downloader.Datum, path string, ctx context.Context
 	return nil
 }
 
-func DownloadMarkdown(list *services.ArticleList, aid int, path string, ctx context.Context) error {
+func DownloadMarkdown(list *services.ArticleList, aid int, path string, ctx context.Context, cb ProgressCallback) error {
 	total, curr := len(list.List), 0
 	for _, v := range list.List {
 		if err := checkCanceled(ctx); err != nil {
@@ -656,6 +678,7 @@ func DownloadMarkdown(list *services.ArticleList, aid int, path string, ctx cont
 		progress.Pct = curr * 100 / progress.Total
 		progress.Value = v.Title
 		runtime.EventsEmit(ctx, "courseDownload", progress)
+		emitProgress(cb, progress)
 
 		if aid > 0 && v.ID != aid {
 			continue
