@@ -595,12 +595,14 @@ const closeEbookDownloadDialog = () => {
 
 const openOdobDownloadDialog = async (item: any, event?: Event) => {
   if (event) event.stopPropagation()
-  const id = Number(item?.id ?? 0)
+  const itemId = Number(item?.id ?? 0)
+  const logId = Number.parseInt(String(item?.log_id ?? '').trim(), 10)
+  const id = itemId > 0 ? itemId : (Number.isNaN(logId) ? 0 : logId)
   const enid = String(item?.id_out ?? '').trim()
   const title = String(item?.name ?? '')
   const aliasId = String(item?.alias_id ?? '').trim()
 
-  if (!enid || !aliasId) {
+  if (id <= 0 || !enid || !aliasId) {
     ElMessage({
       message: '缺少下载所需的信息',
       type: 'warning'
