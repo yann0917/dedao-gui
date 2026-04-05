@@ -9,7 +9,7 @@ import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { themeStore } from './stores/theme'
 import { settingStore } from './stores/setting'
 import { playerStore } from './stores/player'
-import { AudioDetailAlias } from '../wailsjs/go/backend/App'
+import { AudioDetailAlias, SetDir } from '../wailsjs/go/backend/App'
 import { setFontFamily } from './utils/utils'
 
 // 初始化主题
@@ -18,6 +18,14 @@ const sStore = settingStore()
 onMounted(() => {
   store.initTheme()
   setFontFamily(sStore.setting.fontFamily || 'default')
+  // 启动时把持久化的路径同步到后端，让后台下载任务管理器（DownloadTaskPanel）
+  // 在用户未进入 Course/Odob/Ebook 等页面时也能拿到 ffmpeg/wkhtmltopdf 路径。
+  // 不传 path 时 SetDir 内部会校验并返回 error，这里忽略错误不阻塞启动。
+  SetDir([
+    sStore.setting.downloadDir || '',
+    sStore.setting.ffmpegDir || '',
+    sStore.setting.wkhtmltopdfDir || '',
+  ]).catch(() => {})
 })
 
 const pStore = playerStore()

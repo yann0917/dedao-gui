@@ -303,6 +303,9 @@ func (e *CourseExecutor) Execute(ctx context.Context, task *DownloadTask, report
 		AID:          task.ArticleID,
 		EnId:         task.EnID,
 		DownloadType: task.DownloadType,
+		ProgressCB: func(total, current, pct int, name string) {
+			reporter.Report(pct, current, total, name)
+		},
 	}
 	err := d.Download()
 	if err != nil {
@@ -332,6 +335,9 @@ func (e *EbookExecutor) Execute(ctx context.Context, task *DownloadTask, reporte
 		ID:           task.BizID,
 		EnID:         task.EnID,
 		DownloadType: task.DownloadType,
+		ProgressCB: func(total, current, pct int, name string) {
+			reporter.Report(pct, current, total, name)
+		},
 	}
 	err := d.Download()
 	if err != nil {
@@ -372,6 +378,9 @@ func (e *OdobExecutor) Execute(ctx context.Context, task *DownloadTask, reporter
 		ID:           task.BizID,
 		DownloadType: task.DownloadType,
 		Data:         &payload.Data,
+		ProgressCB: func(total, current, pct int, name string) {
+			reporter.Report(pct, current, total, name)
+		},
 	}
 	err := d.Download()
 	if err != nil {
