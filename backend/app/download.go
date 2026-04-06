@@ -33,10 +33,10 @@ func emitProgress(cb ProgressCallback, p Progress) {
 
 type CourseDownload struct {
 	Ctx          context.Context
-	DownloadType int    // 1:mp3, 2:PDF文档, 3:markdown文档
-	ID           int    // 课程 id
-	AID          int    // 文章 id
-	EnId         string // 课程 enid
+	DownloadType int              // 1:mp3, 2:PDF文档, 3:markdown文档
+	ID           int              // 课程 id
+	AID          int              // 文章 id
+	EnId         string           // 课程 enid
 	ProgressCB   ProgressCallback // 可空；下载任务管理器注入以接收实时进度
 }
 
@@ -356,6 +356,9 @@ func extractCourseDownloadData(articles *services.ArticleList, aid int, flag int
 	audioData := make([]*downloader.Datum, 0)
 	for _, article := range articles.List {
 		if aid > 0 && article.ID != aid {
+			continue
+		}
+		if article.Audio == nil {
 			continue
 		}
 

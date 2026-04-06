@@ -3,6 +3,7 @@ package downloadmgr
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -135,6 +136,12 @@ func (m *Manager) workerLoop() {
 }
 
 func (m *Manager) execute(task DownloadTask) {
+	defer func() {
+		if r := recover(); r != nil {
+			msg := fmt.Sprintf("下载任务 panic: %v", r)
+			_ = m.failTask(task, "TASK_PANIC", msg)
+		}
+	}()
 	executor, ok := m.executors[task.BizType]
 	if !ok {
 		_ = m.failTask(task, "TASK_EXECUTOR_NOT_FOUND", "未找到对应下载执行器")
