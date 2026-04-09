@@ -129,7 +129,7 @@ func (c *ConfigsData) Save() error {
 	data, err := jsoniter.MarshalIndent(conf, "", " ")
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// 减掉多余的部分
