@@ -122,7 +122,9 @@ func (d *CourseDownload) Download() error {
 			progress.Total = total
 			curr++
 			progress.Current = curr
-			progress.Pct = curr * 100 / progress.Total
+			if total > 0 {
+				progress.Pct = curr * 100 / progress.Total
+			}
 			progress.Value = datum.Title
 			runtime.EventsEmit(d.Ctx, "courseDownload", progress)
 			emitProgress(d.ProgressCB, progress)
@@ -192,7 +194,9 @@ func (d *OdobDownload) Download() error {
 			progress.Total = total
 			curr++
 			progress.Current = curr
-			progress.Pct = curr * 100 / progress.Total
+			if total > 0 {
+				progress.Pct = curr * 100 / progress.Total
+			}
 			progress.Value = datum.Title + ".mp3"
 			runtime.EventsEmit(d.Ctx, "odobDownload", progress)
 			emitProgress(d.ProgressCB, progress)
@@ -629,7 +633,9 @@ func DownloadPdfCourse(list []downloader.Datum, path string, ctx context.Context
 		progress.Total = total
 		curr++
 		progress.Current = curr
-		progress.Pct = curr * 100 / progress.Total
+		if total > 0 {
+			progress.Pct = curr * 100 / progress.Total
+		}
 		progress.Value = v.Title
 		runtime.EventsEmit(ctx, "courseDownload", progress)
 		emitProgress(cb, progress)
@@ -678,7 +684,9 @@ func DownloadMarkdown(list *services.ArticleList, aid int, path string, ctx cont
 		progress.Total = total
 		curr++
 		progress.Current = curr
-		progress.Pct = curr * 100 / progress.Total
+		if total > 0 {
+			progress.Pct = curr * 100 / progress.Total
+		}
 		progress.Value = v.Title
 		runtime.EventsEmit(ctx, "courseDownload", progress)
 		emitProgress(cb, progress)

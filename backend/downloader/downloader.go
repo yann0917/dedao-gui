@@ -22,6 +22,9 @@ func Download(v Datum, stream, path string) error {
 		title = fmt.Sprintf("%03d.%s", v.OrderNum, title)
 	}
 	if stream == "" {
+		if len(v.sortedStreams) == 0 {
+			return fmt.Errorf("没有可用的下载流：%s", v.Title)
+		}
 		stream = v.sortedStreams[0].name
 	}
 	data, ok := v.Streams[stream]

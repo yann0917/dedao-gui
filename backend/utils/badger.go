@@ -3,7 +3,6 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -36,13 +35,13 @@ func ensureDir(dirPath string) error {
 
 // GetBadgerDB 获取全局 BadgerDB 实例
 func GetBadgerDB(dbPath string) (*BadgerDB, error) {
+	var initErr error
 	once.Do(func() {
-		var err error
-		badgerInstance, err = NewBadgerDB(dbPath)
-		if err != nil {
-			log.Fatalf("初始化 BadgerDB 失败: %v", err)
-		}
+		badgerInstance, initErr = NewBadgerDB(dbPath)
 	})
+	if badgerInstance == nil {
+		return nil, fmt.Errorf("初始化 BadgerDB 失败: %w", initErr)
+	}
 	return badgerInstance, nil
 }
 
@@ -270,9 +269,10 @@ func FormatKey(category string, id int) string {
 
 // GetDefaultBadgerDBPath 获取默认的 BadgerDB 路径
 func GetDefaultBadgerDBPath() string {
-	configDir, err := os.Getwd()
+	// 使用 UserConfigDir 而非 os.Getwd()，避免 macOS .app 包中返回 "/" 的问题
+	configDir, err := os.UserConfigDir()
 	if err != nil {
 		configDir = os.TempDir()
 	}
-	return filepath.Join(configDir, ".cache", "db")
+	return filepath.Join(configDir, "dedao", ".cache", "db")
 }

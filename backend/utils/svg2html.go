@@ -696,7 +696,7 @@ func GenLineContentByElement(chapterID string, element *svgparser.Element) (line
 			// footnote image with text in one line
 			yInt, _ := strconv.ParseFloat(ele.Y, 64)
 			w, _ := strconv.ParseFloat(ele.Width, 64)
-			if children.Name == "image" && w < footNoteImgW {
+			if children.Name == "image" && w < footNoteImgW && k > 0 {
 				attrPre := element.Children[k-1].Attributes
 				yInt, _ = strconv.ParseFloat(attrPre["y"], 64)
 				ele.Y = attrPre["y"]

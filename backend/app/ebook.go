@@ -63,6 +63,9 @@ func EbookPage(ctx context.Context, enID string, cb ProgressCallback) (info *ser
 	wgp := utils.NewWaitGroupPool(5)
 	total, curr := len(info.BookInfo.Orders), 0
 	var chapterMap sync.Map
+	var mu sync.Mutex
+	var firstErr error
+	var svgList []*utils.SvgContent
 	for _, ebookToc := range info.BookInfo.Toc {
 		key := ebookToc.Href
 		href := strings.Split(ebookToc.Href, "#")
@@ -76,7 +79,9 @@ func EbookPage(ctx context.Context, enID string, cb ProgressCallback) (info *ser
 		progress.Total = total
 		curr++
 		progress.Current = curr
-		progress.Pct = curr * 100 / progress.Total
+		if total > 0 {
+			progress.Pct = curr * 100 / progress.Total
+		}
 		value, ok := chapterMap.Load(order.ChapterID)
 		if ok {
 			progress.Value = value.(utils.EbookToc).Text
@@ -87,24 +92,42 @@ func EbookPage(ctx context.Context, enID string, cb ProgressCallback) (info *ser
 		wgp.Add()
 		go func(i int, order services.EbookOrders) {
 			defer func() {
+				if r := recover(); r != nil {
+					mu.Lock()
+					if firstErr == nil {
+						firstErr = fmt.Errorf("goroutine panic: %v", r)
+					}
+					mu.Unlock()
+				}
 				wgp.Done()
 			}()
 			index, count, offset := 0, 20, 0
-			svgList, err1 := generateEbookPages(enID, order.ChapterID, token.Token, index, count, offset)
+			pages, err1 := generateEbookPages(enID, order.ChapterID, token.Token, index, count, offset)
 			if err1 != nil {
-				err = err1
+				mu.Lock()
+				if firstErr == nil {
+					firstErr = err1
+				}
+				mu.Unlock()
 				return
 			}
 
-			svgContent = append(svgContent, &utils.SvgContent{
-				Contents:   svgList,
+			mu.Lock()
+			svgList = append(svgList, &utils.SvgContent{
+				Contents:   pages,
 				ChapterID:  order.ChapterID,
 				PathInEpub: order.PathInEpub,
 				OrderIndex: i,
 			})
+			mu.Unlock()
 		}(i, order)
 	}
 	wgp.Wait()
+	if firstErr != nil {
+		err = firstErr
+		return
+	}
+	svgContent = svgList
 	return
 }
 
@@ -154,7 +177,13 @@ func generateEbookPages(enid, chapterID, token string, index, count, offset int)
 // PKCS7Unpad 实现PKCS7去填充
 func PKCS7Unpad(data []byte) []byte {
 	length := len(data)
+	if length == 0 {
+		return data
+	}
 	unpadding := int(data[length-1])
+	if unpadding == 0 || unpadding > length {
+		return data
+	}
 	return data[:(length - unpadding)]
 }
 
@@ -175,6 +204,10 @@ func DecryptAES(contents string) string {
 	}
 
 	blockSize := block.BlockSize()
+	// CryptBlocks 要求密文长度必须是 block 大小的整数倍，否则会 panic
+	if len(ciphertext) == 0 || len(ciphertext)%blockSize != 0 {
+		return ""
+	}
 	mode := cipher.NewCBCDecrypter(block, iv[:blockSize])
 	plaintext := make([]byte, len(ciphertext))
 	mode.CryptBlocks(plaintext, ciphertext)

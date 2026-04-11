@@ -288,11 +288,11 @@ func (r *Repository) ClearTasks(clearAll bool) error {
 }
 
 func defaultDBPath() (string, error) {
-	wd, err := os.Getwd()
+	configDir, err := os.UserConfigDir()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("获取用户配置目录失败: %w", err)
 	}
-	dir := filepath.Join(wd, ".cache", "download")
+	dir := filepath.Join(configDir, "dedao", "download")
 	if err = os.MkdirAll(dir, 0755); err != nil {
 		return "", fmt.Errorf("创建下载数据库目录失败: %w", err)
 	}
