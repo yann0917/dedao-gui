@@ -4,12 +4,15 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"os/signal"
+	"runtime"
 	"strconv"
 	"syscall"
 	"time"
 
 	"github.com/wailsapp/wails/v2/pkg/options"
+	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/yann0917/dedao-gui/backend/downloadmgr"
 	"github.com/yann0917/dedao-gui/backend/utils"
 )
@@ -48,6 +51,24 @@ func (a *App) Startup(ctx context.Context) {
 	}
 	a.DownloadRepo = repo
 	a.DownloadManager = manager
+
+	if err := wailsruntime.InitializeNotifications(ctx); err != nil {
+		fmt.Printf("初始化通知系统失败: %v\n", err)
+	} else if wailsruntime.IsNotificationAvailable(ctx) {
+		authorized, err := wailsruntime.CheckNotificationAuthorization(ctx)
+		if err != nil {
+			fmt.Printf("检查通知权限失败: %v\n", err)
+		} else if !authorized {
+			authorized, err = wailsruntime.RequestNotificationAuthorization(ctx)
+			if err != nil {
+				fmt.Printf("请求通知权限失败: %v\n", err)
+			} else if authorized {
+				fmt.Println("通知权限已授权")
+			}
+		}
+		registerNotificationCategory(ctx)
+		wailsruntime.OnNotificationResponse(ctx, a.onNotificationResponse)
+	}
 }
 
 func readEnvInt(name string, defaultValue int) int {
@@ -98,4 +119,46 @@ func setupCleanupOnExit() {
 
 		os.Exit(0)
 	}()
+}
+
+func registerNotificationCategory(ctx context.Context) {
+	category := wailsruntime.NotificationCategory{
+		ID: "download-category",
+		Actions: []wailsruntime.NotificationAction{
+			{ID: "open_folder", Title: "打开文件夹"},
+		},
+	}
+	if err := wailsruntime.RegisterNotificationCategory(ctx, category); err != nil {
+		fmt.Printf("注册通知类别失败: %v\n", err)
+	} else {
+		fmt.Println("通知类别已注册")
+	}
+}
+
+func (a *App) onNotificationResponse(result wailsruntime.NotificationResult) {
+	if result.Error != nil {
+		fmt.Printf("通知回调错误: %v\n", result.Error)
+		return
+	}
+	response := result.Response
+	if response.ActionIdentifier == "open_folder" {
+		if saveDir, ok := response.UserInfo["saveDir"].(string); ok && saveDir != "" {
+			openFolder(saveDir)
+		}
+	}
+}
+
+func openFolder(path string) {
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "darwin":
+		cmd = exec.Command("open", path)
+	case "windows":
+		cmd = exec.Command("explorer", path)
+	default:
+		cmd = exec.Command("xdg-open", path)
+	}
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("打开文件夹失败: %v\n", err)
+	}
 }

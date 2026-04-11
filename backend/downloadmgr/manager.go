@@ -181,6 +181,20 @@ func (m *Manager) execute(task DownloadTask) {
 			"error_message": "",
 		})
 		m.emitStatus(task.ID, StatusSuccess, 100, "", "")
+		if task.Title != "" {
+			if runtime.IsNotificationAvailable(m.ctx) {
+				err := runtime.SendNotificationWithActions(m.ctx, runtime.NotificationOptions{
+					Title:      task.Title + "下载完成",
+					CategoryID: "download-category",
+					Data: map[string]interface{}{
+						"saveDir": task.SaveDir,
+					},
+				})
+				if err != nil {
+					fmt.Printf("发送通知失败: %v\n", err)
+				}
+			}
+		}
 		return
 	}
 	if errors.Is(err, context.Canceled) {
