@@ -103,7 +103,7 @@
 }
 
 html {
-    background-color: var(--bg-color);
+    background-color: transparent;
     color: var(--text-color);
     text-align: center;
     width: 100%;
@@ -112,19 +112,31 @@ html {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+:root {
+    --window-radius: 0px;
+}
+
+html.platform-mac {
+    --window-radius: 10px;
+}
+
 body {
     margin: 0;
     color: var(--text-color-secondary);
     font-family: var(--font-family-base);
     line-height: 1.5;
     padding: 0;
-    background-color: var(--bg-color);
+    background-color: transparent;
+    border-radius: var(--window-radius);
+    border: 1px solid transparent;
+    overflow: hidden;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #app {
     height: 100vh;
     text-align: center;
+    border-radius: var(--window-radius);
     overflow: hidden;
 }
 

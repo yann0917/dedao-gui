@@ -2316,11 +2316,11 @@ export namespace services {
 	        this.view_count = source["view_count"];
 	    }
 	}
-	export class Switch {
+	export class SwitchConfig {
 	    img_origin: boolean;
 	
 	    static createFrom(source: any = {}) {
-	        return new Switch(source);
+	        return new SwitchConfig(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -2577,7 +2577,7 @@ export namespace services {
 	    source_type: number;
 	    state: number;
 	    style_note_line: string;
-	    switch: Switch;
+	    switch: SwitchConfig;
 	    tags: any[];
 	    uid: number;
 	    uid_hazy: string;
@@ -2656,7 +2656,7 @@ export namespace services {
 	        this.source_type = source["source_type"];
 	        this.state = source["state"];
 	        this.style_note_line = source["style_note_line"];
-	        this.switch = this.convertValues(source["switch"], Switch);
+	        this.switch = this.convertValues(source["switch"], SwitchConfig);
 	        this.tags = source["tags"];
 	        this.uid = source["uid"];
 	        this.uid_hazy = source["uid_hazy"];

@@ -34,10 +34,11 @@ func main() {
 		MinHeight: 768,
 		MaxWidth:  2560,
 		MaxHeight: 1440,
+		Frameless: true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		BackgroundColour:   &options.RGBA{R: 27, G: 38, B: 54, A: 1},
+		BackgroundColour:   &options.RGBA{R: 27, G: 38, B: 54, A: 0},
 		OnStartup:          app.Startup,
 		OnShutdown:         app.Shutdown,
 		OnDomReady:         app.DomReady,
@@ -80,7 +81,7 @@ func main() {
 				UseToolbar:                 false,
 				HideToolbarSeparator:       true,
 			},
-			Appearance:           mac.DefaultAppearance,
+			Appearance:           mac.NSAppearanceNameVibrantLight,
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
 			About: &mac.AboutInfo{

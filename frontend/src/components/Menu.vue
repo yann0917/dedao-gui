@@ -1,5 +1,31 @@
 <template>
-    <div class="menu-container">
+    <div class="menu-container" style="--wails-draggable:drag" @dblclick="handleTitlebarDblClick">
+        <!-- 窗口控制按钮 -->
+        <div class="window-controls" :class="isWindows ? 'windows-style' : 'mac-style'">
+            <template v-if="isWindows">
+                <!-- Windows 风格 -->
+                <button class="window-btn windows-btn" @click="windowMinimize" title="最小化">
+                    <svg viewBox="0 0 10 10" class="icon-minimize"><path d="M0 5h10" stroke="currentColor" stroke-width="1"/></svg>
+                </button>
+                <button class="window-btn windows-btn" @click="windowMaximize" :title="isMaximized ? '还原' : '最大化'">
+                    <svg v-if="!isMaximized" viewBox="0 0 10 10" class="icon-maximize"><rect x="0.5" y="0.5" width="9" height="9" stroke="currentColor" fill="none" stroke-width="1"/></svg>
+                    <svg v-else viewBox="0 0 10 10" class="icon-restore">
+                        <path d="M3 1.5H8.5V7H7.5V2.5H3V1.5Z" fill="currentColor"/>
+                        <path d="M1.5 3H7V8.5H1.5V3ZM2.5 4V7.5H6V4H2.5Z" fill="currentColor"/>
+                    </svg>
+                </button>
+                <button class="window-btn windows-btn close-btn windows-close" @click="windowClose" title="关闭">
+                    <svg viewBox="0 0 10 10" class="icon-close"><path d="M0 0L10 10M10 0L0 10" stroke="currentColor" stroke-width="1"/></svg>
+                </button>
+            </template>
+            <template v-else>
+                <!-- macOS 风格 -->
+                <button class="window-btn mac-btn close-btn" @click="windowClose" title="关闭"></button>
+                <button class="window-btn mac-btn minimize-btn" @click="windowMinimize" title="最小化"></button>
+                <button class="window-btn mac-btn maximize-btn" @click="windowMaximize" title="最大化"></button>
+            </template>
+        </div>
+        
         <el-menu router :default-active="activeIndex" class="el-menu" mode="horizontal" 
              text-color="var(--text-primary)" 
              active-text-color="var(--accent-color)"
@@ -25,11 +51,12 @@
 </template>
   
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Moon, Sunny } from '@element-plus/icons-vue'
 import MenuItem from './MenuItem.vue'
 import { themeStore } from '../stores/theme'
+import { Environment, Quit, WindowIsMaximised, WindowMinimise, WindowToggleMaximise } from '../../wailsjs/runtime'
 
 const route = useRoute()
 const router = useRouter()
@@ -42,6 +69,58 @@ const toggleDark = () => {
   console.log('切换主题，当前状态:', store.isDark)
   store.toggleTheme()
   console.log('切换后状态:', store.isDark)
+}
+
+const isWindows = ref(false)
+const isMaximized = ref(false)
+
+const initPlatform = async () => {
+  try {
+    const env = await Environment()
+    isWindows.value = env.platform === 'windows'
+    if (isWindows.value) {
+      await syncMaximizedState()
+    }
+  } catch {
+    isWindows.value = false
+  }
+}
+
+const syncMaximizedState = async () => {
+  try {
+    isMaximized.value = await WindowIsMaximised()
+  } catch {
+    isMaximized.value = false
+  }
+}
+
+onMounted(() => {
+  initPlatform()
+})
+
+const windowClose = () => {
+  Quit()
+}
+
+const windowMinimize = () => {
+  WindowMinimise()
+}
+
+const windowMaximize = async () => {
+  WindowToggleMaximise()
+  await syncMaximizedState()
+}
+
+const handleTitlebarDblClick = async (event: MouseEvent) => {
+  if (!isWindows.value) {
+    return
+  }
+  const target = event.target as HTMLElement | null
+  const ignore = target?.closest('.window-controls, .theme-switch-container, .el-menu')
+  if (ignore) {
+    return
+  }
+  await windowMaximize()
 }
 
 const allRoutes = router.options.routes.filter(route => 
@@ -191,5 +270,86 @@ const handleSelect = (key: string, keyPath: string[]) => {
   color: var(--accent-color) !important;
   background-color: var(--card-hover-bg) !important;
   border-bottom-color: var(--accent-color) !important;
+}
+
+/* 窗口控制按钮通用样式 */
+.window-controls {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  margin-right: 16px;
+  -webkit-app-region: no-drag;
+}
+
+.window-controls.mac-style {
+  gap: 8px;
+}
+
+.window-controls.windows-style {
+  gap: 4px;
+}
+
+.window-btn {
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* macOS 风格按钮 */
+.mac-btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.mac-btn:hover {
+  opacity: 0.8;
+}
+
+.mac-btn.close-btn {
+  background-color: #ff5f57;
+}
+
+.mac-btn.minimize-btn {
+  background-color: #febc2e;
+}
+
+.mac-btn.maximize-btn {
+  background-color: #28c840;
+}
+
+/* Windows 风格按钮 */
+.windows-btn {
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border-radius: 4px;
+}
+
+.windows-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.windows-btn .icon-minimize,
+.windows-btn .icon-maximize,
+.windows-btn .icon-close {
+  width: 10px;
+  height: 10px;
+  color: var(--text-primary);
+}
+
+.windows-btn.windows-close:hover {
+  background-color: #e81123;
+}
+
+.windows-btn.windows-close .icon-close {
+  color: var(--text-primary);
+}
+
+.windows-btn.windows-close:hover .icon-close {
+  color: white;
 }
 </style>

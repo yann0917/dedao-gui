@@ -81,7 +81,7 @@ type Comment struct {
 	SourceType              int            `json:"source_type"`
 	State                   int            `json:"state"`
 	StyleNoteLine           string         `json:"style_note_line"`
-	Switch                  Switch         `json:"switch"`
+	SwitchConfig            SwitchConfig   `json:"switch"`
 	Tags                    []interface{}  `json:"tags"`
 	Uid                     int            `json:"uid"`
 	UidHazy                 string         `json:"uid_hazy"`
@@ -100,7 +100,7 @@ type Lesson struct {
 	Ptype   int    `json:"ptype"`
 	PidHazy string `json:"pid_hazy"`
 }
-type Switch struct {
+type SwitchConfig struct {
 	ImgOrigin bool `json:"img_origin"`
 }
 

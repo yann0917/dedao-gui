@@ -10,12 +10,33 @@ import { themeStore } from './stores/theme'
 import { settingStore } from './stores/setting'
 import { playerStore } from './stores/player'
 import { AudioDetailAlias, SetDir } from '../wailsjs/go/backend/App'
+import { Environment } from '../wailsjs/runtime'
 import { setFontFamily } from './utils/utils'
 
 // 初始化主题
 const store = themeStore()
 const sStore = settingStore()
+const applyPlatformClass = async () => {
+  const root = document.documentElement
+  root.classList.remove('platform-mac', 'platform-windows', 'platform-linux')
+  try {
+    const env = await Environment()
+    const platform = String(env?.platform || '').toLowerCase()
+    if (platform === 'darwin') {
+      root.classList.add('platform-mac')
+      return
+    }
+    if (platform === 'windows') {
+      root.classList.add('platform-windows')
+      return
+    }
+    if (platform === 'linux') {
+      root.classList.add('platform-linux')
+    }
+  } catch {}
+}
 onMounted(() => {
+  applyPlatformClass()
   store.initTheme()
   setFontFamily(sStore.setting.fontFamily || 'default')
   // 启动时把持久化的路径同步到后端，让后台下载任务管理器（DownloadTaskPanel）
