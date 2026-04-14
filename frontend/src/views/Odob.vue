@@ -20,9 +20,23 @@
             </el-radio-group>
         </div>
 
-        <div v-loading="initLoading" class="odob-grid-container" v-infinite-scroll="loadMore" :infinite-scroll-disabled="disabled" :infinite-scroll-immediate="false">
-            <div v-if="tableData.list && tableData.list.length > 0" class="odob-grid">
-                <div v-for="item in tableData.list" :key="item.id" class="odob-card" @click="item.is_group ? enterGroup(item) : null">
+        <div
+            ref="scrollContainerRef"
+            v-loading="initLoading"
+            class="odob-grid-container"
+            v-infinite-scroll="loadMore"
+            :infinite-scroll-disabled="disabled"
+            :infinite-scroll-immediate="false"
+            @scroll.passive="handleScroll"
+        >
+            <div v-if="virtualEnabled" :style="{ height: `${topSpacerHeight}px` }"></div>
+            <div ref="gridRef" v-if="tableData.list && tableData.list.length > 0" class="odob-grid">
+                <div
+                    v-for="item in renderList"
+                    :key="item.id"
+                    class="odob-card"
+                    @click="item.is_group ? enterGroup(item) : null"
+                >
                     <div class="card-cover">
                         <!-- 分组封面拼图 -->
                         <div v-if="item.is_group && item.group_books && item.group_books.length > 0" class="group-cover-grid">
@@ -100,6 +114,7 @@
                 </div>
             </div>
             <el-empty v-else description="暂无内容" />
+            <div v-if="virtualEnabled" :style="{ height: `${bottomSpacerHeight}px` }"></div>
         </div>
     
     
@@ -120,7 +135,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref, computed } from 'vue'
+import { onMounted, onBeforeUnmount, reactive, ref, computed, nextTick } from 'vue'
 import 'element-plus/es/components/message/style/css'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft, VideoPlay, Memo, View, Download as DownloadIcon, Picture, Folder, Clock } from '@element-plus/icons-vue'
@@ -155,6 +170,18 @@ const outsideVisible = ref(false)
 const prodEnid = ref("")
 const filterOptions = ref<any[]>([])
 const currentFilter = ref('all')
+const scrollContainerRef = ref<HTMLElement | null>(null)
+const gridRef = ref<HTMLElement | null>(null)
+
+const GRID_COLUMNS = 5
+const GRID_GAP = 20
+const VIRTUAL_THRESHOLD = 120
+const OVERSCAN_ROWS = 3
+const rowHeight = ref(420)
+const containerHeight = ref(0)
+const scrollTop = ref(0)
+let rafId = 0
+let resizeObserver: ResizeObserver | null = null
 
 const groupMode = reactive({
     active: false,
@@ -264,6 +291,27 @@ onMounted(() => {
         }
     })
     getTableData()
+
+    nextTick(() => {
+        syncContainerHeight()
+        syncRowHeight()
+    })
+
+    if (scrollContainerRef.value) {
+        resizeObserver = new ResizeObserver(() => {
+            syncContainerHeight()
+            syncRowHeight()
+        })
+        resizeObserver.observe(scrollContainerRef.value)
+    }
+})
+
+onBeforeUnmount(() => {
+    if (rafId) cancelAnimationFrame(rafId)
+    if (resizeObserver) {
+        resizeObserver.disconnect()
+        resizeObserver = null
+    }
 })
 
 const noMore = computed(() => {
@@ -285,6 +333,60 @@ const noMore = computed(() => {
 })
 
 const disabled = computed(() => loading.value || noMore.value)
+const totalCount = computed(() => tableData.list?.length || 0)
+const virtualEnabled = computed(() => totalCount.value >= VIRTUAL_THRESHOLD)
+const totalRows = computed(() => Math.ceil(totalCount.value / GRID_COLUMNS))
+const startRow = computed(() => {
+    if (!virtualEnabled.value) return 0
+    const raw = Math.floor(scrollTop.value / rowHeight.value) - OVERSCAN_ROWS
+    return Math.max(0, raw)
+})
+const endRow = computed(() => {
+    if (!virtualEnabled.value) return totalRows.value
+    const visibleRows = Math.ceil(containerHeight.value / rowHeight.value)
+    const raw = startRow.value + visibleRows + OVERSCAN_ROWS * 2
+    return Math.min(totalRows.value, raw)
+})
+const renderList = computed(() => {
+    const list = tableData.list || []
+    if (!virtualEnabled.value) return list
+    const startIdx = startRow.value * GRID_COLUMNS
+    const endIdx = endRow.value * GRID_COLUMNS
+    return list.slice(startIdx, endIdx)
+})
+const topSpacerHeight = computed(() => {
+    if (!virtualEnabled.value) return 0
+    return startRow.value * rowHeight.value
+})
+const bottomSpacerHeight = computed(() => {
+    if (!virtualEnabled.value) return 0
+    const remainingRows = totalRows.value - endRow.value
+    return Math.max(0, remainingRows * rowHeight.value)
+})
+
+const syncContainerHeight = () => {
+    if (!scrollContainerRef.value) return
+    containerHeight.value = scrollContainerRef.value.clientHeight
+}
+
+const syncRowHeight = () => {
+    nextTick(() => {
+        const cardEl = gridRef.value?.querySelector('.odob-card') as HTMLElement | null
+        if (!cardEl) return
+        const measured = cardEl.getBoundingClientRect().height + GRID_GAP
+        if (measured > 0) rowHeight.value = measured
+    })
+}
+
+const handleScroll = () => {
+    if (!virtualEnabled.value || !scrollContainerRef.value) return
+    const nextTop = scrollContainerRef.value.scrollTop
+    if (rafId) cancelAnimationFrame(rafId)
+    rafId = requestAnimationFrame(() => {
+        scrollTop.value = nextTop
+        rafId = 0
+    })
+}
 
 const loadMore = () => {
     if (disabled.value) return
@@ -301,6 +403,8 @@ const handleFilterChange = () => {
     }
     page.value = 1
     tableData.list = [] 
+    scrollTop.value = 0
+    if (scrollContainerRef.value) scrollContainerRef.value.scrollTop = 0
     getTableData()
 }
 
@@ -330,6 +434,13 @@ const getTableData = async (append = false) => {
         } else {
             Object.assign(tableData, table)
         }
+
+        if (!append) {
+            scrollTop.value = 0
+            if (scrollContainerRef.value) scrollContainerRef.value.scrollTop = 0
+        }
+        syncContainerHeight()
+        syncRowHeight()
         
         if (groupMode.active || currentFilter.value !== 'all') {
             total.value = table.total || 0
@@ -354,7 +465,6 @@ const closeDialog = () => {
     dialogVisible.value = false
     outsideVisible.value = false
 }
-getTableData()
 
 const enterGroup = (row: any) => {
     const groupId = Number(row?.group_id || row?.id || 0)
@@ -366,6 +476,8 @@ const enterGroup = (row: any) => {
     groupMode.title = String(row?.title || '')
     page.value = 1
     tableData.list = []
+    scrollTop.value = 0
+    if (scrollContainerRef.value) scrollContainerRef.value.scrollTop = 0
     getTableData()
 }
 
@@ -375,6 +487,8 @@ const exitGroup = () => {
     groupMode.title = ''
     page.value = 1
     total.value = outerTotal.value
+    scrollTop.value = 0
+    if (scrollContainerRef.value) scrollContainerRef.value.scrollTop = 0
     getTableData()
 }
 
