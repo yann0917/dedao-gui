@@ -8,8 +8,8 @@ import (
 )
 
 func (a *App) CreateDownloadTask(req downloadmgr.CreateTaskRequest) (task *downloadmgr.DownloadTask, err error) {
-	if a.DownloadRepo == nil {
-		return nil, errors.New("下载任务管理器未初始化")
+	if err = a.ensureDownloadManager(); err != nil {
+		return nil, err
 	}
 	if req.BizType == "" {
 		return nil, errors.New("bizType 不能为空")
@@ -28,8 +28,7 @@ func (a *App) CreateDownloadTask(req downloadmgr.CreateTaskRequest) (task *downl
 }
 
 func (a *App) ListDownloadTasks(query downloadmgr.ListTaskQuery) (result downloadmgr.ListTaskResult, err error) {
-	if a.DownloadRepo == nil {
-		err = errors.New("下载任务管理器未初始化")
+	if err = a.ensureDownloadManager(); err != nil {
 		return
 	}
 	result, err = a.DownloadRepo.ListTasks(query)
@@ -37,44 +36,44 @@ func (a *App) ListDownloadTasks(query downloadmgr.ListTaskQuery) (result downloa
 }
 
 func (a *App) GetDownloadTask(id string) (task *downloadmgr.DownloadTask, err error) {
-	if a.DownloadRepo == nil {
-		return nil, errors.New("下载任务管理器未初始化")
+	if err = a.ensureDownloadManager(); err != nil {
+		return nil, err
 	}
 	task, err = a.DownloadRepo.GetTask(id)
 	return
 }
 
 func (a *App) CancelDownloadTask(id string) (err error) {
-	if a.DownloadManager == nil {
-		return errors.New("下载任务管理器未初始化")
+	if err = a.ensureDownloadManager(); err != nil {
+		return err
 	}
 	return a.DownloadManager.CancelTask(id)
 }
 
 func (a *App) RetryDownloadTask(id string) (err error) {
-	if a.DownloadRepo == nil {
-		return errors.New("下载任务管理器未初始化")
+	if err = a.ensureDownloadManager(); err != nil {
+		return err
 	}
 	return a.DownloadRepo.RetryTask(id)
 }
 
 func (a *App) PauseDownloadTask(id string) (err error) {
-	if a.DownloadManager == nil {
-		return errors.New("下载任务管理器未初始化")
+	if err = a.ensureDownloadManager(); err != nil {
+		return err
 	}
 	return a.DownloadManager.PauseTask(id)
 }
 
 func (a *App) ResumeDownloadTask(id string) (err error) {
-	if a.DownloadManager == nil {
-		return errors.New("下载任务管理器未初始化")
+	if err = a.ensureDownloadManager(); err != nil {
+		return err
 	}
 	return a.DownloadManager.ResumeTask(id)
 }
 
 func (a *App) ClearDownloadTasks(clearAll bool) (err error) {
-	if a.DownloadManager == nil {
-		return errors.New("下载任务管理器未初始化")
+	if err = a.ensureDownloadManager(); err != nil {
+		return err
 	}
 	return a.DownloadManager.ClearTasks(clearAll)
 }

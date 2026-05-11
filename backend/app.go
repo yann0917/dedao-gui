@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"runtime"
 	"strconv"
+	"sync"
 	"syscall"
-	"time"
 
 	"github.com/wailsapp/wails/v2/pkg/options"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -22,35 +22,27 @@ type App struct {
 	Ctx             context.Context
 	DownloadRepo    *downloadmgr.Repository
 	DownloadManager *downloadmgr.Manager
+	downloadInitMu  sync.Mutex
+	downloadInitCh  chan struct{}
+	downloadInitErr error
+	downloadState   downloadManagerState
+	downloadInitFn  downloadManagerInitializer
 }
 
 // NewApp creates a new App application struct
 func NewApp() *App {
-	return &App{}
+	return &App{
+		downloadState: downloadManagerStateUninitialized,
+	}
 }
 
 // Startup is called when the app starts. The context is saved
 // so we can call the runtime methods
 func (a *App) Startup(ctx context.Context) {
 	a.Ctx = ctx
-	repo, err := downloadmgr.NewRepository()
-	if err != nil {
-		fmt.Printf("初始化下载任务数据库失败: %v\n", err)
-		return
-	}
-	manager := downloadmgr.NewManager(ctx, repo, downloadmgr.Config{
-		WorkerCount:  readEnvInt("DOWNLOAD_TASK_WORKER_COUNT", 1),
-		PollInterval: time.Duration(readEnvInt("DOWNLOAD_TASK_POLL_MS", 1000)) * time.Millisecond,
-	})
-	manager.RegisterExecutor(downloadmgr.BizTypeCourse, downloadmgr.NewCourseExecutor(ctx))
-	manager.RegisterExecutor(downloadmgr.BizTypeOdob, downloadmgr.NewOdobExecutor(ctx))
-	manager.RegisterExecutor(downloadmgr.BizTypeEbook, downloadmgr.NewEbookExecutor(ctx))
-	if err = manager.Start(); err != nil {
+	if err := a.ensureDownloadManager(); err != nil {
 		fmt.Printf("启动下载任务管理器失败: %v\n", err)
-		return
 	}
-	a.DownloadRepo = repo
-	a.DownloadManager = manager
 
 	if err := wailsruntime.InitializeNotifications(ctx); err != nil {
 		fmt.Printf("初始化通知系统失败: %v\n", err)
@@ -84,9 +76,7 @@ func readEnvInt(name string, defaultValue int) int {
 }
 
 func (a *App) Shutdown(ctx context.Context) {
-	if a.DownloadManager != nil {
-		a.DownloadManager.Stop()
-	}
+	a.shutdownDownloadManager()
 	setupCleanupOnExit()
 }
 
