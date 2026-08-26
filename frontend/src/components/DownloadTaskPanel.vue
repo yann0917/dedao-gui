@@ -206,6 +206,10 @@ const initPosition = () => {
   position.value = { x: startX, y: startY }
 }
 
+const handleWindowResize = () => {
+  position.value = clampPosition(position.value.x, position.value.y)
+}
+
 const canCancel = (status: string) => ['pending', 'queued', 'running'].includes(String(status))
 const canRetry = (status: string) => ['failed', 'canceled'].includes(String(status))
 const canPause = (status: string) => ['pending', 'queued', 'running'].includes(String(status))
@@ -352,6 +356,7 @@ onMounted(async () => {
     refresh()
   }, 3000)
   window.addEventListener('download-task:open', handleOpenFromEvent)
+  window.addEventListener('resize', handleWindowResize)
 })
 
 onUnmounted(() => {
@@ -361,6 +366,7 @@ onUnmounted(() => {
     window.clearInterval(timer)
   }
   window.removeEventListener('download-task:open', handleOpenFromEvent)
+  window.removeEventListener('resize', handleWindowResize)
 })
 </script>
 
@@ -374,23 +380,43 @@ onUnmounted(() => {
 
 .task-button {
   width: 52px;
+  min-width: 52px;
   height: 52px;
+  min-height: 52px;
   padding: 0;
-  border-radius: 50%;
+  border-radius: 9999px !important;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   color: #fff;
-  background: linear-gradient(135deg, #6aa9ff 0%, #3b82f6 48%, #2563eb 100%);
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.32), 0 2px 8px rgba(37, 99, 235, 0.24);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--accent-hover-rgb, 255, 138, 61), 0.96) 0%,
+    var(--accent-color, #ff6b00) 52%,
+    rgba(var(--accent-color-rgb, 255, 107, 0), 0.92) 100%
+  );
+  box-shadow:
+    0 10px 24px rgba(var(--accent-color-rgb, 255, 107, 0), 0.28),
+    0 2px 8px rgba(var(--accent-color-rgb, 255, 107, 0), 0.2);
   transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.task-button :deep(span) {
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .task-button:hover {
   transform: translateY(-1px) scale(1.04);
   filter: brightness(1.05);
-  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.36), 0 3px 10px rgba(37, 99, 235, 0.3);
+  box-shadow:
+    0 12px 30px rgba(var(--accent-color-rgb, 255, 107, 0), 0.34),
+    0 3px 10px rgba(var(--accent-color-rgb, 255, 107, 0), 0.26);
 }
 
 .task-button:active {
@@ -407,13 +433,22 @@ onUnmounted(() => {
 
 @keyframes taskPulse {
   0% {
-    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.32), 0 2px 8px rgba(37, 99, 235, 0.24), 0 0 0 0 rgba(59, 130, 246, 0.4);
+    box-shadow:
+      0 10px 24px rgba(var(--accent-color-rgb, 255, 107, 0), 0.28),
+      0 2px 8px rgba(var(--accent-color-rgb, 255, 107, 0), 0.2),
+      0 0 0 0 rgba(var(--accent-color-rgb, 255, 107, 0), 0.28);
   }
   70% {
-    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.32), 0 2px 8px rgba(37, 99, 235, 0.24), 0 0 0 10px rgba(59, 130, 246, 0);
+    box-shadow:
+      0 10px 24px rgba(var(--accent-color-rgb, 255, 107, 0), 0.28),
+      0 2px 8px rgba(var(--accent-color-rgb, 255, 107, 0), 0.2),
+      0 0 0 10px rgba(var(--accent-color-rgb, 255, 107, 0), 0);
   }
   100% {
-    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.32), 0 2px 8px rgba(37, 99, 235, 0.24), 0 0 0 0 rgba(59, 130, 246, 0);
+    box-shadow:
+      0 10px 24px rgba(var(--accent-color-rgb, 255, 107, 0), 0.28),
+      0 2px 8px rgba(var(--accent-color-rgb, 255, 107, 0), 0.2),
+      0 0 0 0 rgba(var(--accent-color-rgb, 255, 107, 0), 0);
   }
 }
 

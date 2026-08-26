@@ -59,6 +59,8 @@ export function setThemeColor(color:any) {
   // 生成主题色的悬停效果色
   const hoverColor = adjustBrightness(color, 20);
   el.style.setProperty("--accent-hover", hoverColor);
+  el.style.setProperty("--accent-color-rgb", toRgbChannels(color));
+  el.style.setProperty("--accent-hover-rgb", toRgbChannels(hoverColor));
   
   // 判断当前主题模式
   const isDark = el.classList.contains('theme-dark');
@@ -117,6 +119,20 @@ function adjustBrightness(color: string, percent: number): string {
   return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
     (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
     (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+}
+
+function toRgbChannels(color: string): string {
+  const normalized = String(color ?? "").trim().replace("#", "");
+  if (normalized.length !== 6) {
+    return "255, 107, 0";
+  }
+  const r = parseInt(normalized.slice(0, 2), 16);
+  const g = parseInt(normalized.slice(2, 4), 16);
+  const b = parseInt(normalized.slice(4, 6), 16);
+  if ([r, g, b].some(Number.isNaN)) {
+    return "255, 107, 0";
+  }
+  return `${r}, ${g}, ${b}`;
 }
 
 // 生成暗色模式下的主题色变体
