@@ -1,92 +1,126 @@
-/* Global CSS Variables - Fresh Efficiency Theme */
+/* Global CSS Variables - 书斋印刷风(与 dedao-dl webui 同一设计语言)
+ * 暖纸底 / 朱砂红 accent / 直角细线面板 / 无弥散阴影 / 无衬线
+ */
 :root {
   /* Fonts */
-  --font-family-base: 'PingFang SC', 'Helvetica Neue', Helvetica, 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  --font-family-base: 'PingFang SC', 'Hiragino Sans GB', 'Source Han Sans SC', 'Noto Sans CJK SC', 'Microsoft YaHei', -apple-system, 'Segoe UI', sans-serif;
   --font-family-mono: 'JetBrainsMono', ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   --font-family-wenkai: "LXGW WenKai Lite", sans-serif;
 
-  /* Colors */
-  --primary-color: #409EFF;
-  --accent-color: #FF6B00;
-  --success-color: #67C23A;
-  --warning-color: #E6A23C;
-  --danger-color: #F56C6C;
-  
+  /* Colors - 暖纸底 + 朱砂红 */
+  --primary-color: var(--accent-color);
+  --accent-color: #d32e22;
+  --accent-hover: #e04a30;
+  --accent-soft: var(--el-color-primary-light-9, #f7ece9);
+  --accent-contrast: #ffffff;
+  --success-color: #30915e;
+  --warning-color: #ee8f1b;
+  --danger-color: #dd2c2c;
+  --info-color: #696059;
+
   /* Backgrounds */
-  --bg-color: #f5f7fa;
+  --bg-color: #f8f6f1;
   --card-bg-light: #ffffff;
-  --card-bg-dark: #1d1e1f;
-  
+  --card-bg-dark: #201b18;
+
   /* Text */
-  --text-primary: #303133;
-  --text-regular: #606266;
-  --text-secondary: #909399;
-  --text-placeholder: #C0C4CC;
-  
+  --text-primary: #2b221d;
+  --text-regular: #50463f;
+  --text-secondary: #696059;
+  --text-placeholder: #a89f96;
+
   /* Fill */
-  --fill-color: #ecf5ff;
-  --fill-color-light: #f5f7fa;
-  --fill-color-dark: #e6e8eb;
-  
+  --fill-color: #f3eee7;
+  --fill-color-light: #f6f1ea;
+  --fill-color-dark: #ede6de;
+
   /* Element Plus Overrides */
   --el-menu-bg-color: var(--card-bg);
   --el-menu-text-color: var(--text-primary);
   --el-menu-hover-bg-color: var(--fill-color-light);
-  --el-menu-active-color: var(--primary-color);
-  --el-color-primary: var(--primary-color);
+  --el-menu-active-color: var(--accent-color);
+  --el-color-primary: var(--accent-color);
+  --el-color-success: var(--success-color);
+  --el-color-warning: var(--warning-color);
+  --el-color-danger: var(--danger-color);
+  --el-color-error: var(--danger-color);
+  --el-color-info: var(--info-color);
   --el-bg-color: var(--bg-color);
   --el-bg-color-overlay: var(--card-bg);
   --el-fill-color-light: var(--fill-color-light);
   --el-font-family: var(--font-family-base);
+  --el-border-radius-base: 4px;
+  --el-border-radius-small: 2px;
+  --el-border-radius-round: 999px;
 
   /* Aliases for compatibility */
   --card-bg: var(--card-bg-light);
-  --card-hover-bg: #ffffff;
+  --card-hover-bg: #f6f1ea;
   --menu-bg: var(--card-bg-light);
   --menu-hover-bg: var(--fill-color-light);
-  
-  --text-tertiary: #C0C4CC;
-  
-  /* Borders & Shadows */
-  --border-radius-base: 12px;
-  --border-radius-small: 8px;
-  --border-radius-round: 20px;
-  --border-soft: #EBEEF5;
-  
-  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
-  --shadow-medium: 0 6px 16px rgba(0, 0, 0, 0.08);
-  --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
-  
+
+  --text-tertiary: #a89f96;
+
+  /* Borders & Shadows - 细线优先,阴影只留一层极轻落影 */
+  --border-radius-base: 4px;
+  --border-radius-small: 2px;
+  --border-radius-round: 999px;
+  --border-soft: #ede6de;
+  --border-strong: #c6b6a9;
+
+  --shadow-soft: 0 1px 2px rgba(43, 34, 29, 0.05);
+  --shadow-medium: 0 1px 2px rgba(43, 34, 29, 0.06);
+  --shadow-hover: 0 1px 2px rgba(43, 34, 29, 0.08);
+
   /* Transitions */
-  --transition-base: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  --transition-fast: all 0.2s ease-in-out;
+  --transition-base: all 0.2s ease;
+  --transition-fast: all 0.15s ease-in-out;
 }
 
-/* Force override Element Plus font family */
-.el-button, .el-input, .el-select, .el-menu, .el-dialog, .el-message, .el-notification, .el-tag, .el-table {
-  font-family: var(--font-family-base) !important;
-}
-
-/* Dark Mode Variables */
+/* Dark Mode Variables - 暖褐暗底 */
 html.theme-dark {
-  --bg-color: #141414;
-  --card-bg-light: #1d1e1f;
-  --card-hover-bg: #2b2d30;
-  --fill-color: #2a3d54;
-  --fill-color-light: #262727;
-  --fill-color-dark: #1f2022;
-  
-  --text-primary: #E5EAF3;
-  --text-regular: #A3A6AD;
-  --text-secondary: #8D9095;
-  --text-tertiary: #6C6E72;
-  --text-placeholder: #6C6E72;
-  
-  --border-soft: #4C4D4F;
-  
-  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.3);
-  --shadow-medium: 0 6px 16px rgba(0, 0, 0, 0.4);
-  --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --primary-color: var(--accent-color);
+  --accent-color: var(--accent-color-dark, #e95f49);
+  --accent-hover: var(--accent-hover-dark, #f07a5e);
+  --accent-soft: var(--el-color-primary-light-9, #341b18);
+  --accent-contrast: #241b16;
+  --success-color: #54c086;
+  --warning-color: #f4b152;
+  --danger-color: #eb6f6f;
+  --info-color: #b1a8a0;
+
+  --bg-color: #181411;
+  --card-bg-light: #201b18;
+  --card-hover-bg: #2e2824;
+
+  --text-primary: #f3f0ec;
+  --text-regular: #d8d1ca;
+  --text-secondary: #b1a8a0;
+  --text-placeholder: #7a6f66;
+  --text-tertiary: #7a6f66;
+
+  --fill-color: #2e2824;
+  --fill-color-light: #262019;
+  --fill-color-dark: #201b18;
+
+  --el-menu-hover-bg-color: var(--fill-color-light);
+
+  --border-soft: #39322d;
+  --border-strong: #4d433d;
+
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 1px 2px rgba(0, 0, 0, 0.36);
+  --shadow-hover: 0 1px 2px rgba(0, 0, 0, 0.42);
+}
+
+/* setThemeColor 动态写入的源色映射:亮/暗各取所需,避免内联样式压过暗色 accent */
+:root {
+  --accent-color: var(--accent-color-light, #d32e22);
+  --accent-hover: var(--accent-hover-light, #e04a30);
+}
+html.theme-dark {
+  --accent-color: var(--accent-color-dark, var(--accent-color-light, #e95f49));
+  --accent-hover: var(--accent-hover-dark, var(--accent-hover-light, #f07a5e));
 }
 
 body {
@@ -99,6 +133,36 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 全局纸面颗粒:一层极低透明度噪点,替代渐变光晕(与 dedao-dl 一致) */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+}
+
+html.theme-dark body::after {
+  opacity: 0.06;
+  mix-blend-mode: screen;
+}
+
+/* 键盘焦点全局可见 */
+:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* 浏览器对 button 的默认光标是箭头 */
+button:not(:disabled),
+[role="button"]:not(:disabled) {
+  cursor: pointer;
+}
+
 /* Global Scrollbar Styling - Hidden for cleanliness */
 ::-webkit-scrollbar {
   width: 0 !important;
@@ -106,11 +170,16 @@ body {
   display: none !important;
 }
 
-/* Element Plus Component Overrides for "Fresh Efficiency" Look */
+/* Force override Element Plus font family */
+.el-button, .el-input, .el-select, .el-menu, .el-dialog, .el-message, .el-notification, .el-tag, .el-table {
+  font-family: var(--font-family-base) !important;
+}
 
-/* Buttons */
+/* Element Plus 组件覆盖:直角 + 1px 细线 + 无弥散阴影 */
+
+/* 按钮:维持 EP 默认 hover(primary-light 系),不做抬升 */
 .el-button {
-  border-radius: var(--border-radius-small);
+  border-radius: var(--el-border-radius-base);
   font-weight: 500;
   transition: var(--transition-fast);
 }
@@ -119,30 +188,27 @@ body {
   padding: 8px 16px;
 }
 
-.el-button:not(.el-button--primary):not(.el-button--success):not(.el-button--warning):not(.el-button--danger):not(.el-button--info):hover {
-  background-color: var(--fill-color-light);
-  border-color: var(--border-soft);
-  color: var(--text-primary);
-}
-
-/* Cards */
+/* 卡片:直角细线面板,无阴影,hover 只加深边线 */
 .el-card {
-  border-radius: var(--border-radius-base);
-  border: none !important; /* Remove default border */
-  box-shadow: var(--shadow-soft) !important;
-  background-color: var(--card-bg-light);
-  transition: var(--transition-base);
-  overflow: visible !important; /* Allow hover effects to pop out if needed */
+  border-radius: 0;
+  border: 1px solid var(--border-soft) !important;
+  box-shadow: none !important;
+  background-color: var(--card-bg);
+  transition: border-color 0.2s ease;
 }
 
-/* Menus */
+.el-card:hover {
+  border-color: var(--border-strong);
+}
+
+/* 菜单 */
 .el-menu {
   border-right: none !important;
   background-color: transparent !important;
 }
 
 .el-menu-item {
-  border-radius: var(--border-radius-small);
+  border-radius: var(--el-border-radius-small);
   margin: 4px 8px;
   height: 48px;
   line-height: 48px;
@@ -158,40 +224,41 @@ body {
   background-color: var(--fill-color-light) !important;
 }
 
-/* Dialogs */
+/* 对话框:直角面板 + 细线 */
 .el-dialog {
-  border-radius: var(--border-radius-base);
-  box-shadow: var(--shadow-hover) !important;
-  overflow: hidden; /* Ensure content respects border radius */
+  border-radius: 0;
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-soft) !important;
+  overflow: hidden;
 }
 
 .el-dialog__header {
   padding: 20px;
   margin-right: 0;
-  border-bottom: 1px solid var(--fill-color-light);
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .el-dialog__footer {
   padding: 20px;
-  border-top: 1px solid var(--fill-color-light);
+  border-top: 1px solid var(--border-soft);
 }
 
-/* Inputs */
+/* 输入框:细线,直角 */
 .el-input__wrapper {
-  border-radius: var(--border-radius-small);
-  box-shadow: 0 0 0 1px var(--text-placeholder) inset !important;
+  border-radius: var(--el-border-radius-small);
+  box-shadow: 0 0 0 1px var(--border-color, var(--border-soft)) inset !important;
 }
 
 .el-input__wrapper:hover {
-  box-shadow: 0 0 0 1px var(--text-secondary) inset !important;
+  box-shadow: 0 0 0 1px var(--border-strong) inset !important;
 }
 
 .el-input__wrapper.is-focus {
-  box-shadow: 0 0 0 1px var(--primary-color) inset !important;
+  box-shadow: 0 0 0 1px var(--accent-color) inset !important;
 }
 
-/* Tags */
+/* 标签:印章式小胶囊 */
 .el-tag {
-  border-radius: 4px;
-  border: none;
+  border-radius: 999px;
+  border-color: transparent;
 }

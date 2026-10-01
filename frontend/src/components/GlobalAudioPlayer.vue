@@ -555,7 +555,7 @@ onUnmounted(() => {
 }
 
 .playlist-item.active {
-  background: rgba(255, 107, 0, 0.12);
+  background: rgba(var(--accent-color-rgb, 211, 46, 34), 0.12);
 }
 
 .playlist-title {

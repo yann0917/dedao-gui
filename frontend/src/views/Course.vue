@@ -392,26 +392,22 @@ const closeDownloadDialog = () => {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 20px;
-    padding: 4px; /* 防止阴影被切 */
 }
 
 .course-card {
-    background: var(--card-bg, #fff);
-    border-radius: 12px;
-    box-shadow: var(--shadow-soft, 0 2px 12px rgba(0, 0, 0, 0.08));
+    background: var(--card-bg);
+    border-radius: 0;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: border-color 0.2s ease;
     cursor: pointer;
     position: relative;
-    border: 1px solid var(--border-soft, #ebeef5);
+    border: 1px solid var(--border-soft);
     display: flex;
     flex-direction: column;
 }
 
 .course-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-medium, 0 8px 24px rgba(0, 0, 0, 0.12));
-    border-color: transparent;
+    border-color: var(--border-strong);
 }
 
 .card-cover {
@@ -430,7 +426,7 @@ const closeDownloadDialog = () => {
 }
 
 .course-card:hover .card-cover .el-image {
-    transform: scale(1.05);
+    transform: none;
 }
 
 .image-placeholder, .no-cover {
@@ -557,7 +553,7 @@ const closeDownloadDialog = () => {
 }
 
 .meta-progress {
-    color: var(--accent-color, #ff6b00);
+    color: var(--accent-color);
     font-weight: 500;
 }
 
@@ -570,7 +566,7 @@ const closeDownloadDialog = () => {
 
 .progress-fill {
     height: 100%;
-    background: var(--accent-color, #ff6b00);
+    background: var(--accent-color);
     border-radius: 2px;
     transition: width 0.3s ease;
 }

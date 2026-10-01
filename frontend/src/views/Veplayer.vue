@@ -294,7 +294,7 @@ onUnmounted(() => {
 .veplayer-container {
   width: 100%;
   height: 100%;
-  border-radius: 12px;
+  border-radius: 4px;
   overflow: hidden;
   background: #000;
 }
@@ -306,7 +306,7 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   background: var(--bg-color);
-  border-radius: 12px;
+  border-radius: 4px;
   z-index: 2;
 }
 
@@ -317,7 +317,7 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   background: var(--bg-color);
-  border-radius: 12px;
+  border-radius: 4px;
   z-index: 3;
 }
 </style>

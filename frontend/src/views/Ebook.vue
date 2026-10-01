@@ -591,7 +591,7 @@ const stripHtml = (html: string) => {
 
 .ebook-card {
   background-color: var(--card-bg);
-  border-radius: 12px;
+  border-radius: 4px;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--border-color);
@@ -602,9 +602,7 @@ const stripHtml = (html: string) => {
 }
 
 .ebook-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-medium);
-  border-color: var(--primary-color-light);
+  border-color: var(--border-strong);
 }
 
 .card-cover {
@@ -621,7 +619,7 @@ const stripHtml = (html: string) => {
 }
 
 .ebook-card:hover .cover-image {
-  transform: scale(1.05);
+  transform: none;
 }
 
 .no-cover {
@@ -707,7 +705,7 @@ const stripHtml = (html: string) => {
   border-radius: 4px;
   font-size: 12px;
   font-weight: 600;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
 }
 
 .card-overlay {

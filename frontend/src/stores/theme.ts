@@ -8,8 +8,8 @@ export const themeStore = defineStore("themeStore",  {
         return {
             // 主题模式：'light' | 'dark'
             theme: 'light' as 'light' | 'dark',
-            // 主题颜色
-            color: '#ff6b00',
+            // 主题颜色(朱砂红,与 dedao-dl webui 一致)
+            color: '#d32e22',
         }
     },
     getters: {
@@ -55,6 +55,10 @@ export const themeStore = defineStore("themeStore",  {
         // 初始化主题
         initTheme() {
             console.log('初始化主题，当前主题:', this.theme);
+            // 旧默认主题色(橙色)一次性迁移到朱砂红,持久化存储会随之更新
+            if (this.color === '#ff6b00' || !this.color) {
+                this.color = '#d32e22';
+            }
             this.applyTheme();
         }
     },

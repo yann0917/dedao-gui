@@ -78,7 +78,7 @@ const handleCurrentChange = (val:any)=>{
 
 .custom-pagination :deep(.el-pagination__sizes .el-select .el-input__inner:focus) {
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px var(--accent-color, rgba(255, 107, 0, 0.2));
+    box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb, 211, 46, 34), 0.3);
 }
 
 .custom-pagination :deep(.el-pager li) {
@@ -97,13 +97,11 @@ const handleCurrentChange = (val:any)=>{
     color: var(--accent-color);
     background-color: var(--card-hover-bg);
     border-color: var(--accent-color);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-soft);
 }
 
 .custom-pagination :deep(.el-pager li.is-active) {
     background-color: var(--accent-color);
-    color: #fff;
+    color: var(--accent-contrast, #fff);
     border-color: var(--accent-color);
     font-weight: 500;
 }
@@ -111,7 +109,7 @@ const handleCurrentChange = (val:any)=>{
 .custom-pagination :deep(.el-pager li.is-active:hover) {
     background-color: var(--accent-hover);
     border-color: var(--accent-hover);
-    color: #fff;
+    color: var(--accent-contrast, #fff);
 }
 
 .custom-pagination :deep(.btn-prev),
@@ -132,8 +130,6 @@ const handleCurrentChange = (val:any)=>{
     color: var(--accent-color);
     background-color: var(--card-hover-bg);
     border-color: var(--accent-color);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-soft);
 }
 
 .custom-pagination :deep(.btn-prev:disabled),
@@ -173,7 +169,7 @@ const handleCurrentChange = (val:any)=>{
 
 .custom-pagination :deep(.el-pagination__jump .el-input__inner:focus) {
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px var(--accent-color, rgba(255, 107, 0, 0.2));
+    box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb, 211, 46, 34), 0.3);
 }
 
 /* 暗色模式下的分页器样式 */
@@ -193,7 +189,7 @@ const handleCurrentChange = (val:any)=>{
 
 .theme-dark .custom-pagination :deep(.el-pagination__sizes .el-select .el-input__inner:focus) {
     border-color: var(--accent-color) !important;
-    box-shadow: 0 0 0 2px var(--accent-color, rgba(255, 107, 0, 0.2)) !important;
+    box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb, 211, 46, 34), 0.3) !important;
 }
 
 .theme-dark .custom-pagination :deep(.el-pager li) {
@@ -264,6 +260,6 @@ const handleCurrentChange = (val:any)=>{
 
 .theme-dark .custom-pagination :deep(.el-pagination__jump .el-input__inner:focus) {
     border-color: var(--accent-color) !important;
-    box-shadow: 0 0 0 2px var(--accent-color, rgba(255, 107, 0, 0.2)) !important;
+    box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb, 211, 46, 34), 0.3) !important;
 }
 </style>

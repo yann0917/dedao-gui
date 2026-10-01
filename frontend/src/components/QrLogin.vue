@@ -192,7 +192,7 @@ const closeDialog = () => {
 .qr-container {
   background: var(--bg-color);
   padding: 20px;
-  border-radius: 12px;
+  border-radius: 4px;
   box-shadow: var(--shadow-inner);
   margin-bottom: 24px;
 }
@@ -235,7 +235,7 @@ const closeDialog = () => {
 }
 
 :deep(.el-dialog) {
-  border-radius: 16px;
+  border-radius: 4px;
   overflow: hidden;
   background: var(--card-bg);
   box-shadow: var(--shadow-heavy);

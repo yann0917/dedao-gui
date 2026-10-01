@@ -47,7 +47,7 @@ const predefineColors = ref([
 .about-content {
   background: var(--card-bg);
   padding: 40px;
-  border-radius: 16px;
+  border-radius: 4px;
   box-shadow: var(--shadow-soft);
   text-align: center;
   min-width: 300px;

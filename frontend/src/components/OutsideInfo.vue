@@ -283,9 +283,7 @@ const formatDuration = (duration: number) => {
 
 .course-row:hover {
   background: var(--card-hover-bg);
-  border-color: var(--accent-color);
-  box-shadow: var(--shadow-soft);
-  transform: translateY(-1px);
+  border-color: var(--border-strong);
 }
 
 .course-cover {

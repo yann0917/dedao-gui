@@ -113,7 +113,7 @@ const articleDetail = async (aType: number, enid: string) => {
     line-height: 1.8;
     background: var(--card-bg);
     padding: 32px;
-    border-radius: 12px;
+    border-radius: 4px;
     box-shadow: var(--shadow-soft);
     margin-top: 20px;
     max-width: 900px; /* Improve readability */

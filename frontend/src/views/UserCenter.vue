@@ -247,7 +247,7 @@ getOdobUserInfo()
 .user-card {
     max-width: 800px;
     margin: 0 auto;
-    border-radius: 12px;
+    border-radius: 0;
 }
 
 .user-header {
@@ -261,12 +261,7 @@ getOdobUserInfo()
 }
 
 .user-avatar {
-    border: 4px solid rgba(255, 107, 0, 0.1);
-    transition: transform 0.3s ease;
-}
-
-.user-avatar:hover {
-    transform: scale(1.05);
+    border: 1px solid var(--border-soft);
 }
 
 .avatar-container {
@@ -280,7 +275,7 @@ getOdobUserInfo()
     background: var(--accent-color);
     color: white;
     padding: 4px 8px;
-    border-radius: 16px;
+    border-radius: 4px;
     font-size: 12px;
     font-weight: 500;
     display: flex;
@@ -322,7 +317,7 @@ getOdobUserInfo()
     display: flex;
     align-items: center;
     padding: 8px 16px;
-    border-radius: 24px;
+    border-radius: 4px;
     gap: 8px;
     transition: all 0.3s ease;
     cursor: default;
@@ -332,16 +327,15 @@ getOdobUserInfo()
 }
 
 .vip-badge:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-light);
+    filter: brightness(1.05);
 }
 
 .vip-badge.odob {
-    background: linear-gradient(135deg, #ff6b35 0%, #ff9800 100%);
+    background: var(--accent-color);
 }
 
 .vip-badge.ebook {
-    background: linear-gradient(135deg, #e91e63 0%, #f44336 100%);
+    background: var(--danger-color);
 }
 
 .badge-icon {
@@ -380,10 +374,9 @@ getOdobUserInfo()
     align-items: center;
     gap: 40px;
     margin-bottom: 30px;
-    padding: 20px;
-    background: var(--fill-color-light);
-    border-radius: 12px;
-    border: 1px solid var(--border-soft);
+    padding: 18px 20px;
+    border-top: 1px solid var(--border-soft);
+    border-bottom: 1px solid var(--border-soft);
 }
 
 .stat-item {
@@ -394,8 +387,9 @@ getOdobUserInfo()
 }
 
 .stat-value {
-    font-size: 28px;
-    font-weight: 500;
+    font-family: var(--font-family-mono);
+    font-size: 22px;
+    font-weight: 600;
     color: var(--accent-color);
 }
 
@@ -459,7 +453,7 @@ getOdobUserInfo()
 .el-tag {
     padding: 8px 16px;
     font-size: 14px;
-    border-radius: 6px;
+    border-radius: 999px;
 }
 
 /* 新的样式 */
@@ -469,7 +463,7 @@ getOdobUserInfo()
     gap: 16px;
     padding: 16px;
     background: var(--fill-color-light);
-    border-radius: 12px;
+    border-radius: 0;
     border: 1px solid var(--border-soft);
     flex: 1;
 }
@@ -511,21 +505,16 @@ getOdobUserInfo()
 
 .stat-card {
     flex: 1;
-    padding: 20px;
-    background: var(--fill-color-light);
-    border-radius: 12px;
+    padding: 16px 20px;
+    background: transparent;
+    border-radius: 0;
     border: 1px solid var(--border-soft);
     text-align: center;
-    transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-light);
 }
 
 .stat-card .stat-number {
-    font-size: 28px;
+    font-family: var(--font-family-mono);
+    font-size: 22px;
     font-weight: 600;
     color: var(--accent-color);
     margin-bottom: 8px;
@@ -541,15 +530,16 @@ getOdobUserInfo()
     align-items: center;
     gap: 12px;
     padding: 16px;
-    background: linear-gradient(135deg, rgba(67, 160, 71, 0.1) 0%, rgba(67, 160, 71, 0.05) 100%);
-    border-radius: 12px;
-    border: 1px solid rgba(67, 160, 71, 0.2);
+    background: transparent;
+    border-radius: 0;
+    border-top: 1px solid var(--border-soft);
+    border-bottom: 1px solid var(--border-soft);
     width: 100%;
 }
 
 .savings-highlight .el-icon {
-    font-size: 24px;
-    color: #43a047;
+    font-size: 20px;
+    color: var(--accent-color);
 }
 
 .savings-text {
@@ -558,9 +548,10 @@ getOdobUserInfo()
 }
 
 .savings-amount {
+    font-family: var(--font-family-mono);
     font-size: 18px;
     font-weight: 600;
-    color: #43a047;
+    color: var(--accent-color);
     margin-left: auto;
 }
 
@@ -613,13 +604,8 @@ getOdobUserInfo()
     border-color: var(--border-soft) !important;
 }
 
-.theme-dark .savings-highlight {
-    background: linear-gradient(135deg, rgba(67, 160, 71, 0.15) 0%, rgba(67, 160, 71, 0.08) 100%) !important;
-    border-color: rgba(67, 160, 71, 0.25) !important;
-}
-
 .theme-dark .savings-highlight .el-icon {
-    color: #66bb6a !important;
+    color: var(--accent-color) !important;
 }
 
 .logout-section {
@@ -633,20 +619,11 @@ getOdobUserInfo()
 .logout-btn {
     padding: 12px 32px;
     font-size: 16px;
-    border-radius: 8px;
+    border-radius: 4px;
 }
 
 .logout-btn .el-icon {
     margin-right: 8px;
-}
-
-.logout-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
-}
-
-.logout-btn:active {
-    transform: translateY(0);
 }
 
 /* 暗色主题退出按钮样式 */

@@ -38,8 +38,8 @@
           <div class="avatar-wrapper">
             <el-avatar :size="40" :src="item.f_part.avatar" />
             <div class="vip-badge" v-if="item.f_part.is_v">
-               <el-icon v-if="item.f_part.is_v==2" color="#ff6b00"><Medal /></el-icon>
-               <el-icon v-if="item.f_part.is_v==3||item.f_part.is_v==4" color="#ff6b00"><Trophy /></el-icon>
+               <el-icon v-if="item.f_part.is_v==2" color="var(--accent-color)"><Medal /></el-icon>
+               <el-icon v-if="item.f_part.is_v==3||item.f_part.is_v==4" color="var(--accent-color)"><Trophy /></el-icon>
             </div>
           </div>
           <div class="user-meta">

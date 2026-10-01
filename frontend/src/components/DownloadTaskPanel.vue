@@ -389,17 +389,10 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   border: none;
-  color: #fff;
-  background: linear-gradient(
-    135deg,
-    rgba(var(--accent-hover-rgb, 255, 138, 61), 0.96) 0%,
-    var(--accent-color, #ff6b00) 52%,
-    rgba(var(--accent-color-rgb, 255, 107, 0), 0.92) 100%
-  );
-  box-shadow:
-    0 10px 24px rgba(var(--accent-color-rgb, 255, 107, 0), 0.28),
-    0 2px 8px rgba(var(--accent-color-rgb, 255, 107, 0), 0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  color: var(--accent-contrast, #fff);
+  background: var(--accent-color);
+  box-shadow: 0 1px 2px rgba(43, 34, 29, 0.25);
+  transition: filter 0.2s ease;
 }
 
 .task-button :deep(span) {
@@ -412,15 +405,7 @@ onUnmounted(() => {
 }
 
 .task-button:hover {
-  transform: translateY(-1px) scale(1.04);
   filter: brightness(1.05);
-  box-shadow:
-    0 12px 30px rgba(var(--accent-color-rgb, 255, 107, 0), 0.34),
-    0 3px 10px rgba(var(--accent-color-rgb, 255, 107, 0), 0.26);
-}
-
-.task-button:active {
-  transform: translateY(0) scale(0.98);
 }
 
 .task-icon {
@@ -428,28 +413,9 @@ onUnmounted(() => {
 }
 
 .task-button-active {
-  animation: taskPulse 1.8s ease-in-out infinite;
-}
-
-@keyframes taskPulse {
-  0% {
-    box-shadow:
-      0 10px 24px rgba(var(--accent-color-rgb, 255, 107, 0), 0.28),
-      0 2px 8px rgba(var(--accent-color-rgb, 255, 107, 0), 0.2),
-      0 0 0 0 rgba(var(--accent-color-rgb, 255, 107, 0), 0.28);
-  }
-  70% {
-    box-shadow:
-      0 10px 24px rgba(var(--accent-color-rgb, 255, 107, 0), 0.28),
-      0 2px 8px rgba(var(--accent-color-rgb, 255, 107, 0), 0.2),
-      0 0 0 10px rgba(var(--accent-color-rgb, 255, 107, 0), 0);
-  }
-  100% {
-    box-shadow:
-      0 10px 24px rgba(var(--accent-color-rgb, 255, 107, 0), 0.28),
-      0 2px 8px rgba(var(--accent-color-rgb, 255, 107, 0), 0.2),
-      0 0 0 0 rgba(var(--accent-color-rgb, 255, 107, 0), 0);
-  }
+  box-shadow:
+    0 1px 2px rgba(43, 34, 29, 0.25),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.35);
 }
 
 .drawer-header {

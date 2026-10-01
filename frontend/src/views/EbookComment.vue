@@ -293,14 +293,12 @@ const handleStyleNote = (style_note_line: string) => {
 .waterfall-item {
   width: 100%;
   border: none;
-  border-radius: 12px;
+  border-radius: 4px;
   background: var(--card-bg);
-  box-shadow: var(--shadow-soft);
-  transition: all 0.3s ease;
-  
+  transition: border-color 0.2s ease;
+
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-medium);
+    border-color: var(--border-strong);
   }
   
   :deep(.el-card__header) {

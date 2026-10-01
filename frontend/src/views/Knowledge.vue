@@ -49,7 +49,7 @@ const timer = ()=> {
 .content-area {
     height: 100%;
     overflow-y: auto;
-    border-radius: 16px;
+    border-radius: 4px;
     /* Hide scrollbar for cleaner look */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE/Edge */
@@ -62,7 +62,7 @@ const timer = ()=> {
 .sidebar-area {
     height: 100%;
     overflow-y: auto;
-    border-radius: 12px;
+    border-radius: 4px;
     order: -1; /* Move sidebar to left on desktop */
 }
 

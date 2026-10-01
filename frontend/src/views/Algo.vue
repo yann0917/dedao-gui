@@ -776,10 +776,9 @@ const refreshAlgoData = () => {
 
 .filters {
   background: var(--card-bg);
-  border-radius: 12px;
+  border: 1px solid var(--border-soft);
   padding: 20px;
   margin-bottom: 24px;
-  box-shadow: var(--shadow-soft);
   flex-shrink: 0;
 }
 
@@ -808,7 +807,7 @@ const refreshAlgoData = () => {
   .filter-btn {
     font-size: 14px;
     padding: 6px 16px;
-    border-radius: 16px;
+    border-radius: 4px;
     transition: all 0.3s ease;
     color: var(--text-secondary);
     background: transparent;
@@ -816,21 +815,21 @@ const refreshAlgoData = () => {
 
     &:hover {
       color: var(--accent-color);
-      background: rgba(255, 107, 0, 0.05);
+      background: rgba(var(--accent-color-rgb, 211, 46, 34), 0.06);
     }
   }
 
   .active-btn {
     color: var(--accent-color);
     font-weight: 500;
-    background: rgba(255, 107, 0, 0.1);
+    background: rgba(var(--accent-color-rgb, 211, 46, 34), 0.1);
   }
 }
 
 .sub-options {
   background: var(--fill-color);
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 2px;
 }
 
 .filter-divider {
@@ -840,9 +839,8 @@ const refreshAlgoData = () => {
 
 .content-container {
   background: var(--card-bg);
-  border-radius: 12px;
+  border: 1px solid var(--border-soft);
   padding: 24px;
-  box-shadow: var(--shadow-soft);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -857,12 +855,13 @@ const refreshAlgoData = () => {
   flex-shrink: 0;
 
   .result-count {
-    font-size: 16px;
-    color: var(--text-primary);
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-family: var(--font-family-mono);
 
     .highlight {
-      color: var(--accent-color);
-      font-weight: 500;
+      color: var(--text-primary);
+      font-weight: 600;
     }
   }
 
@@ -923,14 +922,13 @@ const refreshAlgoData = () => {
 .content-item {
   .content-card {
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: border-color 0.2s ease;
     height: 100%;
     display: flex;
     flex-direction: column;
 
     &:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-medium);
+      border-color: var(--border-strong);
     }
   }
 }
@@ -945,7 +943,7 @@ const refreshAlgoData = () => {
   width: 100px;
   height: 133px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 2px;
   background: var(--fill-color-light);
   flex-shrink: 0;
 }
@@ -1033,8 +1031,8 @@ const refreshAlgoData = () => {
 }
 
 :deep(.el-card) {
-  border-radius: 12px;
-  border: none;
+  border-radius: 0;
+  border: 1px solid var(--border-soft);
   overflow: hidden;
   background: var(--card-bg);
 
@@ -1085,7 +1083,7 @@ const refreshAlgoData = () => {
 }
 
 .card-actions :deep(.el-tag) {
-  border-radius: 4px;
+  border-radius: 999px;
 }
 
 /* 暗色主题适配 */
@@ -1157,7 +1155,7 @@ const refreshAlgoData = () => {
 /* 确保选中按钮在暗色主题下可见 */
 .theme-dark .filter-btn.active-btn {
   color: var(--accent-color) !important;
-  background: rgba(255, 107, 0, 0.15) !important;
+  background: rgba(var(--accent-color-rgb, 211, 46, 34), 0.15) !important;
 }
 
 .theme-dark .filter-btn {
@@ -1166,6 +1164,6 @@ const refreshAlgoData = () => {
 
 .theme-dark .filter-btn:hover {
   color: var(--accent-color) !important;
-  background: rgba(255, 107, 0, 0.05) !important;
+  background: rgba(var(--accent-color-rgb, 211, 46, 34), 0.06) !important;
 }
 </style>

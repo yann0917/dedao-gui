@@ -597,7 +597,7 @@ const handleProd = (row: any) => {
 
 .odob-card {
     background: var(--card-bg);
-    border-radius: 16px;
+    border-radius: 4px;
     overflow: hidden;
     box-shadow: var(--shadow-soft);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -609,9 +609,7 @@ const handleProd = (row: any) => {
 }
 
 .odob-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-medium);
-    border-color: var(--accent-color);
+    border-color: var(--border-strong);
 }
 
 .card-cover {
@@ -632,7 +630,7 @@ const handleProd = (row: any) => {
 }
 
 .odob-card:hover .card-cover .el-image {
-    transform: scale(1.05);
+    transform: none;
 }
 
 .image-placeholder, .no-cover {

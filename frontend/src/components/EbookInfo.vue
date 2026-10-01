@@ -331,7 +331,6 @@ const gotoCommentList = (row: any) => {
   &:hover {
     background-color: var(--accent-hover);
     border-color: var(--accent-hover);
-    transform: translateY(-2px);
   }
 }
 

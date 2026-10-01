@@ -169,7 +169,7 @@ const download = async () => {
     justify-content: center;
     height: 40px;
     border: 1px solid var(--border-color, #dcdfe6);
-    border-radius: 8px;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s;
     background-color: var(--fill-color-light, #f5f7fa);
@@ -184,9 +184,9 @@ const download = async () => {
 }
 
 .format-option.active {
-    border-color: var(--primary-color, #409eff);
-    background-color: var(--primary-color, #409eff);
-    color: white;
+    border-color: var(--accent-color);
+    background-color: var(--accent-color);
+    color: var(--accent-contrast, #fff);
     font-weight: 500;
 }
 
@@ -201,7 +201,7 @@ const download = async () => {
     margin-top: 20px;
     background: var(--fill-color-lighter, #fafafa);
     padding: 16px;
-    border-radius: 8px;
+    border-radius: 4px;
     border: 1px solid var(--border-color-lighter, #ebeef5);
 }
 

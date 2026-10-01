@@ -621,8 +621,8 @@ const gotoCategory = (item: any, label_id: string) => {
   width: 200px;
   flex-shrink: 0;
   background: var(--card-bg);
-  border-radius: 12px;
-  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -685,9 +685,9 @@ const gotoCategory = (item: any, label_id: string) => {
 
 .banner-wrapper {
   flex: 1;
-  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: var(--shadow-medium);
   min-width: 0; /* 防止 Flex 子元素溢出 */
 }
 
@@ -695,11 +695,7 @@ const gotoCategory = (item: any, label_id: string) => {
   width: 100%;
   height: 100%;
   cursor: pointer;
-  transition: transform 0.5s ease;
-}
-
-.banner-image:hover {
-  transform: scale(1.02);
+  display: block;
 }
 
 .user-card-wrapper {
@@ -710,8 +706,8 @@ const gotoCategory = (item: any, label_id: string) => {
 .user-card {
   height: 100%;
   background: var(--card-bg);
-  border-radius: 12px;
-  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -722,7 +718,7 @@ const gotoCategory = (item: any, label_id: string) => {
 }
 
 .user-card.not-login {
-  background: linear-gradient(135deg, var(--card-bg) 0%, var(--fill-color-light) 100%);
+  background: var(--card-bg);
 }
 
 .login-placeholder {
@@ -733,7 +729,7 @@ const gotoCategory = (item: any, label_id: string) => {
   width: 64px;
   height: 64px;
   margin-bottom: 16px;
-  border-radius: 12px;
+  border-radius: 4px;
 }
 
 .login-placeholder p {
@@ -763,13 +759,12 @@ const gotoCategory = (item: any, label_id: string) => {
 }
 
 .user-avatar {
-  border: 4px solid var(--fill-color-light);
+  border: 1px solid var(--border-soft);
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: border-color 0.2s ease;
 }
 
 .user-avatar:hover {
-  transform: scale(1.05);
   border-color: var(--accent-color);
 }
 
@@ -784,9 +779,9 @@ const gotoCategory = (item: any, label_id: string) => {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background: var(--fill-color-light);
-  border-radius: 8px;
-  padding: 16px 8px;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+  padding: 14px 8px;
   margin-bottom: 10px;
 }
 
@@ -847,9 +842,22 @@ const gotoCategory = (item: any, label_id: string) => {
 }
 
 .module-title {
-  font-size: 24px;
+  position: relative;
+  padding-left: 12px;
+  font-size: 18px;
   color: var(--text-primary);
   margin: 0;
+}
+
+.module-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 1em;
+  background: var(--accent-color);
 }
 
 .module-desc {
@@ -872,7 +880,7 @@ const gotoCategory = (item: any, label_id: string) => {
   color: var(--text-secondary);
   cursor: pointer;
   padding: 4px 12px;
-  border-radius: 16px;
+  border-radius: 4px;
   background: var(--fill-color);
   transition: all 0.2s ease;
   white-space: nowrap;
@@ -908,18 +916,17 @@ const gotoCategory = (item: any, label_id: string) => {
 
 .content-card {
   background: var(--card-bg);
-  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: var(--shadow-soft);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.2s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
 }
 
 .content-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-medium);
+  border-color: var(--border-strong);
 }
 
 .card-cover {
@@ -937,7 +944,7 @@ const gotoCategory = (item: any, label_id: string) => {
 }
 
 .content-card:hover .card-cover img {
-  transform: scale(1.05);
+  transform: none;
 }
 
 .play-overlay {
@@ -980,13 +987,11 @@ const gotoCategory = (item: any, label_id: string) => {
   width: auto;
   height: 100%;
   max-width: 100%;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-  transition: transform 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
 }
 
 .content-card:hover .ebook-cover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.24);
 }
 
 .card-info {
@@ -1057,8 +1062,6 @@ const gotoCategory = (item: any, label_id: string) => {
     background-color: var(--fill-color-light);
     border-color: var(--accent-color);
     color: var(--accent-color);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-soft);
 }
 
 /* Responsive adjustments */

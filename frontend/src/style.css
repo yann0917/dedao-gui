@@ -1,105 +1,109 @@
 @import url("./assets/css/theme-overrides.css");
 
-/* CSS 变量定义 - 亮色主题 */
+/* CSS 变量定义 - 亮色主题(书斋印刷风,与 dedao-dl webui 同源) */
 :root {
-    --bg-color: #ffffff;
-    --text-color: #303133;
-    --text-color-secondary: #606266;
-    --text-color-placeholder: #a8abb2;
-    --border-color: #dcdfe6;
-    --border-color-light: #e4e7ed;
-    --border-color-lighter: #ebeef5;
-    --border-color-extra-light: #f2f6fc;
-    --fill-color: #f0f2f5;
-    --fill-color-light: #f5f7fa;
-    --fill-color-lighter: #fafafa;
-    --fill-color-extra-light: #fafcff;
+    --bg-color: #f8f6f1;
+    --text-color: #2b221d;
+    --text-color-secondary: #50463f;
+    --text-color-placeholder: #a89f96;
+    --border-color: #ded7cf;
+    --border-color-light: #e6dfd7;
+    --border-color-lighter: #ede6de;
+    --border-color-extra-light: #f4efe8;
+    --fill-color: #f3eee7;
+    --fill-color-light: #f6f1ea;
+    --fill-color-lighter: #faf6f0;
+    --fill-color-extra-light: #fbf8f3;
     --fill-color-blank: #ffffff;
-    --box-shadow: 0 12px 32px 4px rgba(0, 0, 0, 0.04), 0 8px 20px rgba(0, 0, 0, 0.08);
-    --box-shadow-light: 0 0 12px rgba(0, 0, 0, 0.12);
-    --box-shadow-lighter: 0 0 6px rgba(0, 0, 0, 0.12);
-    --box-shadow-dark: 0 16px 48px 16px rgba(0, 0, 0, 0.08), 0 12px 32px rgba(0, 0, 0, 0.12), 0 8px 16px -8px rgba(0, 0, 0, 0.16);
-    
+    --box-shadow: 0 1px 2px rgba(43, 34, 29, 0.04), 0 16px 44px rgba(43, 34, 29, 0.07);
+    --box-shadow-light: 0 1px 2px rgba(43, 34, 29, 0.06);
+    --box-shadow-lighter: 0 1px 2px rgba(43, 34, 29, 0.05);
+    --box-shadow-dark: 0 1px 2px rgba(43, 34, 29, 0.08);
+
     /* 扩展颜色变量 */
     --card-bg: #ffffff;
-    --card-hover-bg: #f5f7fa;
+    --card-hover-bg: #f6f1ea;
     --menu-bg: #ffffff;
-    --menu-hover-bg: #fff5f0;
-    --text-primary: #303133;
-    --text-secondary: #606266;
-    --text-tertiary: #909399;
-    --accent-color: #ff6b00;
-    --accent-hover: #ff7b1a;
-    --border-soft: #ebeef5;
-    --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.08);
-    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --menu-hover-bg: #f3eee7;
+    --text-primary: #2b221d;
+    --text-secondary: #50463f;
+    --text-tertiary: #696059;
+    --accent-color: #d32e22;
+    --accent-hover: #e04a30;
+    --accent-contrast: #ffffff;
+    --border-soft: #ede6de;
+    --border-strong: #c6b6a9;
+    --shadow-soft: 0 1px 2px rgba(43, 34, 29, 0.05);
+    --shadow-medium: 0 1px 2px rgba(43, 34, 29, 0.06);
 
     /* Element Plus 全局变量覆盖 - 统一色调 */
     --el-color-primary: var(--accent-color);
-    --el-color-primary-light-3: rgba(255, 107, 0, 0.3); /* 基于 #ff6b00 */
-    --el-color-primary-light-5: rgba(255, 107, 0, 0.2);
-    --el-color-primary-light-7: rgba(255, 107, 0, 0.1);
-    --el-color-primary-light-8: rgba(255, 107, 0, 0.05);
+    --el-color-primary-light-3: rgba(211, 46, 34, 0.3); /* 基于 #d32e22 */
+    --el-color-primary-light-5: rgba(211, 46, 34, 0.2);
+    --el-color-primary-light-7: rgba(211, 46, 34, 0.1);
+    --el-color-primary-light-8: rgba(211, 46, 34, 0.05);
     --el-color-primary-light-9: var(--fill-color); /* 最浅色直接用填充色，避免蓝色/橙色底 */
-    --el-color-primary-dark-2: #cc5600;
+    --el-color-primary-dark-2: #a9251b;
 }
 
-/* 暗色主题变量 */
+/* 暗色主题变量 - 暖褐暗底 */
 .theme-dark {
-    --bg-color: #0d1117;
-    --text-color: #f0f6fc;
-    --text-color-secondary: #c9d1d9;
-    --text-color-placeholder: #8b949e;
-    --border-color: #30363d;
-    --border-color-light: #21262d;
-    --border-color-lighter: #161b22;
-    --border-color-extra-light: #0d1117;
-    --fill-color: #21262d;
-    --fill-color-light: #161b22;
-    --fill-color-lighter: #0d1117;
-    --fill-color-extra-light: #010409;
-    --fill-color-blank: #0d1117;
-    --box-shadow: 0 12px 32px 4px rgba(0, 0, 0, 0.36), 0 8px 20px rgba(0, 0, 0, 0.72);
-    --box-shadow-light: 0 0 12px rgba(0, 0, 0, 0.72);
-    --box-shadow-lighter: 0 0 6px rgba(0, 0, 0, 0.72);
-    --box-shadow-dark: 0 16px 48px 16px rgba(0, 0, 0, 0.72), 0 12px 32px rgba(0, 0, 0, 0.84), 0 8px 16px -8px rgba(0, 0, 0, 0.96);
-    
+    --bg-color: #181411;
+    --text-color: #f3f0ec;
+    --text-color-secondary: #d8d1ca;
+    --text-color-placeholder: #7a6f66;
+    --border-color: #39322d;
+    --border-color-light: #332c27;
+    --border-color-lighter: #2e2824;
+    --border-color-extra-light: #262019;
+    --fill-color: #2e2824;
+    --fill-color-light: #262019;
+    --fill-color-lighter: #201b18;
+    --fill-color-extra-light: #1a1512;
+    --fill-color-blank: #181411;
+    --box-shadow: 0 1px 2px rgba(0, 0, 0, 0.36), 0 16px 44px rgba(0, 0, 0, 0.4);
+    --box-shadow-light: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --box-shadow-lighter: 0 1px 2px rgba(0, 0, 0, 0.36);
+    --box-shadow-dark: 0 1px 2px rgba(0, 0, 0, 0.46);
+
     /* 扩展颜色变量 - 优化对比度 */
-    --card-bg: #161b22;
-    --card-hover-bg: #21262d;
-    --menu-bg: #0d1117;
-    --menu-hover-bg: #161b22;
-    --text-primary: #f0f6fc;
-    --text-secondary: #c9d1d9;
-    --text-tertiary: #8b949e;
-    --accent-color: var(--accent-color, #ff6b00);
-    --accent-hover: var(--accent-hover, #ff7b1a);
-    --border-soft: #30363d;
-    --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.36);
-    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.48);
-    
+    --card-bg: #201b18;
+    --card-hover-bg: #2e2824;
+    --menu-bg: #181411;
+    --menu-hover-bg: #2e2824;
+    --text-primary: #f3f0ec;
+    --text-secondary: #d8d1ca;
+    --text-tertiary: #b1a8a0;
+    --accent-color: var(--accent-color-dark, #e95f49);
+    --accent-hover: var(--accent-hover-dark, #f07a5e);
+    --accent-contrast: #241b16;
+    --border-soft: #39322d;
+    --border-strong: #4d433d;
+    --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-medium: 0 1px 2px rgba(0, 0, 0, 0.36);
+
     /* 语义化颜色变量 - 暗色模式 */
     --primary-color: var(--accent-color);
-    --success-color: #67c23a;
-    --warning-color: #e6a23c;
-    --danger-color: #f56c6c;
-    --info-color: #909399;
+    --success-color: #54c086;
+    --warning-color: #f4b152;
+    --danger-color: #eb6f6f;
+    --info-color: #b1a8a0;
 
     /* 动态主题色变量 - 在暗色模式下使用更柔和的主题色 */
-    --accent-color-dark: var(--accent-color-dark, var(--accent-color));
-    --accent-hover-dark: var(--accent-hover-dark, var(--accent-hover));
-    --dark-bg-color: var(--dark-bg-color, #0d1117);
-    --dark-card-bg: var(--dark-card-bg, #161b22);
-    --dark-hover-bg: var(--dark-hover-bg, #21262d);
+    --accent-color-dark: var(--accent-color-dark, #e95f49);
+    --accent-hover-dark: var(--accent-hover-dark, #f07a5e);
+    --dark-bg-color: #181411;
+    --dark-card-bg: #201b18;
+    --dark-hover-bg: #2e2824;
 
     /* Element Plus 全局变量覆盖 - 暗色模式 */
     --el-color-primary: var(--accent-color);
-    --el-color-primary-light-3: rgba(255, 107, 0, 0.3);
-    --el-color-primary-light-5: rgba(255, 107, 0, 0.2);
-    --el-color-primary-light-7: rgba(255, 107, 0, 0.1);
-    --el-color-primary-light-8: rgba(255, 107, 0, 0.05);
+    --el-color-primary-light-3: rgba(233, 95, 73, 0.3);
+    --el-color-primary-light-5: rgba(233, 95, 73, 0.2);
+    --el-color-primary-light-7: rgba(233, 95, 73, 0.1);
+    --el-color-primary-light-8: rgba(233, 95, 73, 0.05);
     --el-color-primary-light-9: var(--fill-color);
-    --el-color-primary-dark-2: #cc5600;
+    --el-color-primary-dark-2: #b23e2c;
 }
 
 html {
@@ -327,7 +331,7 @@ body {
 
 .el-pagination__sizes .el-select .el-input__inner:focus {
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2);
+    box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb, 211, 46, 34), 0.25);
 }
 
 /* 分页器页码按钮 */
@@ -336,16 +340,14 @@ body {
     color: var(--text-primary);
     border: 1px solid var(--border-soft);
     margin: 0 2px;
-    border-radius: 4px;
-    transition: all 0.3s ease;
+    border-radius: 2px;
+    transition: all 0.15s ease;
 }
 
 .el-pagination .el-pager li:hover {
     color: var(--accent-color);
     background-color: var(--card-hover-bg);
     border-color: var(--accent-color);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-soft);
 }
 
 .el-pagination .el-pager li.is-active {
@@ -368,8 +370,8 @@ body {
     color: var(--text-primary);
     border: 1px solid var(--border-soft);
     margin: 0 2px;
-    border-radius: 4px;
-    transition: all 0.3s ease;
+    border-radius: 2px;
+    transition: all 0.15s ease;
 }
 
 .el-pagination .btn-prev:hover,
@@ -377,8 +379,6 @@ body {
     color: var(--accent-color);
     background-color: var(--card-hover-bg);
     border-color: var(--accent-color);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-soft);
 }
 
 .el-pagination .btn-prev:disabled,
@@ -418,7 +418,7 @@ body {
 
 .el-pagination__jump .el-input__inner:focus {
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2);
+    box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb, 211, 46, 34), 0.25);
 }
 
 /* 分页器背景模式 */
@@ -490,7 +490,7 @@ body {
     box-shadow: var(--shadow-medium);
     transition: all 0.3s ease;
     outline: none;
-    border-radius: 8px;
+    border-radius: 2px;
 }
 
 /* 强制覆盖所有可能的白边样式 */
@@ -613,17 +613,17 @@ body {
     background-color: var(--card-bg);
     border-color: var(--border-soft);
     box-shadow: var(--shadow-medium);
-    border-radius: 12px;
+    border-radius: 4px;
     padding: 8px 0;
-    transition: all 0.3s ease;
+    transition: all 0.15s ease;
 }
 
 .el-menu--popup .el-menu-item {
     background-color: transparent;
     color: var(--text-primary);
     margin: 0 8px;
-    border-radius: 4px;
-    transition: all 0.3s ease;
+    border-radius: 2px;
+    transition: all 0.15s ease;
 }
 
 .el-menu--popup .el-menu-item:hover {

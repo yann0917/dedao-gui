@@ -47,32 +47,27 @@ export const  timestampToDate = (timestamp:number)=> {
 
 export function setThemeColor(color:any) {
   const el = document.documentElement;
-  const body = document.querySelector("body");
-  
-  // 设置 Element Plus 主题色
-  el.style.setProperty("--el-color-primary", color);
-  body?.style.setProperty("--van-primary-color", color);
-  
-  // 设置自定义主题色变量
-  el.style.setProperty("--accent-color", color);
-  
+
+  // 只写入"源色"变量,--accent-color / --el-color-primary 由 CSS 按 亮/暗 模式映射,
+  // 避免内联样式压过暗色模式下更亮的 accent。
+  el.style.setProperty("--accent-color-light", color);
+
   // 生成主题色的悬停效果色
   const hoverColor = adjustBrightness(color, 20);
-  el.style.setProperty("--accent-hover", hoverColor);
+  el.style.setProperty("--accent-hover-light", hoverColor);
   el.style.setProperty("--accent-color-rgb", toRgbChannels(color));
   el.style.setProperty("--accent-hover-rgb", toRgbChannels(hoverColor));
-  
+
   // 判断当前主题模式
   const isDark = el.classList.contains('theme-dark');
   let mixColor = isDark ? "#000000" : "#ffffff";
-  
+
   // 生成主题色的各种变体
   for (let i = 1; i < 10; i++) {
     el.style.setProperty(`--el-color-primary-light-${i}`, colourBlend(color, mixColor, i / 10));
-    el.style.setProperty(`--el-color-primary-dark-${i}`, colourBlend(color, mixColor, i / 10));
   }
   el.style.setProperty(`--el-color-primary-dark-2`, colourBlend(color, mixColor, 0.2));
-  
+
   // 更新设置存储 - 在函数内部获取 store 实例
   try {
     const store = settingStore();
@@ -81,8 +76,8 @@ export function setThemeColor(color:any) {
   } catch (error) {
     console.warn('无法更新设置存储，可能 Pinia 尚未初始化:', error);
   }
-  
-  // 生成暗色模式下的主题色变体
+
+  // 生成暗色模式下的主题色变体(暗色下 accent 要提亮,与 dedao-dl 一致)
   if (isDark) {
     generateDarkThemeColors(color);
   }
@@ -124,36 +119,26 @@ function adjustBrightness(color: string, percent: number): string {
 function toRgbChannels(color: string): string {
   const normalized = String(color ?? "").trim().replace("#", "");
   if (normalized.length !== 6) {
-    return "255, 107, 0";
+    return "211, 46, 34";
   }
   const r = parseInt(normalized.slice(0, 2), 16);
   const g = parseInt(normalized.slice(2, 4), 16);
   const b = parseInt(normalized.slice(4, 6), 16);
   if ([r, g, b].some(Number.isNaN)) {
-    return "255, 107, 0";
+    return "211, 46, 34";
   }
   return `${r}, ${g}, ${b}`;
 }
 
-// 生成暗色模式下的主题色变体
+// 生成暗色模式下的主题色变体:暗底上 accent 提亮才够看
 function generateDarkThemeColors(primaryColor: string) {
   const el = document.documentElement;
-  
-  // 生成暗色模式下的主题色变体
-  const darkAccent = adjustBrightness(primaryColor, -10);
-  const darkAccentHover = adjustBrightness(primaryColor, 10);
-  
+
+  const darkAccent = adjustBrightness(primaryColor, 10);
+  const darkAccentHover = adjustBrightness(primaryColor, 25);
+
   el.style.setProperty("--accent-color-dark", darkAccent);
   el.style.setProperty("--accent-hover-dark", darkAccentHover);
-  
-  // 生成暗色模式下的背景色变体
-  const darkBg = adjustBrightness(primaryColor, -95);
-  const darkCardBg = adjustBrightness(primaryColor, -90);
-  const darkHoverBg = adjustBrightness(primaryColor, -85);
-  
-  el.style.setProperty("--dark-bg-color", darkBg);
-  el.style.setProperty("--dark-card-bg", darkCardBg);
-  el.style.setProperty("--dark-hover-bg", darkHoverBg);
 }
 
 export function colourBlend(c1:any, c2:any, ratio:any) {

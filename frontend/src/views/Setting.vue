@@ -200,7 +200,7 @@ const store = settingStore()
 const themeStoreInstance = themeStore()
 
 const predefineColors = ref([
-  '#ff6b00',
+  '#d32e22',
   '#ff4500',
   '#ff8c00',
   '#ffd700',
@@ -219,7 +219,7 @@ const predefineColors = ref([
 
 const form = reactive({
   downloadDir: store.getDownloadDir,
-  systemColor: themeStoreInstance.color || store.getColor || '#ff6b00',
+  systemColor: themeStoreInstance.color || store.getColor || '#d32e22',
   ffmpegDir: store.getFfmpegDirDir,
   wkhtmltopdfDir: store.getWkDir,
   fontFamily: store.setting.fontFamily || 'default',
@@ -228,7 +228,7 @@ const form = reactive({
 // 保存原始设置值用于重置
 const originalSettings = {
   downloadDir: store.getDownloadDir,
-  systemColor: themeStoreInstance.color || store.getColor || '#ff6b00',
+  systemColor: themeStoreInstance.color || store.getColor || '#d32e22',
   ffmpegDir: store.getFfmpegDirDir,
   wkhtmltopdfDir: store.getWkDir,
   fontFamily: store.setting.fontFamily || 'default',
@@ -345,15 +345,14 @@ const onSubmit = () => {
 }
 
 .setting-card {
-  border-radius: 16px;
+  border-radius: 4px;
   border: 1px solid var(--border-soft);
   background-color: var(--card-bg);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .setting-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-medium);
+  border-color: var(--border-strong);
 }
 
 .card-header {

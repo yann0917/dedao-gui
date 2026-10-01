@@ -627,11 +627,10 @@ onMounted(async () => {
       width: 120px;
       height: 120px;
       flex-shrink: 0;
-      border-radius: 16px;
+      border-radius: 0;
       overflow: hidden;
       background: var(--fill-color);
       border: 1px solid var(--border-soft);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 
       img {
         width: 100%;
@@ -659,9 +658,9 @@ onMounted(async () => {
         }
 
         .vip-tag {
-           background: linear-gradient(135deg, #ffd700, #ffa500);
+           background: var(--accent-color);
            border: none;
-           color: #fff;
+           color: var(--accent-contrast, #fff);
            font-weight: bold;
            letter-spacing: 1px;
         }
@@ -705,7 +704,7 @@ onMounted(async () => {
              gap: 10px;
              background: var(--fill-color);
              padding: 6px 16px 6px 6px;
-             border-radius: 50px;
+             border-radius: 999px;
              border: 1px solid var(--border-soft);
 
              .person-name {
@@ -727,7 +726,7 @@ onMounted(async () => {
                gap: 8px;
                background: var(--fill-color);
                padding: 4px 12px 4px 4px;
-               border-radius: 50px;
+               border-radius: 999px;
                border: 1px solid var(--border-soft);
                
                .person-name {
@@ -752,7 +751,7 @@ onMounted(async () => {
         background: rgba(255, 255, 255, 0.5);
         backdrop-filter: blur(10px);
         padding: 20px;
-        border-radius: 16px;
+        border-radius: 4px;
         border: 1px solid var(--border-soft);
         text-align: center;
         transition: all 0.3s ease;
@@ -778,15 +777,14 @@ onMounted(async () => {
       }
 
       .status-card {
-        background: linear-gradient(135deg, #2c3e50, #000000);
-        color: #ffd700;
+        background: var(--bg-inverse, #2b221d);
+        color: #f3f0ec;
         padding: 16px;
-        border-radius: 16px;
+        border-radius: 0;
         display: flex;
         align-items: center;
         gap: 16px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        border: 1px solid rgba(255,255,255,0.1);
+        border: 1px solid var(--border-strong);
 
         &.is-expired {
            background: var(--fill-color);
@@ -803,7 +801,7 @@ onMounted(async () => {
            width: 48px;
            height: 48px;
            background: rgba(255,255,255,0.1);
-           border-radius: 12px;
+           border-radius: 4px;
         }
 
         .status-info {
@@ -841,7 +839,7 @@ onMounted(async () => {
 
   .category-tabs-container {
     background: var(--card-bg);
-    border-radius: 16px;
+    border-radius: 4px;
     padding: 6px;
     box-shadow: var(--shadow-soft);
     border: 1px solid var(--border-soft);
@@ -935,7 +933,7 @@ onMounted(async () => {
 
 .subcategory-list {
   background: var(--card-bg);
-  border-radius: 16px;
+  border-radius: 4px;
   padding: 12px;
   border: 1px solid var(--border-soft);
 
@@ -945,7 +943,7 @@ onMounted(async () => {
     align-items: center;
     gap: 12px;
     padding: 14px 16px;
-    border-radius: 12px;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
     margin-bottom: 4px;
@@ -1076,7 +1074,7 @@ onMounted(async () => {
 
   .item-card {
     background: var(--card-bg);
-    border-radius: 16px;
+    border-radius: 4px;
     overflow: hidden;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -1086,12 +1084,10 @@ onMounted(async () => {
     height: 100%;
 
     &:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
-      border-color: transparent;
-      
+      border-color: var(--border-strong);
+
       .item-cover img {
-        transform: scale(1.05);
+        transform: none;
       }
       
       .hover-overlay {

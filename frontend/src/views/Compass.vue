@@ -203,7 +203,7 @@ const download = async (id: number, dType: number) => {
 
 .compass-card {
   background: var(--card-bg);
-  border-radius: 12px;
+  border-radius: 4px;
   box-shadow: var(--shadow-soft);
   transition: all 0.3s ease;
   overflow: hidden;
@@ -214,9 +214,7 @@ const download = async (id: number, dType: number) => {
 }
 
 .compass-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-medium);
-  border-color: var(--primary-color-light);
+  border-color: var(--border-strong);
 }
 
 .card-inner {
@@ -239,7 +237,7 @@ const download = async (id: number, dType: number) => {
 }
 
 .compass-card:hover .card-cover .el-image {
-  transform: scale(1.05);
+  transform: none;
 }
 
 .image-placeholder {
@@ -345,7 +343,7 @@ const download = async (id: number, dType: number) => {
 
 /* Custom Dialog */
 .custom-dialog {
-  border-radius: 12px;
+  border-radius: 4px;
   overflow: hidden;
 }
 
