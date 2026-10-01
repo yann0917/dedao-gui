@@ -6,6 +6,8 @@ import (
 	"crypto/cipher"
 	"encoding/base64"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -144,8 +146,27 @@ func generateEbookPages(enid, chapterID, token string, index, count, offset int)
 		return
 	}
 
+	// 添加 nil 检查
+	if pageList == nil {
+		err = fmt.Errorf("章节 %s 返回的页面数据为空", chapterID)
+		return
+	}
+
+	if pageList.Pages == nil {
+		err = fmt.Errorf("章节 %s 的页面列表为空", chapterID)
+		return
+	}
+
+	if len(pageList.Pages) == 0 {
+		fmt.Printf("警告: 章节 %s 没有页面内容\n", chapterID)
+		return []string{}, nil
+	}
+
 	for _, item := range pageList.Pages {
 		desContents := DecryptAES(item.Svg)
+		// 调试用：保存解密后的原始 XHTML（chapterID 即文件名），方便定位解析/渲染问题
+		// 按 enid 建子目录，区分不同书籍的 debug 内容
+		// saveDebug(enid, chapterID, desContents)
 		svgList = append(svgList, desContents)
 	}
 
@@ -172,6 +193,18 @@ func generateEbookPages(enid, chapterID, token string, index, count, offset int)
 	}
 
 	return
+}
+
+// saveDebug 调试用：将解密后的原始内容 保存到 <OutputDir>/debug/<enid> 目录
+func saveDebug(enid, chapterID string, content string) {
+	dir, err := utils.Mkdir(OutputDir, "debug", enid)
+	if err != nil {
+		return
+	}
+	filePath := filepath.Join(dir, chapterID)
+	if err := os.WriteFile(filePath, []byte(content), 0644); err != nil {
+		fmt.Printf("警告: 保存调试内容 失败 %s: %v\n", filePath, err)
+	}
 }
 
 // PKCS7Unpad 实现PKCS7去填充
