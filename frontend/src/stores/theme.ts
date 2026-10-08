@@ -1,6 +1,6 @@
 import { ref, computed, reactive } from "vue";
 import { defineStore } from "pinia";
-import { services } from '../../wailsjs/go/models'
+import * as services from '@backend-bindings/services/models';
 import { setThemeColor } from '../utils/utils'
 
 export const themeStore = defineStore("themeStore",  {

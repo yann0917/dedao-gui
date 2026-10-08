@@ -96,6 +96,7 @@ func (a *App) initDownloadManager(ctx context.Context) (*downloadmgr.Repository,
 		WorkerCount:  readEnvInt("DOWNLOAD_TASK_WORKER_COUNT", 1),
 		PollInterval: time.Duration(readEnvInt("DOWNLOAD_TASK_POLL_MS", 1000)) * time.Millisecond,
 	})
+	manager.SetNotifier(a.Notifier)
 	manager.RegisterExecutor(downloadmgr.BizTypeCourse, downloadmgr.NewCourseExecutor(ctx))
 	manager.RegisterExecutor(downloadmgr.BizTypeOdob, downloadmgr.NewOdobExecutor(ctx))
 	manager.RegisterExecutor(downloadmgr.BizTypeEbook, downloadmgr.NewEbookExecutor(ctx))

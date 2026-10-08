@@ -28,7 +28,7 @@
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
-import { GetVolcPlayAuthToken } from '../../wailsjs/go/backend/App'
+import { GetVolcPlayAuthToken } from '@backend-bindings/app'
 import { userStore } from '../stores/user'
 
 type VePlayerCtor = new (options: Record<string, any>) => {

@@ -26,4 +26,6 @@ coverage.txt
 .idea
 .cache
 .DS_Store
-.claude
+.claude/
+bin/
+.task/

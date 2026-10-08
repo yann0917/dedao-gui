@@ -45,7 +45,7 @@
 
 <script lang="ts" setup>
 import {onMounted, ref, PropType} from "vue";
-import {EbookDownload, CourseDownload, OdobDownload} from "../../wailsjs/go/backend/App";
+import {EbookDownload, CourseDownload, OdobDownload} from '@backend-bindings/app';
 import {ElMessage} from "element-plus";
 import { Check } from '@element-plus/icons-vue'
 

@@ -287,13 +287,13 @@ import {
   Trophy,
   Warning
 } from '@element-plus/icons-vue'
-import type { services } from '../../wailsjs/go/models'
+import type * as services from '@backend-bindings/services/models';
 import {
   ChannelInfo as getChannelInfo,
   ChannelHomepage as getChannelHomepage,
   ChannelVipInfo as getVipInfo,
   ChannelTopicDetail,
-} from '../../wailsjs/go/backend/App'
+} from '@backend-bindings/app'
 import CourseInfo from '../components/CourseInfo.vue'
 import { useAppRouter } from '../composables/useRouter'
 

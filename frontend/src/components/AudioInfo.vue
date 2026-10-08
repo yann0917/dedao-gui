@@ -82,8 +82,8 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { AudioDetail } from '../../wailsjs/go/backend/App'
-import { services } from '../../wailsjs/go/models'
+import { AudioDetail } from '@backend-bindings/app'
+import * as services from '@backend-bindings/services/models';
 import { secondToHour,timestampToDate } from '../utils/utils'
 const dialogVisible = ref(false)
 

@@ -249,8 +249,8 @@ import {
   OdobUserInfo,
   SetDir,
   OdobDownload,
-} from "../../wailsjs/go/backend/App";
-import { services } from "../../wailsjs/go/models";
+} from '@backend-bindings/app';
+import * as services from '@backend-bindings/services/models';
 import { useRoute, useRouter } from "vue-router";
 import EbookInfo  from '../components/EbookInfo.vue';
 import CourseInfo from "../components/CourseInfo.vue";

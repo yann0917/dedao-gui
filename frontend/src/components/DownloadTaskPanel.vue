@@ -115,9 +115,9 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Download } from '@element-plus/icons-vue'
-import { CancelDownloadTask, ClearDownloadTasks, ListDownloadTasks, PauseDownloadTask, ResumeDownloadTask, RetryDownloadTask } from '../../wailsjs/go/backend/App'
-import { downloadmgr } from '../../wailsjs/go/models'
-import { EventsOff, EventsOn } from '../../wailsjs/runtime/runtime'
+import { CancelDownloadTask, ClearDownloadTasks, ListDownloadTasks, PauseDownloadTask, ResumeDownloadTask, RetryDownloadTask } from '@backend-bindings/app'
+import * as downloadmgr from '@backend-bindings/downloadmgr/models';
+import { Events } from '@wailsio/runtime'
 
 const visible = ref(false)
 const tasks = ref<downloadmgr.DownloadTask[]>([])
@@ -351,7 +351,7 @@ const handleOpenFromEvent = () => {
 onMounted(async () => {
   initPosition()
   await refresh()
-  EventsOn('download:task:update', updateTaskByEvent)
+  Events.On('download:task:update', updateTaskByEvent)
   timer = window.setInterval(() => {
     refresh()
   }, 3000)
@@ -361,7 +361,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   onDragEnd()
-  EventsOff('download:task:update')
+  Events.Off('download:task:update')
   if (timer) {
     window.clearInterval(timer)
   }

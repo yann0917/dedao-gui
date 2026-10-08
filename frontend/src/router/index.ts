@@ -2,7 +2,7 @@ import { createRouter, createWebHashHistory } from "vue-router";
 import { Store } from "pinia";
 import {userStore} from "../stores/user"
 // import { ref, reactive, onMounted } from 'vue'
-// import { CourseCategory } from '../../wailsjs/go/backend/App'
+// import { CourseCategory } from '@backend-bindings/app'
 
 
 // const category = () => {

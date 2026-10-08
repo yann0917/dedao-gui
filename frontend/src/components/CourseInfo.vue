@@ -129,8 +129,8 @@
 <script lang="ts" setup>
 import { ref, reactive, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { CourseInfo as GetCourseInfo } from '../../wailsjs/go/backend/App'
-import { services } from '../../wailsjs/go/models'
+import { CourseInfo as GetCourseInfo } from '@backend-bindings/app'
+import * as services from '@backend-bindings/services/models';
 import { Collection, User, Star, StarFilled, ChatLineSquare } from '@element-plus/icons-vue'
 
 const props = defineProps({

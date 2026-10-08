@@ -68,8 +68,8 @@
 import { ref, reactive, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
-import { EbookCommentList } from '../../wailsjs/go/backend/App'
-import { services } from '../../wailsjs/go/models'
+import { EbookCommentList } from '@backend-bindings/app'
+import * as services from '@backend-bindings/services/models';
 import { useRoute, useRouter } from 'vue-router'
 import { userStore } from '../stores/user';
 
@@ -148,7 +148,7 @@ const getTableData = async () => {
   
   loading.value = true
   try {
-    const result = await EbookCommentList(enid.value, page.value, pageSize.value)
+    const result = (await EbookCommentList(enid.value, page.value, pageSize.value))!
     
     if (page.value === 1) {
       // 重置所有列

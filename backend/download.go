@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	jsoniter "github.com/json-iterator/go"
-	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
+	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/yann0917/dedao-gui/backend/app"
 	"github.com/yann0917/dedao-gui/backend/downloadmgr"
 	"github.com/yann0917/dedao-gui/backend/services"
@@ -16,30 +16,27 @@ import (
 
 func (a *App) OpenDirectoryDialog(title string) (dir string, err error) {
 	home, _ := os.LookupEnv("HOME")
-	dialogOptions := wailsruntime.OpenDialogOptions{
-		DefaultDirectory:           home,
-		Title:                      title,
-		ShowHiddenFiles:            false,
-		CanCreateDirectories:       true,
-		ResolvesAliases:            false,
-		TreatPackagesAsDirectories: false,
-	}
-	dir, err = wailsruntime.OpenDirectoryDialog(a.Ctx, dialogOptions)
+	dir, err = application.Get().Dialog.OpenFile().
+		SetTitle(title).
+		SetDirectory(home).
+		CanChooseDirectories(true).
+		CanChooseFiles(false).
+		CanCreateDirectories(true).
+		ShowHiddenFiles(false).
+		PromptForSingleSelection()
 	app.SetOutputDir(dir)
 	return
 }
 
 func (a *App) OpenFileDialog(title string) (file string, err error) {
 	home, _ := os.LookupEnv("HOME")
-	dialogOptions := wailsruntime.OpenDialogOptions{
-		DefaultDirectory:           home,
-		Title:                      title,
-		ShowHiddenFiles:            false,
-		CanCreateDirectories:       false,
-		ResolvesAliases:            false,
-		TreatPackagesAsDirectories: false,
-	}
-	file, err = wailsruntime.OpenFileDialog(a.Ctx, dialogOptions)
+	file, err = application.Get().Dialog.OpenFile().
+		SetTitle(title).
+		SetDirectory(home).
+		CanChooseDirectories(false).
+		CanChooseFiles(true).
+		ShowHiddenFiles(false).
+		PromptForSingleSelection()
 	return
 }
 

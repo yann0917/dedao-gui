@@ -43,10 +43,10 @@
 import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
 import { ElMessage } from "element-plus";
 import { Loading } from '@element-plus/icons-vue';
-import { GetQrcode, CheckLogin } from "../../wailsjs/go/backend/App";
+import { GetQrcode, CheckLogin } from '@backend-bindings/app';
 import { useRouter } from "vue-router";
 import { userStore } from "../stores/user";
-import { services } from "../../wailsjs/go/models";
+import * as services from '@backend-bindings/services/models';
 import { Local } from "../utils/storage";
 
 // const route = useRoute()
@@ -110,9 +110,7 @@ timeState.timer = window.setInterval(() => {
       if (loginResult.status == 1) {
         let user = reactive(new services.User());
         Object.assign(user, loginResult.user);
-        store.user = user;
-
-        Local.set("cookies", loginResult.cookie);
+        store.loginSuccess(loginResult.cookie, user);
 
         if (store.userList.length == 0) {
           store.userList.push(user);

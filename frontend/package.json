@@ -5,11 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "build:dev": "vue-tsc --noEmit && vite build --minify false --mode development",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
+    "@wailsio/runtime": "^3.0.0-beta.28",
     "element-plus": "^2.14.5",
     "highlight.js": "^11.12.0",
     "marked": "^17.0.1",

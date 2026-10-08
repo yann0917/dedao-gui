@@ -52,15 +52,15 @@
       <div class="banner-wrapper">
         <el-carousel :interval="5000" arrow="hover" height="380px" class="custom-carousel">
           <el-carousel-item v-for="item in initial.homeData.banner" :key="item">
-            <el-image :src="item.img" fit="cover" class="banner-image" @click="BrowserOpenURL(item.url)" />
+            <el-image :src="item.img" fit="cover" class="banner-image" @click="Browser.OpenURL(item.url)" />
           </el-carousel-item>
         </el-carousel>
       </div>
 
       <!-- 右侧用户信息卡片 -->
       <div class="user-card-wrapper">
-        <div class="user-card" :class="!Local.get('cookies') ? 'not-login' : ''">
-          <div v-if="Local.get('cookies')==null" class="login-prompt">
+        <div class="user-card" :class="!store.loggedIn ? 'not-login' : ''">
+          <div v-if="!store.loggedIn" class="login-prompt">
             <div class="login-placeholder">
                <img src="../assets/images/logo-universal.png" alt="Logo" class="login-logo" />
                <p>登录开启学习之旅</p>
@@ -269,17 +269,18 @@ import {
   SunflowerResourceList,
   ArticleList,
   UserInfo,
-} from "../../wailsjs/go/backend/App";
-import { services } from "../../wailsjs/go/models";
-import { BrowserOpenURL } from "../../wailsjs/runtime";
+} from '@backend-bindings/app';
+import * as services from '@backend-bindings/services/models';
+import { Browser } from '@wailsio/runtime';
 import QrLogin from "../components/QrLogin.vue";
 import EbookInfo from "../components/EbookInfo.vue";
 import CourseInfo from "../components/CourseInfo.vue";
 import { useAppRouter } from "../composables/useRouter";
 import { ROUTE_NAMES } from "../router/routes";
-import { Local } from "../utils/storage";
+import { userStore } from "../stores/user";
 
 const { pushByName, replace, pushCourseDetail } = useAppRouter();
+const store = userStore();
 
 const loading = ref(true);
 const page = ref(0);

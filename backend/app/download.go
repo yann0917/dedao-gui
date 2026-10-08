@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	jsoniter "github.com/json-iterator/go"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/yann0917/dedao-gui/backend/downloader"
 	"github.com/yann0917/dedao-gui/backend/services"
 	"github.com/yann0917/dedao-gui/backend/utils"
@@ -126,7 +126,7 @@ func (d *CourseDownload) Download() error {
 				progress.Pct = curr * 100 / progress.Total
 			}
 			progress.Value = datum.Title
-			runtime.EventsEmit(d.Ctx, "courseDownload", progress)
+			application.Get().Event.Emit("courseDownload", progress)
 			emitProgress(d.ProgressCB, progress)
 			if !datum.IsCanDL {
 				continue
@@ -198,7 +198,7 @@ func (d *OdobDownload) Download() error {
 				progress.Pct = curr * 100 / progress.Total
 			}
 			progress.Value = datum.Title + ".mp3"
-			runtime.EventsEmit(d.Ctx, "odobDownload", progress)
+			application.Get().Event.Emit("odobDownload", progress)
 			emitProgress(d.ProgressCB, progress)
 			if !datum.IsCanDL {
 				continue
@@ -237,7 +237,7 @@ func (d *OdobDownload) Download() error {
 		progress.Current = 100
 		progress.Pct = 100 * 100 / progress.Total
 		progress.Value = d.Data.Title + ".pdf"
-		runtime.EventsEmit(d.Ctx, "odobDownload", progress)
+		application.Get().Event.Emit("odobDownload", progress)
 		emitProgress(d.ProgressCB, progress)
 		return utils.Md2Pdf(path, d.Data.Title, []byte(res))
 	case 3:
@@ -255,7 +255,7 @@ func (d *OdobDownload) Download() error {
 		progress.Current = 100
 		progress.Pct = 100 * 100 / progress.Total
 		progress.Value = d.Data.Title + ".md"
-		runtime.EventsEmit(d.Ctx, "odobDownload", progress)
+		application.Get().Event.Emit("odobDownload", progress)
 		emitProgress(d.ProgressCB, progress)
 		if err := DownloadOdobMarkdown(d.Data, path, d.Ctx); err != nil {
 			return err
@@ -298,7 +298,7 @@ func (d *EBookDownload) Download() error {
 	var progress Progress
 	progress.Pct = 100
 	progress.Value = "正在生成" + dType[d.DownloadType] + "文件"
-	runtime.EventsEmit(d.Ctx, "ebookDownload", progress)
+	application.Get().Event.Emit("ebookDownload", progress)
 	emitProgress(d.ProgressCB, progress)
 	switch d.DownloadType {
 	case 1:
@@ -643,7 +643,7 @@ func DownloadPdfCourse(list []downloader.Datum, path string, ctx context.Context
 			progress.Pct = curr * 100 / progress.Total
 		}
 		progress.Value = v.Title
-		runtime.EventsEmit(ctx, "courseDownload", progress)
+		application.Get().Event.Emit("courseDownload", progress)
 		emitProgress(cb, progress)
 		detail, err := ArticleDetail(v.Enid)
 		if err != nil {
@@ -694,7 +694,7 @@ func DownloadMarkdown(list *services.ArticleList, aid int, path string, ctx cont
 			progress.Pct = curr * 100 / progress.Total
 		}
 		progress.Value = v.Title
-		runtime.EventsEmit(ctx, "courseDownload", progress)
+		application.Get().Event.Emit("courseDownload", progress)
 		emitProgress(cb, progress)
 
 		if aid > 0 && v.ID != aid {

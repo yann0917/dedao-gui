@@ -9,8 +9,8 @@ import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { themeStore } from './stores/theme'
 import { settingStore } from './stores/setting'
 import { playerStore } from './stores/player'
-import { AudioDetailAlias, SetDir } from '../wailsjs/go/backend/App'
-import { Environment } from '../wailsjs/runtime'
+import { AudioDetailAlias, SetDir } from '@backend-bindings/app'
+import { System } from '@wailsio/runtime'
 import { setFontFamily } from './utils/utils'
 
 // 初始化主题
@@ -20,8 +20,8 @@ const applyPlatformClass = async () => {
   const root = document.documentElement
   root.classList.remove('platform-mac', 'platform-windows', 'platform-linux')
   try {
-    const env = await Environment()
-    const platform = String(env?.platform || '').toLowerCase()
+    const env = await System.Environment()
+    const platform = String(env?.OS || '').toLowerCase()
     if (platform === 'darwin') {
       root.classList.add('platform-mac')
       return

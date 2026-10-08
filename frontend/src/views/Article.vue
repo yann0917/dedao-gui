@@ -15,7 +15,7 @@
 import { ref, reactive, onMounted, watch } from 'vue'
 import 'element-plus/es/components/message/style/css'
 import { ElMessage } from 'element-plus'
-import { ArticleDetail } from '../../wailsjs/go/backend/App'
+import { ArticleDetail } from '@backend-bindings/app'
 import { useRoute } from 'vue-router'
 import { ROUTE_NAMES } from '../router/routes'
 

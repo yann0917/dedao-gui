@@ -27,8 +27,8 @@
 <script setup lang="ts">
 import {ref, reactive, onMounted} from 'vue'
 import { ElMessage } from 'element-plus'
-import { TopicAll } from '../../wailsjs/go/backend/App'
-import { services } from '../../wailsjs/go/models'
+import { TopicAll } from '@backend-bindings/app'
+import * as services from '@backend-bindings/services/models';
 
 const infLoadingTopic = ref(true)
 

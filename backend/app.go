@@ -4,12 +4,11 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/signal"
 	"strconv"
 	"sync"
-	"syscall"
 
-	"github.com/wailsapp/wails/v2/pkg/options"
+	"github.com/wailsapp/wails/v3/pkg/application"
+	"github.com/wailsapp/wails/v3/pkg/services/notifications"
 	"github.com/yann0917/dedao-gui/backend/downloadmgr"
 	"github.com/yann0917/dedao-gui/backend/utils"
 )
@@ -17,6 +16,7 @@ import (
 // App struct
 type App struct {
 	Ctx             context.Context
+	Notifier        *notifications.NotificationService
 	DownloadRepo    *downloadmgr.Repository
 	DownloadManager *downloadmgr.Manager
 	downloadInitMu  sync.Mutex
@@ -29,17 +29,19 @@ type App struct {
 // NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{
+		Notifier:      notifications.New(),
 		downloadState: downloadManagerStateUninitialized,
 	}
 }
 
-// Startup is called when the app starts. The context is saved
+// ServiceStartup is called when the service starts. The context is saved
 // so we can call the runtime methods
-func (a *App) Startup(ctx context.Context) {
+func (a *App) ServiceStartup(ctx context.Context, options application.ServiceOptions) error {
 	a.Ctx = ctx
 	if err := a.ensureDownloadManager(); err != nil {
 		fmt.Printf("启动下载任务管理器失败: %v\n", err)
 	}
+	return nil
 }
 
 func readEnvInt(name string, defaultValue int) int {
@@ -54,42 +56,15 @@ func readEnvInt(name string, defaultValue int) int {
 	return val
 }
 
-func (a *App) Shutdown(ctx context.Context) {
+func (a *App) ServiceShutdown() error {
 	a.shutdownDownloadManager()
 	// 退出前关闭缓存库：Close 内会回收一轮 value log，被删除的章节内容才能释放磁盘
 	if err := utils.CloseBadgerDB(); err != nil {
 		fmt.Printf("关闭缓存数据库时出错: %v\n", err)
 	}
-	setupCleanupOnExit()
+	return nil
 }
 
-func (a *App) DomReady(ctx context.Context) {
-	// fmt.Println(a.Ctx)
-	// fmt.Println("dom ready")
-}
-
-func (a *App) OnSecondInstanceLaunch(secondInstanceData options.SecondInstanceData) {
+func (a *App) OnSecondInstanceLaunch(secondInstanceData application.SecondInstanceData) {
 	fmt.Println("OnSecondInstanceLaunch", secondInstanceData)
-}
-
-func setupCleanupOnExit() {
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-
-	go func() {
-		<-c
-		fmt.Println("正在关闭程序...")
-
-		// 获取 BadgerDB 实例并关闭
-		db, err := utils.GetBadgerDB(utils.GetDefaultBadgerDBPath())
-		if err == nil && db != nil {
-			if err := db.Close(); err != nil {
-				fmt.Printf("关闭数据库时出错: %v\n", err)
-			} else {
-				fmt.Println("数据库已安全关闭")
-			}
-		}
-
-		os.Exit(0)
-	}()
 }

@@ -15,7 +15,7 @@
 import NotesItem from "../components/NotesItem.vue";
 import TopicItem from "../components/TopicItem.vue";
 import {reactive} from "vue";
-import {services} from "../../wailsjs/go/models";
+import * as services from '@backend-bindings/services/models';
 
 const topicDetail = reactive(new services.TopicIntro)
 

@@ -18,7 +18,7 @@
     ],
     "skipLibCheck": true,
     "paths": {
-      "../wailsjs/*": ["./wailsjs/*"]
+      "@backend-bindings/*": ["./bindings/github.com/yann0917/dedao-gui/backend/*"]
     }
   },
   "include": [
@@ -26,8 +26,7 @@
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "../wailsjs/**/*.ts",
-    "../wailsjs/**/*.d.ts"
+    "bindings/**/*.d.ts"
   ],
   "references": [
     {

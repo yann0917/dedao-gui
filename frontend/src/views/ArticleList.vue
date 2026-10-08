@@ -121,8 +121,8 @@
 import { onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { ArrowRight, VideoPlay, Memo, Download, Picture, Loading } from '@element-plus/icons-vue'
-import {ArticleList, SetDir} from '../../wailsjs/go/backend/App'
-import {services} from '../../wailsjs/go/models'
+import {ArticleList, SetDir} from '@backend-bindings/app'
+import * as services from '@backend-bindings/services/models';
 import {useRoute} from 'vue-router'
 import {secondToHour} from '../utils/utils'
 import DownloadDialog from "../components/DownloadDialog.vue";
@@ -281,7 +281,7 @@ const loadMoreArticles = async () => {
     loading.value = true
     try {
         // 使用 maxId 分页
-        const res = await ArticleList(enid.value, "", pageSize.value, maxId.value, isReverse.value)
+        const res = (await ArticleList(enid.value, "", pageSize.value, maxId.value, isReverse.value))!
         console.log("xxxxxxxxxxxxxxxx")
         console.log(res)
         // 如果返回数据为空，直接 finished
