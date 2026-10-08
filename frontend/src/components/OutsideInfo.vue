@@ -94,8 +94,8 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Clock, VideoPlay } from '@element-plus/icons-vue'
-import { OutsideDetail } from '../../wailsjs/go/backend/App'
-import { services } from '../../wailsjs/go/models'
+import { OutsideDetail } from '@backend-bindings/app'
+import * as services from '@backend-bindings/services/models';
 
 const dialogVisible = ref(false)
 

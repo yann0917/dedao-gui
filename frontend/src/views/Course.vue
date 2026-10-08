@@ -108,8 +108,8 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft, View, Download, Picture, Folder } from '@element-plus/icons-vue'
-import {CourseList, CourseCategory, CourseGroupList, SetDir, GetNavbar} from '../../wailsjs/go/backend/App'
-import { services } from '../../wailsjs/go/models'
+import {CourseList, CourseCategory, CourseGroupList, SetDir, GetNavbar} from '@backend-bindings/app'
+import * as services from '@backend-bindings/services/models';
 import { userStore } from '../stores/user';
 import { settingStore } from '../stores/setting';
 import { useAppRouter } from '../composables/useRouter';

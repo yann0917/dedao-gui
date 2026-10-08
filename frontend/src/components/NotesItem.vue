@@ -144,8 +144,8 @@
 import { ref, reactive, onMounted, watch, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Connection, Medal, Trophy, Share, ChatDotRound, Star } from '@element-plus/icons-vue'
-import { NotesTimeline, TopicNotesList } from '../../wailsjs/go/backend/App'
-import { services } from '../../wailsjs/go/models'
+import { NotesTimeline, TopicNotesList } from '@backend-bindings/app'
+import * as services from '@backend-bindings/services/models';
 
 const page = ref(0)
 const total = ref(0)

@@ -52,7 +52,7 @@
       <div class="banner-wrapper">
         <el-carousel :interval="5000" arrow="hover" height="380px" class="custom-carousel">
           <el-carousel-item v-for="item in initial.homeData.banner" :key="item">
-            <el-image :src="item.img" fit="cover" class="banner-image" @click="BrowserOpenURL(item.url)" />
+            <el-image :src="item.img" fit="cover" class="banner-image" @click="Browser.OpenURL(item.url)" />
           </el-carousel-item>
         </el-carousel>
       </div>
@@ -269,9 +269,9 @@ import {
   SunflowerResourceList,
   ArticleList,
   UserInfo,
-} from "../../wailsjs/go/backend/App";
-import { services } from "../../wailsjs/go/models";
-import { BrowserOpenURL } from "../../wailsjs/runtime";
+} from '@backend-bindings/app';
+import * as services from '@backend-bindings/services/models';
+import { Browser } from '@wailsio/runtime';
 import QrLogin from "../components/QrLogin.vue";
 import EbookInfo from "../components/EbookInfo.vue";
 import CourseInfo from "../components/CourseInfo.vue";

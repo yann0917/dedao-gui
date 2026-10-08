@@ -192,7 +192,7 @@ import {
 } from '@element-plus/icons-vue'
 import { settingStore } from "../stores/setting"
 import { themeStore } from "../stores/theme"
-import { OpenDirectoryDialog, OpenFileDialog } from "../../wailsjs/go/backend/App"
+import { OpenDirectoryDialog, OpenFileDialog } from '@backend-bindings/app'
 import { setThemeColor, setFontFamily } from "../utils/utils"
 import { ElMessage } from 'element-plus'
 

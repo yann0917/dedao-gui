@@ -43,10 +43,10 @@
 import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
 import { ElMessage } from "element-plus";
 import { Loading } from '@element-plus/icons-vue';
-import { GetQrcode, CheckLogin } from "../../wailsjs/go/backend/App";
+import { GetQrcode, CheckLogin } from '@backend-bindings/app';
 import { useRouter } from "vue-router";
 import { userStore } from "../stores/user";
-import { services } from "../../wailsjs/go/models";
+import * as services from '@backend-bindings/services/models';
 import { Local } from "../utils/storage";
 
 // const route = useRoute()

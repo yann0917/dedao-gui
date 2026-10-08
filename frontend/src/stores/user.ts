@@ -1,8 +1,8 @@
 import { ref, computed, reactive } from "vue";
 import { defineStore } from "pinia";
-import { services } from '../../wailsjs/go/models'
-import { Logout } from '../../wailsjs/go/backend/App'
-import { WindowReloadApp } from '../../wailsjs/runtime'
+import * as services from '@backend-bindings/services/models';
+import { Logout } from '@backend-bindings/app'
+import { Window } from '@wailsio/runtime'
 import { Local } from '../utils/storage'
 
 export const userStore = defineStore("userStore",  {
@@ -19,7 +19,7 @@ export const userStore = defineStore("userStore",  {
                 this.user = null
                 Local.remove("cookies")
                 Local.remove("userStore")
-                WindowReloadApp()
+                Window.Reload()
             } catch (error) {
                 console.error('Logout failed:', error)
             }

@@ -56,7 +56,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { Moon, Sunny } from '@element-plus/icons-vue'
 import MenuItem from './MenuItem.vue'
 import { themeStore } from '../stores/theme'
-import { Environment, Quit, WindowIsMaximised, WindowMinimise, WindowToggleMaximise } from '../../wailsjs/runtime'
+import { Application, System, Window } from '@wailsio/runtime'
 
 const route = useRoute()
 const router = useRouter()
@@ -76,8 +76,8 @@ const isMaximized = ref(false)
 
 const initPlatform = async () => {
   try {
-    const env = await Environment()
-    isWindows.value = env.platform === 'windows'
+    const env = await System.Environment()
+    isWindows.value = env.OS === 'windows'
     if (isWindows.value) {
       await syncMaximizedState()
     }
@@ -88,7 +88,7 @@ const initPlatform = async () => {
 
 const syncMaximizedState = async () => {
   try {
-    isMaximized.value = await WindowIsMaximised()
+    isMaximized.value = await Window.IsMaximised()
   } catch {
     isMaximized.value = false
   }
@@ -99,15 +99,15 @@ onMounted(() => {
 })
 
 const windowClose = () => {
-  Quit()
+  Application.Quit()
 }
 
 const windowMinimize = () => {
-  WindowMinimise()
+  Window.Minimise()
 }
 
 const windowMaximize = async () => {
-  WindowToggleMaximise()
+  Window.ToggleMaximise()
   await syncMaximizedState()
 }
 

@@ -1,5 +1,5 @@
 import {settingStore} from "../stores/setting";
-import {OpenDirectoryDialog} from "../../wailsjs/go/backend/App";
+import {OpenDirectoryDialog} from '@backend-bindings/app';
 export const secondToHour = function (msd:number) {
     let second = 0; // 秒
     let minute = 0; // 分

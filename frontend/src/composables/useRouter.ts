@@ -1,7 +1,7 @@
 import { useRouter as useVueRouter, useRoute as useVueRoute } from 'vue-router';
 import type { RouteLocationRaw } from 'vue-router';
 import { ROUTES, ROUTE_NAMES, buildRoute } from '../router/routes';
-import { BrowserOpenURL } from '../../wailsjs/runtime';
+import { Browser } from '@wailsio/runtime';
 
 // 类型安全的路由 hook
 export function useAppRouter() {
@@ -13,7 +13,7 @@ export function useAppRouter() {
     if (!normalized) return;
 
     try {
-      BrowserOpenURL(normalized);
+      Browser.OpenURL(normalized);
     } catch {
       window.open(normalized, '_blank');
     }

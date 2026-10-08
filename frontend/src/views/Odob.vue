@@ -139,8 +139,8 @@ import { onMounted, onBeforeUnmount, reactive, ref, computed, nextTick } from 'v
 import 'element-plus/es/components/message/style/css'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft, VideoPlay, Memo, View, Download as DownloadIcon, Picture, Folder, Clock } from '@element-plus/icons-vue'
-import { AudioDetailAlias, CourseCategory, CourseGroupList, CourseList, OdobDownload, SetDir, GetNavbar } from '../../wailsjs/go/backend/App'
-import { services } from '../../wailsjs/go/models'
+import { AudioDetailAlias, CourseCategory, CourseGroupList, CourseList, OdobDownload, SetDir, GetNavbar } from '@backend-bindings/app'
+import * as services from '@backend-bindings/services/models';
 import AudioInfo from '../components/AudioInfo.vue'
 import OutsideInfo from '../components/OutsideInfo.vue'
 import DownloadDialog from '../components/DownloadDialog.vue'
@@ -150,7 +150,7 @@ import { Local } from '../utils/storage'
 import { useAppRouter } from '../composables/useRouter'
 
 import { secondToHour } from '../utils/utils'
-import { EventsOff, EventsOn } from '../../wailsjs/runtime/runtime'
+import { Events } from '@wailsio/runtime'
 import { playerStore, type PlayerTrack } from '../stores/player'
 
 const pStore = playerStore()

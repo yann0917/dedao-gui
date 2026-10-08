@@ -166,8 +166,8 @@ import { reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { SwitchButton, Clock, Present, School, Headset, Reading } from '@element-plus/icons-vue'
 
-import { UserInfo, EbookUserInfo, OdobUserInfo } from '../../wailsjs/go/backend/App'
-import { services } from '../../wailsjs/go/models'
+import { UserInfo, EbookUserInfo, OdobUserInfo } from '@backend-bindings/app'
+import * as services from '@backend-bindings/services/models';
 import { userStore } from '../stores/user';
 import { timestampToTime } from '../utils/utils'
 const store = userStore()

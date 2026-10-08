@@ -8,7 +8,8 @@ import (
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"github.com/wailsapp/wails/v3/pkg/application"
+	"github.com/wailsapp/wails/v3/pkg/services/notifications"
 	"github.com/yann0917/dedao-gui/backend/app"
 	"github.com/yann0917/dedao-gui/backend/services"
 )
@@ -21,7 +22,7 @@ type progressReporter struct {
 
 func (p *progressReporter) Report(progress int, current int, total int, currentName string) {
 	_ = p.repo.UpdateTaskProgress(p.taskID, progress, current, total, currentName)
-	runtime.EventsEmit(p.ctx, "download:task:update", map[string]interface{}{
+	application.Get().Event.Emit("download:task:update", map[string]interface{}{
 		"taskId":      p.taskID,
 		"progress":    progress,
 		"current":     current,
@@ -36,6 +37,7 @@ type Executor interface {
 
 type Manager struct {
 	ctx          context.Context
+	notifier     *notifications.NotificationService
 	repo         *Repository
 	queue        chan DownloadTask
 	workerCount  int
@@ -72,6 +74,11 @@ func NewManager(ctx context.Context, repo *Repository, cfg Config) *Manager {
 		stopCh:       make(chan struct{}),
 		running:      map[string]context.CancelFunc{},
 	}
+}
+
+// SetNotifier 设置系统通知服务；为 nil 时下载完成不发送通知
+func (m *Manager) SetNotifier(n *notifications.NotificationService) {
+	m.notifier = n
 }
 
 func (m *Manager) RegisterExecutor(bizType string, executor Executor) {
@@ -181,16 +188,12 @@ func (m *Manager) execute(task DownloadTask) {
 			"error_message": "",
 		})
 		m.emitStatus(task.ID, StatusSuccess, 100, "", "")
-		if task.Title != "" {
-			if runtime.IsNotificationAvailable(m.ctx) {
-				err := runtime.SendNotificationWithActions(m.ctx, runtime.NotificationOptions{
-					Title:      task.Title + "下载完成",
-					CategoryID: "download-category",
-					Data: map[string]interface{}{
-						"saveDir": task.SaveDir,
-					},
-				})
-				if err != nil {
+		if task.Title != "" && m.notifier != nil {
+			if authorized, err := m.notifier.CheckNotificationAuthorization(); err == nil && authorized {
+				if err := m.notifier.SendNotification(notifications.NotificationOptions{
+					Title: task.Title + "下载完成",
+					Body:  "文件已保存到输出目录",
+				}); err != nil {
 					fmt.Printf("发送通知失败: %v\n", err)
 				}
 			}
@@ -280,7 +283,7 @@ func (m *Manager) ClearTasks(clearAll bool) error {
 }
 
 func (m *Manager) emitStatus(taskID, status string, progress int, errorCode, errorMessage string) {
-	runtime.EventsEmit(m.ctx, "download:task:update", map[string]interface{}{
+	application.Get().Event.Emit("download:task:update", map[string]interface{}{
 		"taskId":       taskID,
 		"status":       status,
 		"progress":     progress,

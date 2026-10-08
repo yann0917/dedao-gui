@@ -159,8 +159,8 @@ import {
   EbookShelfRemove,
   SetDir,
   GetNavbar
-} from '../../wailsjs/go/backend/App'
-import {services} from '../../wailsjs/go/models'
+} from '@backend-bindings/app'
+import * as services from '@backend-bindings/services/models';
 import EbookInfo from '../components/EbookInfo.vue'
 import DownloadDialog from "../components/DownloadDialog.vue";
 

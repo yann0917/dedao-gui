@@ -92,8 +92,8 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { EbookInfo, EbookShelfAdd, EbookShelfRemove } from '../../wailsjs/go/backend/App'
-import { services } from '../../wailsjs/go/models'
+import { EbookInfo, EbookShelfAdd, EbookShelfRemove } from '@backend-bindings/app'
+import * as services from '@backend-bindings/services/models';
 import { repeat } from 'lodash'
 import { secondToHour } from '../utils/utils'
 import { useAppRouter } from '../composables/useRouter'
