@@ -4,7 +4,7 @@
 
 ## 技术栈
 
-* [Wails](https://wails.io/zh-Hans/) - 用于构建桌面应用程序
+* [Wails v3](https://v3.wails.io/zh-Hans/) - 用于构建桌面应用程序
 * [Go](https://go.dev/) - 后端服务和业务逻辑
 * [Vue 3](https://cn.vuejs.org/guide/introduction.html) - 前端框架
 * [Vue Router 4](https://router.vuejs.org/zh/introduction.html) - 路由管理
@@ -53,9 +53,9 @@
 
 ### 环境要求
 
-1. 安装 Go 1.23 或更高版本
+1. 安装 Go 1.26 或更高版本
 2. 安装 Node.js 18+ 和 npm
-3. 安装 Wails CLI: `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
+3. 安装 Wails v3 CLI: `go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.28`
 
 ### 构建步骤
 
@@ -64,18 +64,32 @@
    git clone https://github.com/yann0917/dedao-gui.git
    cd dedao-gui
    ```
-2. 直接构建应用（Wails 会自动处理前端依赖安装和构建）
+2. 开发调试（自动构建前端与 Go 绑定，支持热更新）
    ```bash
-   wails build
+   wails3 dev
+   ```
+3. 构建生产版本（Wails 会自动处理前端依赖安装和构建）
+   ```bash
+   wails3 build
+   ```
+4. 打包 macOS .app（含签名与图标资源，产物在 `bin/dedao-gui.app`）
+   ```bash
+   wails3 task darwin:package
+   ```
+5. 跨平台构建（在 macOS 上构建 Windows/Linux 版本）
+   ```bash
+   wails3 build GOOS=windows
    ```
 
-详细构建说明请参考 [Wails 文档](https://wails.io/zh-Hans/docs/introduction)
+> macOS 请从 `.app` 启动应用；直接运行裸二进制会因缺少 bundle 信息导致系统通知初始化失败。
+
+详细构建说明请参考 [Wails v3 文档](https://v3.wails.io/zh-Hans/)
 
 ### 必需依赖
 
 项目运行需要以下依赖：
 
-* **Go** 1.23+ - 后端开发语言
+* **Go** 1.26+ - 后端开发语言
 * **Node.js** 18+ - 前端运行环境
 * **npm** - 前端包管理器
 
