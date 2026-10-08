@@ -54,6 +54,10 @@ func NewBadgerDB(dbPath string) (*BadgerDB, error) {
 
 	options := badger.DefaultOptions(dbPath)
 	options.Logger = nil // 禁用日志
+	// 关闭时强制压缩 L0：让本轮的删除标记与旧值相遇，产生 vlog GC 依赖的 discard 统计。
+	// 章节内容超过 1MB 必进 vlog，而没有压缩就没有统计，RunValueLogGC 只会返回 ErrNoRewrite，
+	// 短命进程里的删除将永远不会被回收。代价只是关闭时多一次极小的 L0 压缩（LSM 里只有键和指针）
+	options.CompactL0OnClose = true
 
 	db, err := badger.Open(options)
 	if err != nil {
@@ -79,10 +83,39 @@ func NewBadgerDB(dbPath string) (*BadgerDB, error) {
 	}, nil
 }
 
+// CloseBadgerDB 关闭全局 BadgerDB 实例；若未初始化则直接返回。
+func CloseBadgerDB() error {
+	if badgerInstance == nil {
+		return nil
+	}
+
+	if err := badgerInstance.Close(); err != nil {
+		return err
+	}
+
+	badgerInstance = nil
+	once = sync.Once{}
+	return nil
+}
+
 // Close 关闭数据库
 func (b *BadgerDB) Close() error {
 	b.mu.Lock()
 	defer b.mu.Unlock()
+
+	// 短命命令等不到 5 分钟一次的定时 GC，退出前尽力回收一轮 value log：
+	// 章节内容超过 1MB 必写进 .vlog，删除只是墓碑，磁盘要靠 GC 才能真正释放。
+	// 补一次读事务是关键：纯写入进程的读水位恒为 0，badger 压缩时不会丢弃任何
+	// 旧版本，discard 统计永远是空的，RunValueLogGC 只会返回 ErrNoRewrite；
+	// 读水位推进后，db.Close 内的 L0 压缩（CompactL0OnClose）才会统计出可丢弃数据，
+	// 供下一轮退出时的 GC 循环回收（badger 不允许重写本轮的活跃 vlog 文件）。
+	_ = b.db.View(func(txn *badger.Txn) error { return nil })
+	for {
+		if err := b.db.RunValueLogGC(0.7); err != nil {
+			break
+		}
+	}
+
 	return b.db.Close()
 }
 

@@ -330,8 +330,14 @@ func (d *EBookDownload) Download() error {
 		if err = utils.Svg2Epub(OutputDir, title, svgContent, opts); err != nil {
 			return err
 		}
+	}
 
-		return err
+	// 各格式成功生成后清掉本书的页面缓存：内容已写入输出文件，留着只占磁盘。
+	// 失败路径在 switch 内已 return err，走到这里即成功
+	if d.DownloadType >= 1 && d.DownloadType <= 3 {
+		if clearErr := services.ClearBookCache(detail.Enid); clearErr != nil {
+			fmt.Printf("Warning: Failed to clear book cache: %v\n", clearErr)
+		}
 	}
 
 	return nil

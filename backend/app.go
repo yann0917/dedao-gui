@@ -56,6 +56,10 @@ func readEnvInt(name string, defaultValue int) int {
 
 func (a *App) Shutdown(ctx context.Context) {
 	a.shutdownDownloadManager()
+	// 退出前关闭缓存库：Close 内会回收一轮 value log，被删除的章节内容才能释放磁盘
+	if err := utils.CloseBadgerDB(); err != nil {
+		fmt.Printf("关闭缓存数据库时出错: %v\n", err)
+	}
 	setupCleanupOnExit()
 }
 
