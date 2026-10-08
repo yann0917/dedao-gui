@@ -1,6 +1,6 @@
 package services
 
-import "strings"
+import "errors"
 
 // ArticleDetail article content
 // GET query params token,sign,appid
@@ -203,14 +203,9 @@ func shouldFallbackToFreeArticleList(err error) bool {
 	if err == nil {
 		return false
 	}
-	msg := err.Error()
-	if strings.Contains(msg, "401 Unauthorized") ||
-		strings.Contains(msg, "404 NotFound") ||
-		strings.Contains(msg, "400 BadRequest") ||
-		strings.Contains(msg, "496 NoCertificate") {
-		return false
-	}
-	return strings.Contains(msg, "errMsg:")
+	// 仅业务错误（h.c != 0）回退到免费文章；HTTP 状态码与网络错误不回退
+	var be *BusinessError
+	return errors.As(err, &be)
 }
 
 // ArticleInfo get article info

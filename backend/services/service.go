@@ -166,17 +166,24 @@ func handleHTTPResponse(resp *resty.Response, err error) (io.ReadCloser, error) 
 		return nil, err
 	}
 
-	if resp.StatusCode() == http.StatusNotFound {
-		return nil, errors.New("404 NotFound")
+	status := resp.StatusCode()
+
+	// 403/429 常以 JSON body 出现（如 h.c=0 且 c=null），必须在解析内容之前拦截，
+	// 否则会被当作成功解析出空页面
+	if status == http.StatusForbidden || status == http.StatusTooManyRequests {
+		return nil, &HTTPStatusError{Code: status, URL: resp.Request.URL}
 	}
-	if resp.StatusCode() == http.StatusBadRequest {
-		return nil, errors.New("400 BadRequest")
+
+	// HTML 错误页（如 <h2>403 Forbidden</h2>）
+	contentType := resp.Header().Get("Content-Type")
+	if strings.Contains(contentType, "text/html") && status != http.StatusOK {
+		return nil, &HTTPStatusError{Code: status, URL: resp.Request.URL, FromHTMLPage: true}
 	}
-	if resp.StatusCode() == http.StatusUnauthorized {
-		return nil, errors.New("401 Unauthorized")
-	}
-	if resp.StatusCode() == 496 {
-		return nil, errors.New("496 NoCertificate")
+
+	// Permanent errors that shouldn't be retried
+	switch status {
+	case http.StatusNotFound, http.StatusBadRequest, http.StatusUnauthorized, 496:
+		return nil, &HTTPStatusError{Code: status, URL: resp.Request.URL}
 	}
 
 	data := resp.Body()
@@ -193,11 +200,9 @@ func handleJSONParse(reader io.Reader, v interface{}) error {
 		fmt.Printf("err1: %s \n", err.Error())
 		return err
 	}
-	// fmt.Printf("result.C:=%#v", result.C)
 	if !result.isSuccess() {
-		// 未登录或者登录凭证无效
-		err = errors.New("服务异常，请稍后重试。errMsg:" + result.H.E)
-		return err
+		// 业务错误（如 user no legal 的 code 4000），带 Code/Msg 供上层分类处理
+		return &BusinessError{Code: result.H.C, Msg: result.H.E}
 	}
 	err = utils.UnmarshalJSON(result.C, v)
 	if err != nil {
