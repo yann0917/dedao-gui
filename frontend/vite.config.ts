@@ -24,4 +24,9 @@ export default defineConfig({
       ),
     },
   },
+  server: {
+    // vite 8 默认 host=localhost 只落 IPv6(::1)，
+    // 而 wails3 的 ExternalAssetHandler 代理固定拨 IPv4 127.0.0.1，不显式绑定会 dev 白屏
+    host: '127.0.0.1',
+  },
 })
