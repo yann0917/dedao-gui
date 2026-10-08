@@ -27,13 +27,13 @@ const (
 	maxConsecutiveFailures = 3
 	// 全局请求令牌桶大小
 	tokenBucketSize = 5
-	// 令牌产生速率（秒/个）
+	// 令牌产生速率（个/秒）
 	tokenRefillRate = 0.5
 )
 
 // requestLimiter 请求限流器
 type requestLimiter struct {
-	tokens         int        // 当前可用令牌数
+	tokens         int        // 当前可用令牌数；为负表示已预支（排队等待）的个数
 	maxTokens      int        // 最大令牌数
 	refillRate     float64    // 令牌填充速率（个/秒）
 	lastRefillTime time.Time  // 上次填充时间
@@ -50,7 +50,7 @@ func newRequestLimiter(maxTokens int, refillRate float64) *requestLimiter {
 	}
 }
 
-// getToken 获取一个请求令牌，如果没有可用令牌则等待
+// getToken 获取一个请求令牌；桶空时预支一个令牌，返回调用方需要等待的时长
 func (r *requestLimiter) getToken() time.Duration {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
@@ -60,32 +60,28 @@ func (r *requestLimiter) getToken() time.Duration {
 	elapsedTime := now.Sub(r.lastRefillTime).Seconds()
 	newTokens := int(elapsedTime * r.refillRate)
 
-	if newTokens > 0 {
-		// 填充令牌，但不超过最大值
-		r.tokens = min(r.tokens+newTokens, r.maxTokens)
+	if r.tokens+newTokens >= r.maxTokens {
+		// 桶满：丢弃零头
+		r.tokens = r.maxTokens
 		r.lastRefillTime = now
+	} else if newTokens > 0 {
+		r.tokens += newTokens
+		// 只推进已折算成整数令牌的那段时间，保留不足一个令牌的零头
+		r.lastRefillTime = r.lastRefillTime.Add(time.Duration(float64(newTokens) / r.refillRate * float64(time.Second)))
 	}
 
-	// 如果没有令牌，计算等待时间
-	if r.tokens <= 0 {
-		// 计算需要等待多久才能获得一个令牌
-		waitTime := time.Duration((1.0 / r.refillRate) * float64(time.Second))
-		return waitTime
-	}
-
-	// 消耗一个令牌
+	// 不管桶里有没有令牌都先扣一个：扣成负数表示已预支，后到者排在更后面
 	r.tokens--
 	// 添加小的随机抖动，使请求不那么规律
 	jitter := time.Duration(rand.Float64() * 200 * float64(time.Millisecond))
-	return jitter
-}
 
-// min 返回两个整数中的较小值
-func min(a, b int) int {
-	if a < b {
-		return a
+	// 已预支：第 n 个预支者要等到第 n 个新令牌产生的时刻
+	if r.tokens < 0 {
+		due := r.lastRefillTime.Add(time.Duration(float64(-r.tokens) / r.refillRate * float64(time.Second)))
+		return due.Sub(now) + jitter
 	}
-	return b
+
+	return jitter
 }
 
 // 全局请求控制相关变量
@@ -115,7 +111,13 @@ func waitForNextRequest() {
 			antispiderMutex.Unlock()
 			fmt.Printf("处于反爬虫冷却期，等待 %.1f 秒...\n", waitTime.Seconds())
 			time.Sleep(waitTime)
-			return
+			// 冷却已结束，先清除标记再去拿令牌：
+			// 若带着标记睡醒直接放行，这批请求会绕过令牌桶集中发出，
+			// 而它们更新 lastRequestTime 后，后续进入者又会被重新判入冷却
+			antispiderMutex.Lock()
+			antispiderCooldown = false
+			consecutiveFailures = 0
+			antispiderMutex.Unlock()
 		}
 	} else {
 		antispiderMutex.Unlock()
