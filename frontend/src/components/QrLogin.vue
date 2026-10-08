@@ -110,9 +110,7 @@ timeState.timer = window.setInterval(() => {
       if (loginResult.status == 1) {
         let user = reactive(new services.User());
         Object.assign(user, loginResult.user);
-        store.user = user;
-
-        Local.set("cookies", loginResult.cookie);
+        store.loginSuccess(loginResult.cookie, user);
 
         if (store.userList.length == 0) {
           store.userList.push(user);

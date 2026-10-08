@@ -7,8 +7,8 @@
 				</el-icon>
 				<span>{{ props.menu.meta?.name }}</span>
 			</template>
-			<template v-for="children in props.menu.children" :key="children.path">
-				<menu-item v-if="!children.meta?.hideMenu" :menu="children" :path="`${menuPath}/${children.path}`" />
+			<template v-for="children in visibleChildren" :key="children.path">
+				<menu-item :menu="children" :path="`${menuPath}/${children.path}`" />
 			</template>
 		</el-sub-menu>
 			<el-menu-item v-else :index="menuPath">
@@ -29,6 +29,7 @@
 <script lang="ts" setup>
 import { computed, PropType } from 'vue'
 import { RouteRecordRaw } from 'vue-router'
+import { userStore } from '../stores/user'
 const props = defineProps({
 	menu: {
 		type: Object as PropType<RouteRecordRaw>,
@@ -39,6 +40,15 @@ const props = defineProps({
 		default: ''
 	}
 })
+// 未登录时隐藏需要登录的子菜单（如 个人简介），避免进入后接口直接报错
+const store = userStore()
+const visibleChildren = computed(() =>
+	(props.menu.children ?? []).filter(
+		(children) =>
+			!children.meta?.hideMenu &&
+			(!children.meta?.requiresAuth || store.isLoggedIn()),
+	),
+)
 const menuPath = computed(() => {
 	if ([1, 2].includes(props.menu.meta?.menuType as number)) {
 		return (

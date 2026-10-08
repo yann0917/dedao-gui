@@ -59,8 +59,8 @@
 
       <!-- 右侧用户信息卡片 -->
       <div class="user-card-wrapper">
-        <div class="user-card" :class="!Local.get('cookies') ? 'not-login' : ''">
-          <div v-if="Local.get('cookies')==null" class="login-prompt">
+        <div class="user-card" :class="!store.loggedIn ? 'not-login' : ''">
+          <div v-if="!store.loggedIn" class="login-prompt">
             <div class="login-placeholder">
                <img src="../assets/images/logo-universal.png" alt="Logo" class="login-logo" />
                <p>登录开启学习之旅</p>
@@ -277,9 +277,10 @@ import EbookInfo from "../components/EbookInfo.vue";
 import CourseInfo from "../components/CourseInfo.vue";
 import { useAppRouter } from "../composables/useRouter";
 import { ROUTE_NAMES } from "../router/routes";
-import { Local } from "../utils/storage";
+import { userStore } from "../stores/user";
 
 const { pushByName, replace, pushCourseDetail } = useAppRouter();
+const store = userStore();
 
 const loading = ref(true);
 const page = ref(0);
