@@ -13,7 +13,7 @@
                 <div class="section-label">选择导出格式</div>
                 <div class="format-options">
                     <div 
-                        v-for="item in props.downloadTypeOptions" 
+                        v-for="item in formatOptions"
                         :key="item.value" 
                         class="format-option"
                         :class="downloadType === item.value ? 'active' : ''"
@@ -24,6 +24,12 @@
                     </div>
                 </div>
             </div>
+
+            <p v-if="supportsAudioMetadata" class="metadata-hint">
+                {{ downloadType === 4
+                    ? '仅生成 NFO、封面，并为已有 MP3 补写标签；不下载音频。补写标签需要 ffmpeg。'
+                    : 'MP3 下载会同时保存 NFO、封面及内嵌音频标签，可导入 Jellyfin 音乐库或有声书库。' }}
+            </p>
 
             <div class="download-status">
                 <div class="status-header">
@@ -44,7 +50,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, PropType} from "vue";
+import {computed, onMounted, ref, PropType} from "vue";
 import {EbookDownload, CourseDownload, OdobDownload} from '@backend-bindings/app';
 import {ElMessage} from "element-plus";
 import { Check } from '@element-plus/icons-vue'
@@ -89,6 +95,11 @@ const props = defineProps({
     }
 });
 const emits = defineEmits(["close"]);
+
+const supportsAudioMetadata = computed(() => props.prodType === 66 || props.prodType === 3)
+const formatOptions = computed(() => supportsAudioMetadata.value
+    ? [...props.downloadTypeOptions, { value: 4, label: '仅元数据' }]
+    : props.downloadTypeOptions)
 
 onMounted(() => {
     openDialog();
@@ -160,6 +171,12 @@ const download = async () => {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
+}
+
+.metadata-hint {
+    color: var(--text-secondary, #606266);
+    font-size: 12px;
+    line-height: 1.6;
 }
 
 .format-option {

@@ -33,7 +33,7 @@ func emitProgress(cb ProgressCallback, p Progress) {
 
 type CourseDownload struct {
 	Ctx          context.Context
-	DownloadType int              // 1:mp3, 2:PDF文档, 3:markdown文档
+	DownloadType int              // 1:mp3及元数据, 2:PDF文档, 3:markdown文档, 4:仅元数据
 	ID           int              // 课程 id
 	AID          int              // 文章 id
 	EnId         string           // 课程 enid
@@ -42,7 +42,7 @@ type CourseDownload struct {
 
 type OdobDownload struct {
 	Ctx          context.Context
-	DownloadType int // 1:mp3, 2:PDF文档, 3:markdown文档
+	DownloadType int // 1:mp3及元数据, 2:PDF文档, 3:markdown文档, 4:仅元数据
 	ID           int
 	Data         *services.Course
 	ProgressCB   ProgressCallback // 可空；下载任务管理器注入以接收实时进度
@@ -136,9 +136,20 @@ func (d *CourseDownload) Download() error {
 				errs = append(errs, err)
 			}
 		}
+		album, tracks := courseMetadata(course, articles, d.AID)
+		if err := exportAudioMetadata(d.Ctx, path, album, tracks); err != nil {
+			errs = append(errs, err)
+		}
 		if len(errs) > 0 {
 			return errs[0]
 		}
+	case DownloadMetadata:
+		path, err := utils.Mkdir(OutputDir, utils.FileName(course.ClassInfo.Name, ""), "MP3")
+		if err != nil {
+			return err
+		}
+		album, tracks := courseMetadata(course, articles, d.AID)
+		return exportAudioMetadata(d.Ctx, path, album, tracks)
 	case 2:
 		if err := checkCanceled(d.Ctx); err != nil {
 			return err
@@ -171,6 +182,9 @@ func (d *OdobDownload) Download() error {
 	if err := checkCanceled(d.Ctx); err != nil {
 		return err
 	}
+	if d.Data == nil {
+		return fmt.Errorf("缺少听书下载数据")
+	}
 	fileName := "每天听本书"
 	switch d.DownloadType {
 	case 1:
@@ -178,9 +192,13 @@ func (d *OdobDownload) Download() error {
 			Title: fileName,
 		}
 		downloadData.Type = "audio"
-		downloadData.Data = extOdobDownloadData(d.Data)
+		data, err := extOdobDownloadData(d.Data)
+		if err != nil {
+			return err
+		}
+		downloadData.Data = data
 		errors := make([]error, 0)
-		path, err := utils.Mkdir(OutputDir, utils.FileName(fileName, ""), "MP3")
+		path, err := odobAudioDir(OutputDir, d.Data)
 		if err != nil {
 			return err
 		}
@@ -208,9 +226,20 @@ func (d *OdobDownload) Download() error {
 				errors = append(errors, err)
 			}
 		}
+		album, tracks := odobMetadata(d.Data)
+		if err := exportAudioMetadata(d.Ctx, path, album, tracks); err != nil {
+			errors = append(errors, err)
+		}
 		if len(errors) > 0 {
 			return errors[0]
 		}
+	case DownloadMetadata:
+		path, err := odobAudioDir(OutputDir, d.Data)
+		if err != nil {
+			return err
+		}
+		album, tracks := odobMetadata(d.Data)
+		return exportAudioMetadata(d.Ctx, path, album, tracks)
 	case 2:
 		if err := checkCanceled(d.Ctx); err != nil {
 			return err
@@ -417,7 +446,7 @@ func extractCourseDownloadData(articles *services.ArticleList, aid int, flag int
 }
 
 // extOdobDownloadData 生成 AudioBook 下载数据
-func extOdobDownloadData(info *services.Course) []downloader.Datum {
+func extOdobDownloadData(info *services.Course) ([]downloader.Datum, error) {
 	data := downloader.EmptyData
 	audioIds := map[int]string{}
 
@@ -441,7 +470,7 @@ func extOdobDownloadData(info *services.Course) []downloader.Datum {
 	}
 	detail, err := getService().AudioDetailAlias(aliasID)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	datum := &downloader.Datum{
 		ID:      info.ID,
@@ -460,7 +489,7 @@ func extOdobDownloadData(info *services.Course) []downloader.Datum {
 	for _, d := range audioData {
 		data = append(data, *d)
 	}
-	return data
+	return data, nil
 }
 
 func handleStreams(audioData []*downloader.Datum, audioIds map[int]string) {

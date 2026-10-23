@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -14,13 +15,16 @@ import (
 
 // Download download data
 func Download(v Datum, stream, path string) error {
+	filePreName := filepath.Join(path, strings.TrimSuffix(AudioFilename(v), ".mp3"))
+	fileName := filepath.Join(path, AudioFilename(v))
+	// Existing audio must not be fetched again just to repair metadata.
+	if size, exists, err := utils.FileSize(fileName); err != nil {
+		return err
+	} else if exists && size > 0 {
+		return nil
+	}
 	// 按大到小排序
 	v.genSortedStreams()
-
-	title := utils.FileName(v.Title, "")
-	if v.OrderNum > 0 {
-		title = fmt.Sprintf("%03d.%s", v.OrderNum, title)
-	}
 	if stream == "" {
 		if len(v.sortedStreams) == 0 {
 			return fmt.Errorf("没有可用的下载流：%s", v.Title)
@@ -34,23 +38,12 @@ func Download(v Datum, stream, path string) error {
 
 	// 判断下载连接是否存在
 	if len(data.URLs) == 0 {
-		return nil
-	}
-
-	filePreName := filepath.Join(path, title)
-	fileName, err := utils.FilePath(filePreName, "mp3", false)
-
-	if err != nil {
-		return err
+		return fmt.Errorf("没有可用的下载链接：%s", v.Title)
 	}
 
 	if v.Type == "audio" {
 		fmt.Println(fileName)
-		err = downloadAudio(v.M3U8URL, fileName)
-		if err != nil {
-			fmt.Println(err)
-			return err
-		}
+		return downloadAudio(v.M3U8URL, fileName)
 	}
 	_, mergedFileExists, err := utils.FileSize(fileName)
 	if err != nil {
@@ -123,9 +116,37 @@ func Download(v Datum, stream, path string) error {
 	return err
 }
 
+// AudioFilename is shared by the downloader and metadata exporter so that
+// sanitising, truncation and article ordering can never drift apart.
+func AudioFilename(v Datum) string {
+	title := utils.FileName(v.Title, "")
+	if v.OrderNum > 0 {
+		title = fmt.Sprintf("%03d.%s", v.OrderNum, title)
+	}
+	return title + ".mp3"
+}
+
 func downloadAudio(m3u8 string, fname string) (err error) {
-	err = utils.MergeAudio([]string{m3u8}, fname)
-	return
+	f, err := os.CreateTemp(filepath.Dir(fname), ".audio-*.mp3")
+	if err != nil {
+		return err
+	}
+	defer os.Remove(f.Name())
+	if err = f.Close(); err != nil {
+		return err
+	}
+	if err = utils.MergeAudio([]string{m3u8}, f.Name()); err != nil {
+		return err
+	}
+	if info, err := os.Stat(f.Name()); err != nil {
+		return err
+	} else if info.Size() == 0 {
+		return fmt.Errorf("音频下载结果为空")
+	}
+	if err = os.Chmod(f.Name(), 0644); err != nil {
+		return err
+	}
+	return os.Rename(f.Name(), fname)
 }
 
 // Save url file
