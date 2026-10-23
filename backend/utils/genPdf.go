@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
+	"sync"
 
 	"github.com/SebastiaanKlippert/go-wkhtmltopdf"
 	"github.com/pdfcpu/pdfcpu/pkg/api"
@@ -24,9 +26,33 @@ type PdfOption struct {
 	Toc bool
 }
 
+var pdfGeneratorMu sync.Mutex
+
+func newPDFGenerator() (*wkhtmltopdf.PDFGenerator, error) {
+	configured := WkToPdfDir
+	if configured == "" && os.Getenv("WKHTMLTOPDF_PATH") != "" {
+		configured = filepath.Join(os.Getenv("WKHTMLTOPDF_PATH"), "wkhtmltopdf")
+	}
+	path, err := resolveExecutable(configured, "wkhtmltopdf")
+	if err != nil {
+		return nil, err
+	}
+	// The library uses a global path while constructing per-document generators.
+	pdfGeneratorMu.Lock()
+	defer pdfGeneratorMu.Unlock()
+	wkhtmltopdf.SetPath(path)
+	pdfg, err := wkhtmltopdf.NewPDFGenerator()
+	if err != nil {
+		return nil, fmt.Errorf("初始化 wkhtmltopdf 失败: %w", err)
+	}
+	return pdfg, nil
+}
+
 func (p *PdfOption) GenPdf(buf *bytes.Buffer) (err error) {
-	wkhtmltopdf.SetPath(WkToPdfDir)
-	pdfg, _ := wkhtmltopdf.NewPDFGenerator()
+	pdfg, err := newPDFGenerator()
+	if err != nil {
+		return err
+	}
 	page := wkhtmltopdf.NewPageReader(buf)
 	page.FooterFontSize.Set(10)
 	page.FooterRight.Set("[page]")
@@ -267,7 +293,10 @@ func (p *PdfOption) genCoverPdf(coverHTMLPath string) (string, error) {
 	}
 	defer f.Close()
 
-	pdfg, _ := wkhtmltopdf.NewPDFGenerator()
+	pdfg, err := newPDFGenerator()
+	if err != nil {
+		return "", err
+	}
 	page := wkhtmltopdf.NewPageReader(f)
 	page.DisableSmartShrinking.Set(true)
 	page.EnableLocalFileAccess.Set(true)
