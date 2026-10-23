@@ -322,7 +322,7 @@ const openDownloadDialog = (row: any) => {
     } else {
         SetDir([setStore.getDownloadDir,
             setStore.getFfmpegDirDir,
-            setStore.getWkDir]).then(() => {
+            setStore.getWkDir, setStore.getChromiumPath]).then(() => {
         }).catch((error) => {
             ElMessage({
                 message: error,

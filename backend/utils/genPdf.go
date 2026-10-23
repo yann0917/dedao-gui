@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
+	"sync"
 
 	"github.com/SebastiaanKlippert/go-wkhtmltopdf"
 	"github.com/pdfcpu/pdfcpu/pkg/api"
@@ -21,12 +23,78 @@ type PdfOption struct {
 	PageSize  string
 	// Toc 预留：目录页已改由 Svg2Pdf 自绘 HTML（wkhtmltopdf 内置 TOC
 	// 行距不可控，同样存在 1em 行距与页顶裁切问题）
-	Toc bool
+	Toc      bool
+	renderer pdfRenderer
 }
 
-func (p *PdfOption) GenPdf(buf *bytes.Buffer) (err error) {
-	wkhtmltopdf.SetPath(WkToPdfDir)
-	pdfg, _ := wkhtmltopdf.NewPDFGenerator()
+type pdfRenderer interface {
+	Render(context.Context, *PdfOption, []byte) error
+}
+
+// GenPdf keeps callers independent of the selected rendering engine.
+func (p *PdfOption) GenPdf(buf *bytes.Buffer) error {
+	renderer := p.renderer
+	if renderer == nil {
+		var err error
+		renderer, err = selectPDFRenderer()
+		if err != nil {
+			return err
+		}
+	}
+	if err := renderer.Render(context.Background(), p, buf.Bytes()); err != nil {
+		return err
+	}
+	if p.CoverPath != "" {
+		return os.Remove(p.CoverPath)
+	}
+	return nil
+}
+
+// Legacy rendering is opt-in only; never silently downgrade to old WebKit.
+func selectPDFRenderer() (pdfRenderer, error) {
+	switch os.Getenv("DEDAO_PDF_ENGINE") {
+	case "", "chromium":
+		return chromiumPDFRenderer{}, nil
+	case "wkhtmltopdf":
+		return legacyPDFRenderer{}, nil
+	default:
+		return nil, fmt.Errorf("不支持的 PDF 引擎 %q（可选 chromium、wkhtmltopdf）", os.Getenv("DEDAO_PDF_ENGINE"))
+	}
+}
+
+type legacyPDFRenderer struct{}
+
+func (legacyPDFRenderer) Render(_ context.Context, p *PdfOption, data []byte) error {
+	return p.genLegacyPDF(bytes.NewBuffer(data))
+}
+
+var pdfGeneratorMu sync.Mutex
+
+func newPDFGenerator() (*wkhtmltopdf.PDFGenerator, error) {
+	configured := WkToPdfDir
+	if configured == "" && os.Getenv("WKHTMLTOPDF_PATH") != "" {
+		configured = filepath.Join(os.Getenv("WKHTMLTOPDF_PATH"), "wkhtmltopdf")
+	}
+	path, err := resolveExecutable(configured, "wkhtmltopdf")
+	if err != nil {
+		return nil, err
+	}
+	// The library uses a global path while constructing per-document generators.
+	pdfGeneratorMu.Lock()
+	defer pdfGeneratorMu.Unlock()
+	wkhtmltopdf.SetPath(path)
+	pdfg, err := wkhtmltopdf.NewPDFGenerator()
+	if err != nil {
+		return nil, fmt.Errorf("初始化 wkhtmltopdf 失败: %w", err)
+	}
+	return pdfg, nil
+}
+
+func (p *PdfOption) genLegacyPDF(buf *bytes.Buffer) (err error) {
+	pdfg, err := newPDFGenerator()
+	if err != nil {
+		return err
+	}
 	page := wkhtmltopdf.NewPageReader(buf)
 	page.FooterFontSize.Set(10)
 	page.FooterRight.Set("[page]")
@@ -83,9 +151,6 @@ func (p *PdfOption) GenPdf(buf *bytes.Buffer) (err error) {
 		}
 	}
 	fmt.Printf("\033[32;1m%s\033[0m\n", "完成")
-	if p.CoverPath != "" {
-		err = os.Remove(p.CoverPath)
-	}
 	return
 }
 
@@ -267,7 +332,10 @@ func (p *PdfOption) genCoverPdf(coverHTMLPath string) (string, error) {
 	}
 	defer f.Close()
 
-	pdfg, _ := wkhtmltopdf.NewPDFGenerator()
+	pdfg, err := newPDFGenerator()
+	if err != nil {
+		return "", err
+	}
 	page := wkhtmltopdf.NewPageReader(f)
 	page.DisableSmartShrinking.Set(true)
 	page.EnableLocalFileAccess.Set(true)

@@ -4,17 +4,17 @@
         <key>CFBundlePackageType</key>
             <string>APPL</string>
         <key>CFBundleName</key>
-            <string>My Product</string>
+            <string>dedao-gui</string>
         <key>CFBundleExecutable</key>
-            <string>wails3tpl</string>
+            <string>dedao-gui</string>
         <key>CFBundleIdentifier</key>
-            <string>com.example.wails3tpl</string>
+            <string>com.yann0917.dedao-gui</string>
         <key>CFBundleVersion</key>
-            <string>0.1.0</string>
+            <string>0.0.1</string>
         <key>CFBundleGetInfoString</key>
-            <string>This is a comment</string>
+            <string>dedao GUI downloader</string>
         <key>CFBundleShortVersionString</key>
-            <string>0.1.0</string>
+            <string>0.0.1</string>
         <key>CFBundleIconFile</key>
             <string>icons</string>
         <key>LSMinimumSystemVersion</key>
@@ -22,7 +22,7 @@
         <key>NSHighResolutionCapable</key>
             <string>true</string>
         <key>NSHumanReadableCopyright</key>
-            <string>© 2026, My Company</string>
+            <string>(c) 2025, My Company</string>
         <key>NSAppTransportSecurity</key>
         <dict>
             <key>NSAllowsLocalNetworking</key>

@@ -13,7 +13,7 @@
 * [Vite](https://cn.vitejs.dev/) - 构建工具
 * [Pinia](https://pinia.vuejs.org/zh/) - 状态管理
 * [FFmpeg](https://ffmpeg.org/) - 音频处理
-* [wkhtmltopdf](https://wkhtmltopdf.org/downloads.html) - PDF 生成
+* Chrome / Edge / Chromium - 默认 PDF 渲染（无界面运行）
 
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/yann0917/dedao-gui)
 [![Go Report Card](https://goreportcard.com/badge/github.com/yann0917/dedao-gui)](https://goreportcard.com/report/github.com/yann0917/dedao-gui)
@@ -99,8 +99,12 @@
 
 #### PDF 生成
 
-* **wkhtmltopdf**
-  > 电子书转 PDF 需要借助 [wkhtmltopdf](https://wkhtmltopdf.org/downloads.html)
+* **Chrome / Edge / Chromium**（默认引擎）
+  > 使用本机浏览器的 Headless 打印功能，适用于课程、听书文稿和电子书。无需 Node.js、ChromeDriver 或 wkhtmltopdf；建议使用 Chrome/Edge 131+（页码依赖 CSS 页边距盒）。应用会从 PATH 和常见安装目录自动查找，也可在系统设置填写“PDF 浏览器路径”，或设置 `DEDAO_CHROME_PATH`。
+  > 每次导出使用独立临时浏览器配置，保留浏览器沙箱，禁止执行文档脚本；不访问日常浏览器的 Cookie、扩展或登录状态。封面、目录与正文一次渲染，保留内部链接和 PDF 大纲。
+
+* **旧版兼容模式（不推荐新安装）**
+  > 已安装 wkhtmltopdf 的用户可显式设置 `DEDAO_PDF_ENGINE=wkhtmltopdf`，继续使用设置中的旧工具路径或 `WKHTMLTOPDF_PATH`。默认不会自动回退到旧引擎；Chrome 启动失败时会返回错误。
 
 #### 音频处理
 
