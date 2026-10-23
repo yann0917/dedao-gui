@@ -246,8 +246,8 @@ const bizTypeLabel = (bizType: string) => {
 
 const taskTitle = (task: downloadmgr.DownloadTask) => {
   const title = String(task?.title ?? '').trim()
-  if (title) return title
-  return `${bizTypeLabel(task.bizType)} #${task.bizId}`
+  const name = title || `${bizTypeLabel(task.bizType)} #${task.bizId}`
+  return task.downloadType === 4 ? `${name}（仅元数据）` : name
 }
 
 const updateTaskByEvent = (payload: any) => {
