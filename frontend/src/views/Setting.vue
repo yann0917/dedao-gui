@@ -76,7 +76,7 @@
                 <li>
                   <div class="info-item">
                     <el-icon><Document /></el-icon>
-                    <span>如需下载PDF格式电子书，需安装 <el-link href="https://wkhtmltopdf.org/downloads.html" target="_blank" type="primary">wkhtmltopdf</el-link> 并设置路径</span>
+                    <span>PDF 导出默认使用本机 Chrome、Edge 或 Chromium，无需安装 wkhtmltopdf</span>
                   </div>
                 </li>
               </ul>
@@ -102,7 +102,26 @@
             </div>
           </el-form-item>
 
-          <el-form-item label="wkhtmltopdf 可执行文件路径">
+          <el-form-item label="PDF 浏览器路径（可选）">
+            <div class="dir-input-wrapper">
+              <el-input
+                v-model="form.chromiumPath"
+                :prefix-icon="Document"
+                placeholder="留空自动查找 Chrome / Edge / Chromium"
+                clearable
+              />
+              <el-button @click="openToolPathDialog('选择 PDF 浏览器可执行文件', 'chromium')">
+                <el-icon><FolderOpened /></el-icon>
+                浏览
+              </el-button>
+            </div>
+            <div class="form-tip">
+              <el-icon><InfoFilled /></el-icon>
+              <span>默认使用独立的无界面浏览器，不读取或修改您的日常浏览器配置。macOS 可填写 /Applications/Google Chrome.app/Contents/MacOS/Google Chrome。</span>
+            </div>
+          </el-form-item>
+
+          <el-form-item label="旧版 wkhtmltopdf 路径（仅兼容模式）">
             <div class="dir-input-wrapper">
               <el-input 
                 v-model="form.wkhtmltopdfDir"
@@ -117,7 +136,7 @@
             </div>
             <div class="form-tip">
               <el-icon><InfoFilled /></el-icon>
-              <span>电子书转 PDF 需要借助 <el-link href="https://wkhtmltopdf.org/downloads.html" target="_blank" type="primary">wkhtmltopdf</el-link>，安装后终端执行 whereis wkhtmltopdf 查找路径</span>
+              <span>此项不影响默认 PDF 导出；仅在设置环境变量 DEDAO_PDF_ENGINE=wkhtmltopdf 时使用。不建议新安装旧引擎。</span>
             </div>
             <div class="form-tip">
               <el-icon><InfoFilled /></el-icon>
@@ -222,6 +241,7 @@ const form = reactive({
   systemColor: themeStoreInstance.color || store.getColor || '#d32e22',
   ffmpegDir: store.getFfmpegDirDir,
   wkhtmltopdfDir: store.getWkDir,
+  chromiumPath: store.getChromiumPath,
   fontFamily: store.setting.fontFamily || 'default',
 })
 
@@ -231,6 +251,7 @@ const originalSettings = {
   systemColor: themeStoreInstance.color || store.getColor || '#d32e22',
   ffmpegDir: store.getFfmpegDirDir,
   wkhtmltopdfDir: store.getWkDir,
+  chromiumPath: store.getChromiumPath,
   fontFamily: store.setting.fontFamily || 'default',
 }
 
@@ -252,6 +273,8 @@ const openToolPathDialog = async (title: string, toolType: string) => {
     if (result) {
       if (toolType === 'ffmpeg') {
         form.ffmpegDir = result
+      } else if (toolType === 'chromium') {
+        form.chromiumPath = result
       } else if (toolType === 'wkhtmltopdf') {
         form.wkhtmltopdfDir = result
       }
@@ -271,6 +294,7 @@ const resetForm = () => {
   form.systemColor = originalSettings.systemColor
   form.ffmpegDir = originalSettings.ffmpegDir
   form.wkhtmltopdfDir = originalSettings.wkhtmltopdfDir
+  form.chromiumPath = originalSettings.chromiumPath
   
   // 重新应用主题色
   setThemeColor(form.systemColor)
@@ -291,6 +315,7 @@ const onSubmit = () => {
   store.setting.theme = form.systemColor
   store.setting.ffmpegDir = form.ffmpegDir
   store.setting.wkhtmltopdfDir = form.wkhtmltopdfDir
+  store.setting.chromiumPath = form.chromiumPath
   store.setting.fontFamily = form.fontFamily
   
   // 更新主题存储
@@ -303,6 +328,7 @@ const onSubmit = () => {
     systemColor: form.systemColor,
     ffmpegDir: form.ffmpegDir,
     wkhtmltopdfDir: form.wkhtmltopdfDir,
+    chromiumPath: form.chromiumPath,
     fontFamily: form.fontFamily,
   })
   

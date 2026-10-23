@@ -560,7 +560,7 @@ const ensureDownloadDirReady = async () => {
   }
 
   try {
-    await SetDir([setStore.getDownloadDir, setStore.getFfmpegDirDir, setStore.getWkDir])
+    await SetDir([setStore.getDownloadDir, setStore.getFfmpegDirDir, setStore.getWkDir, setStore.getChromiumPath])
     return true
   } catch (error) {
     ElMessage({

@@ -468,7 +468,7 @@ const openDownloadDialog = (row: any) => {
         // Ensure directories are set in backend
         SetDir([setStore.getDownloadDir,
             setStore.getFfmpegDirDir,
-            setStore.getWkDir]).then(() => {
+            setStore.getWkDir, setStore.getChromiumPath]).then(() => {
             dialogDownloadVisible.value = true
         }).catch((error) => {
             ElMessage({

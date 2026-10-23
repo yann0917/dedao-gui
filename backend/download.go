@@ -50,12 +50,18 @@ func (a *App) SetDir(dir []string) (err error) {
 	if len(dir) > 2 {
 		utils.WkToPdfDir = dir[2]
 	}
+	if len(dir) > 3 {
+		if err = validateExecutablePath(dir[3], "PDF 浏览器"); err != nil {
+			return err
+		}
+		utils.ChromiumPath = dir[3]
+	}
 	if len(dir) > 1 {
 		if err = validateExecutablePath(utils.FfmpegDir, "ffmpeg"); err != nil {
 			return err
 		}
 	}
-	if len(dir) > 2 {
+	if len(dir) > 2 && os.Getenv("DEDAO_PDF_ENGINE") == "wkhtmltopdf" {
 		if err = validateExecutablePath(utils.WkToPdfDir, "wkhtmltopdf"); err != nil {
 			return err
 		}

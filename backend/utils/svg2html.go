@@ -229,6 +229,7 @@ func Svg2Pdf(outputDir, title string, svgContents []*SvgContent, toc []EbookToc)
 	assignFootnoteAnchors(chapters)
 
 	buf.WriteString(genPdfTocHtml(toc))
+	wroteChapter := false
 	for k, svgContent := range svgContents {
 		chapter, coverContent, err1 := OneByOneHtml(eBookTypePdf, k, svgContent, toc, chapters[k].pages)
 		if err1 != nil {
@@ -238,8 +239,14 @@ func Svg2Pdf(outputDir, title string, svgContents []*SvgContent, toc []EbookToc)
 		if k == 0 {
 			cover = coverContent
 		}
+		if !hasVisiblePDFContent([]byte(chapter)) {
+			continue
+		}
+		if wroteChapter {
+			buf.WriteString(`<div style="break-before:page;page-break-before:always"></div>`)
+		}
 		buf.Write([]byte(chapter))
-		buf.WriteString(`<P style="page-break-before: always">`)
+		wroteChapter = true
 	}
 
 	// write cover into cover.html file（cover 为空时不设封面）

@@ -10,6 +10,7 @@ import (
 )
 
 func TestGenPdfReportsMissingConverter(t *testing.T) {
+	t.Setenv("DEDAO_PDF_ENGINE", "wkhtmltopdf")
 	old := WkToPdfDir
 	WkToPdfDir = filepath.Join(t.TempDir(), "missing-wkhtmltopdf")
 	t.Cleanup(func() {

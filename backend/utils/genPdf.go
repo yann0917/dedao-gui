@@ -23,7 +23,49 @@ type PdfOption struct {
 	PageSize  string
 	// Toc 预留：目录页已改由 Svg2Pdf 自绘 HTML（wkhtmltopdf 内置 TOC
 	// 行距不可控，同样存在 1em 行距与页顶裁切问题）
-	Toc bool
+	Toc      bool
+	renderer pdfRenderer
+}
+
+type pdfRenderer interface {
+	Render(context.Context, *PdfOption, []byte) error
+}
+
+// GenPdf keeps callers independent of the selected rendering engine.
+func (p *PdfOption) GenPdf(buf *bytes.Buffer) error {
+	renderer := p.renderer
+	if renderer == nil {
+		var err error
+		renderer, err = selectPDFRenderer()
+		if err != nil {
+			return err
+		}
+	}
+	if err := renderer.Render(context.Background(), p, buf.Bytes()); err != nil {
+		return err
+	}
+	if p.CoverPath != "" {
+		return os.Remove(p.CoverPath)
+	}
+	return nil
+}
+
+// Legacy rendering is opt-in only; never silently downgrade to old WebKit.
+func selectPDFRenderer() (pdfRenderer, error) {
+	switch os.Getenv("DEDAO_PDF_ENGINE") {
+	case "", "chromium":
+		return chromiumPDFRenderer{}, nil
+	case "wkhtmltopdf":
+		return legacyPDFRenderer{}, nil
+	default:
+		return nil, fmt.Errorf("不支持的 PDF 引擎 %q（可选 chromium、wkhtmltopdf）", os.Getenv("DEDAO_PDF_ENGINE"))
+	}
+}
+
+type legacyPDFRenderer struct{}
+
+func (legacyPDFRenderer) Render(_ context.Context, p *PdfOption, data []byte) error {
+	return p.genLegacyPDF(bytes.NewBuffer(data))
 }
 
 var pdfGeneratorMu sync.Mutex
@@ -48,7 +90,7 @@ func newPDFGenerator() (*wkhtmltopdf.PDFGenerator, error) {
 	return pdfg, nil
 }
 
-func (p *PdfOption) GenPdf(buf *bytes.Buffer) (err error) {
+func (p *PdfOption) genLegacyPDF(buf *bytes.Buffer) (err error) {
 	pdfg, err := newPDFGenerator()
 	if err != nil {
 		return err
@@ -109,9 +151,6 @@ func (p *PdfOption) GenPdf(buf *bytes.Buffer) (err error) {
 		}
 	}
 	fmt.Printf("\033[32;1m%s\033[0m\n", "完成")
-	if p.CoverPath != "" {
-		err = os.Remove(p.CoverPath)
-	}
 	return
 }
 

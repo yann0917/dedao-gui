@@ -17,6 +17,7 @@ import (
 // TestPdfTocLinkDestOffsets 回归：封面与正文合并后，目录链接的命名目的地
 // （/Dests 里的 0 基整数页号）必须整体偏移封面页数，否则点击会落早一页。
 func TestPdfTocLinkDestOffsets(t *testing.T) {
+	t.Setenv("DEDAO_PDF_ENGINE", "wkhtmltopdf") // legacy merge regression
 	if _, err := exec.LookPath("wkhtmltopdf"); err != nil {
 		t.Skipf("本机无 wkhtmltopdf，跳过: %v", err)
 	}

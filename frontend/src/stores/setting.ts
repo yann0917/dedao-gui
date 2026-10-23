@@ -9,6 +9,7 @@ export const settingStore = defineStore("setting", {
                 color: "",
                 ffmpegDir: "",
                 wkhtmltopdfDir: "",
+                chromiumPath: "",
                 fontFamily: "default", // default, jetbrains, wenkai
             },
         }
@@ -22,6 +23,9 @@ export const settingStore = defineStore("setting", {
         },
         getWkDir: (state) => {
             return state.setting.wkhtmltopdfDir
+        },
+        getChromiumPath: (state) => {
+            return state.setting.chromiumPath || ""
         },
         getColor:(state)=>{
             return state.setting.color

@@ -17,6 +17,7 @@ import (
 // 用于人工检查排版（封面满版、目录行距、页顶截断等）。
 // 本机无 wkhtmltopdf 或无调试数据时跳过。
 func TestSvg2PdfRealDataSmoke(t *testing.T) {
+	t.Setenv("DEDAO_PDF_ENGINE", "wkhtmltopdf") // legacy merge regression
 	if _, err := exec.LookPath("wkhtmltopdf"); err != nil {
 		t.Skipf("本机无 wkhtmltopdf，跳过 PDF 冒烟: %v", err)
 	}
