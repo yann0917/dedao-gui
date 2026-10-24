@@ -110,6 +110,14 @@ const router = createRouter({
                     meta: {
                         name: "书评", hideMenu:true,requiresAuth:false
                     },
+                },
+                {
+                    path: 'records',
+                    name: "studyRecord",
+                    component: () => import("../views/StudyRecord.vue"),
+                    meta: {
+                        name: "学习记录", requiresAuth:true
+                    },
                 }
             ],
         },

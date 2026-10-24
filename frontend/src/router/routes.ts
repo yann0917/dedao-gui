@@ -20,6 +20,7 @@ export const ROUTES = {
     ODOB_DETAIL: (id: string) => `/bought/odob/${id}`,
     EBOOK: '/bought/ebook',
     EBOOK_COMMENT: '/bought/ebook/comment',
+    RECORDS: '/bought/records',
   },
 
   // 知识城邦
@@ -58,6 +59,7 @@ export const ROUTE_NAMES = {
   ODOB_ARTICLE: 'odobArticle',
   EBOOK: 'ebook',
   EBOOK_COMMENT: 'ebookComment',
+  STUDY_RECORD: 'studyRecord',
 
   // 知识城邦
   KNOWLEDGE: 'knowledgeHome',

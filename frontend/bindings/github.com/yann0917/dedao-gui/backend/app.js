@@ -462,6 +462,28 @@ export function PauseDownloadTask(id) {
 }
 
 /**
+ * RecentList 最近学习记录，游标翻页：下一页 maxID 传上一页最后一条的 timestamp
+ * @param {number} maxID
+ * @param {number} pageSize
+ * @returns {$CancellablePromise<services$0.RecentResponse | null>}
+ */
+export function RecentList(maxID, pageSize) {
+    return $Call.ByID(4288508426, maxID, pageSize).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType53($result);
+    }));
+}
+
+/**
+ * RecentStats 近 30 天学习统计（服务端聚合）
+ * @returns {$CancellablePromise<services$0.RecentStats | null>}
+ */
+export function RecentStats() {
+    return $Call.ByID(3598046277).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType55($result);
+    }));
+}
+
+/**
  * @param {string} id
  * @returns {$CancellablePromise<void>}
  */
@@ -482,7 +504,7 @@ export function RetryDownloadTask(id) {
  */
 export function SearchHot() {
     return $Call.ByID(910533088).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType53($result);
+        return $$createType57($result);
     }));
 }
 
@@ -503,7 +525,7 @@ export function SetDir(dir) {
  */
 export function SunflowerLabelContent(enID, nType, page, pageSize) {
     return $Call.ByID(4257134821, enID, nType, page, pageSize).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType55($result);
+        return $$createType59($result);
     }));
 }
 
@@ -515,7 +537,7 @@ export function SunflowerLabelContent(enID, nType, page, pageSize) {
  */
 export function SunflowerLabelList(nType) {
     return $Call.ByID(835478792, nType).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType57($result);
+        return $$createType61($result);
     }));
 }
 
@@ -524,7 +546,7 @@ export function SunflowerLabelList(nType) {
  */
 export function SunflowerResourceList() {
     return $Call.ByID(604570190).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType59($result);
+        return $$createType63($result);
     }));
 }
 
@@ -536,7 +558,7 @@ export function SunflowerResourceList() {
  */
 export function TopicAll(page, limit) {
     return $Call.ByID(1402317375, page, limit).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType61($result);
+        return $$createType65($result);
     }));
 }
 
@@ -547,7 +569,7 @@ export function TopicAll(page, limit) {
  */
 export function TopicNoteDetail(id) {
     return $Call.ByID(3403994225, id).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType63($result);
+        return $$createType67($result);
     }));
 }
 
@@ -562,7 +584,7 @@ export function TopicNoteDetail(id) {
  */
 export function TopicNotesList(id, isElected, page, limit) {
     return $Call.ByID(1175143493, id, isElected, page, limit).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType65($result);
+        return $$createType69($result);
     }));
 }
 
@@ -571,7 +593,7 @@ export function TopicNotesList(id, isElected, page, limit) {
  */
 export function UserInfo() {
     return $Call.ByID(1139105482).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType67($result);
+        return $$createType71($result);
     }));
 }
 
@@ -628,19 +650,23 @@ const $$createType48 = services$0.OdobVip.createFrom;
 const $$createType49 = $Create.Nullable($$createType48);
 const $$createType50 = services$0.OutsideDetail.createFrom;
 const $$createType51 = $Create.Nullable($$createType50);
-const $$createType52 = services$0.SearchTot.createFrom;
+const $$createType52 = services$0.RecentResponse.createFrom;
 const $$createType53 = $Create.Nullable($$createType52);
-const $$createType54 = services$0.SunflowerContent.createFrom;
+const $$createType54 = services$0.RecentStats.createFrom;
 const $$createType55 = $Create.Nullable($$createType54);
-const $$createType56 = services$0.SunflowerLabelList.createFrom;
+const $$createType56 = services$0.SearchTot.createFrom;
 const $$createType57 = $Create.Nullable($$createType56);
-const $$createType58 = services$0.SunflowerResourceList.createFrom;
+const $$createType58 = services$0.SunflowerContent.createFrom;
 const $$createType59 = $Create.Nullable($$createType58);
-const $$createType60 = services$0.TopicAll.createFrom;
+const $$createType60 = services$0.SunflowerLabelList.createFrom;
 const $$createType61 = $Create.Nullable($$createType60);
-const $$createType62 = services$0.TopicDetail.createFrom;
+const $$createType62 = services$0.SunflowerResourceList.createFrom;
 const $$createType63 = $Create.Nullable($$createType62);
-const $$createType64 = services$0.NotesList.createFrom;
+const $$createType64 = services$0.TopicAll.createFrom;
 const $$createType65 = $Create.Nullable($$createType64);
-const $$createType66 = services$0.User.createFrom;
+const $$createType66 = services$0.TopicDetail.createFrom;
 const $$createType67 = $Create.Nullable($$createType66);
+const $$createType68 = services$0.NotesList.createFrom;
+const $$createType69 = $Create.Nullable($$createType68);
+const $$createType70 = services$0.User.createFrom;
+const $$createType71 = $Create.Nullable($$createType70);

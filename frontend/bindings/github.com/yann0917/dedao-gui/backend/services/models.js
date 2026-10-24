@@ -12218,6 +12218,465 @@ export class Rank {
     }
 }
 
+/**
+ * RecentDayCount 每日条数，Date 为 MM-DD
+ */
+export class RecentDayCount {
+    /**
+     * Creates a new RecentDayCount instance.
+     * @param {Partial<RecentDayCount>} [$$source = {}] - The source object to create the RecentDayCount.
+     */
+    constructor($$source = {}) {
+        if (!("date" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["date"] = "";
+        }
+        if (!("count" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["count"] = 0;
+        }
+        if (!("types" in $$source)) {
+            /**
+             * 按类型细分，顺序与顶层 Types 一致
+             * @member
+             * @type {RecentNameCount[]}
+             */
+            this["types"] = [];
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new RecentDayCount instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {RecentDayCount}
+     */
+    static createFrom($$source = {}) {
+        const $$createField2_0 = $$createType127;
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("types" in $$parsedSource) {
+            $$parsedSource["types"] = $$createField2_0($$parsedSource["types"]);
+        }
+        return new RecentDayCount(/** @type {Partial<RecentDayCount>} */($$parsedSource));
+    }
+}
+
+/**
+ * RecentHourCount 单小时条数，仅非 0 小时
+ */
+export class RecentHourCount {
+    /**
+     * Creates a new RecentHourCount instance.
+     * @param {Partial<RecentHourCount>} [$$source = {}] - The source object to create the RecentHourCount.
+     */
+    constructor($$source = {}) {
+        if (!("hour" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["hour"] = 0;
+        }
+        if (!("count" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["count"] = 0;
+        }
+        if (!("types" in $$source)) {
+            /**
+             * @member
+             * @type {RecentNameCount[]}
+             */
+            this["types"] = [];
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new RecentHourCount instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {RecentHourCount}
+     */
+    static createFrom($$source = {}) {
+        const $$createField2_0 = $$createType127;
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("types" in $$parsedSource) {
+            $$parsedSource["types"] = $$createField2_0($$parsedSource["types"]);
+        }
+        return new RecentHourCount(/** @type {Partial<RecentHourCount>} */($$parsedSource));
+    }
+}
+
+/**
+ * RecentItem 最近学习列表项（只保留界面用到的字段）
+ */
+export class RecentItem {
+    /**
+     * Creates a new RecentItem instance.
+     * @param {Partial<RecentItem>} [$$source = {}] - The source object to create the RecentItem.
+     */
+    constructor($$source = {}) {
+        if (!("product_id" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["product_id"] = 0;
+        }
+        if (!("product_type" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["product_type"] = 0;
+        }
+        if (!("product_id_hazy" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["product_id_hazy"] = "";
+        }
+        if (!("type_name" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["type_name"] = "";
+        }
+        if (!("title" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["title"] = "";
+        }
+        if (!("author" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["author"] = "";
+        }
+        if (!("index_img" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["index_img"] = "";
+        }
+        if (!("square_img" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["square_img"] = "";
+        }
+        if (!("timestamp" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["timestamp"] = 0;
+        }
+        if (!("last_info" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["last_info"] = "";
+        }
+        if (!("progress_intro" in $$source)) {
+            /**
+             * @member
+             * @type {RecentProgress}
+             */
+            this["progress_intro"] = (new RecentProgress());
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new RecentItem instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {RecentItem}
+     */
+    static createFrom($$source = {}) {
+        const $$createField10_0 = $$createType128;
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("progress_intro" in $$parsedSource) {
+            $$parsedSource["progress_intro"] = $$createField10_0($$parsedSource["progress_intro"]);
+        }
+        return new RecentItem(/** @type {Partial<RecentItem>} */($$parsedSource));
+    }
+}
+
+/**
+ * RecentNameCount 按内容类型聚合的条数
+ */
+export class RecentNameCount {
+    /**
+     * Creates a new RecentNameCount instance.
+     * @param {Partial<RecentNameCount>} [$$source = {}] - The source object to create the RecentNameCount.
+     */
+    constructor($$source = {}) {
+        if (!("name" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["name"] = "";
+        }
+        if (!("count" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["count"] = 0;
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new RecentNameCount instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {RecentNameCount}
+     */
+    static createFrom($$source = {}) {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new RecentNameCount(/** @type {Partial<RecentNameCount>} */($$parsedSource));
+    }
+}
+
+/**
+ * RecentProgress 最近学习进度
+ */
+export class RecentProgress {
+    /**
+     * Creates a new RecentProgress instance.
+     * @param {Partial<RecentProgress>} [$$source = {}] - The source object to create the RecentProgress.
+     */
+    constructor($$source = {}) {
+        if (!("intro" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["intro"] = "";
+        }
+        if (!("progress" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["progress"] = 0;
+        }
+        if (!("max_progress" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["max_progress"] = 0;
+        }
+        if (!("is_finish" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["is_finish"] = 0;
+        }
+        if (!("uint" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["uint"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new RecentProgress instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {RecentProgress}
+     */
+    static createFrom($$source = {}) {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new RecentProgress(/** @type {Partial<RecentProgress>} */($$parsedSource));
+    }
+}
+
+/**
+ * RecentResponse 最近学习接口响应
+ */
+export class RecentResponse {
+    /**
+     * Creates a new RecentResponse instance.
+     * @param {Partial<RecentResponse>} [$$source = {}] - The source object to create the RecentResponse.
+     */
+    constructor($$source = {}) {
+        if (!("list" in $$source)) {
+            /**
+             * @member
+             * @type {RecentItem[]}
+             */
+            this["list"] = [];
+        }
+        if (!("timestamp" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["timestamp"] = 0;
+        }
+        if (!("current_time" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["current_time"] = 0;
+        }
+        if (!("has_more" in $$source)) {
+            /**
+             * @member
+             * @type {boolean}
+             */
+            this["has_more"] = false;
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new RecentResponse instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {RecentResponse}
+     */
+    static createFrom($$source = {}) {
+        const $$createField0_0 = $$createType130;
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("list" in $$parsedSource) {
+            $$parsedSource["list"] = $$createField0_0($$parsedSource["list"]);
+        }
+        return new RecentResponse(/** @type {Partial<RecentResponse>} */($$parsedSource));
+    }
+}
+
+/**
+ * RecentStats 近 N 天学习统计（服务端翻页拉满窗口后聚合）
+ */
+export class RecentStats {
+    /**
+     * Creates a new RecentStats instance.
+     * @param {Partial<RecentStats>} [$$source = {}] - The source object to create the RecentStats.
+     */
+    constructor($$source = {}) {
+        if (!("total" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["total"] = 0;
+        }
+        if (!("window_days" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["window_days"] = 0;
+        }
+        if (!("active_days" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["active_days"] = 0;
+        }
+        if (!("finish_rate" in $$source)) {
+            /**
+             * 百分比整数
+             * @member
+             * @type {number}
+             */
+            this["finish_rate"] = 0;
+        }
+        if (!("top_type" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["top_type"] = "";
+        }
+        if (!("truncated" in $$source)) {
+            /**
+             * @member
+             * @type {boolean}
+             */
+            this["truncated"] = false;
+        }
+        if (!("types" in $$source)) {
+            /**
+             * @member
+             * @type {RecentNameCount[]}
+             */
+            this["types"] = [];
+        }
+        if (!("daily" in $$source)) {
+            /**
+             * 近 14 天从旧到新，含 0
+             * @member
+             * @type {RecentDayCount[]}
+             */
+            this["daily"] = [];
+        }
+        if (!("hours" in $$source)) {
+            /**
+             * 仅非 0 小时
+             * @member
+             * @type {RecentHourCount[]}
+             */
+            this["hours"] = [];
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new RecentStats instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {RecentStats}
+     */
+    static createFrom($$source = {}) {
+        const $$createField6_0 = $$createType127;
+        const $$createField7_0 = $$createType132;
+        const $$createField8_0 = $$createType134;
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("types" in $$parsedSource) {
+            $$parsedSource["types"] = $$createField6_0($$parsedSource["types"]);
+        }
+        if ("daily" in $$parsedSource) {
+            $$parsedSource["daily"] = $$createField7_0($$parsedSource["daily"]);
+        }
+        if ("hours" in $$parsedSource) {
+            $$parsedSource["hours"] = $$createField8_0($$parsedSource["hours"]);
+        }
+        return new RecentStats(/** @type {Partial<RecentStats>} */($$parsedSource));
+    }
+}
+
 export class Recommend {
     /**
      * Creates a new Recommend instance.
@@ -12255,7 +12714,7 @@ export class Recommend {
      * @returns {Recommend}
      */
     static createFrom($$source = {}) {
-        const $$createField2_0 = $$createType127;
+        const $$createField2_0 = $$createType136;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("list" in $$parsedSource) {
             $$parsedSource["list"] = $$createField2_0($$parsedSource["list"]);
@@ -12294,8 +12753,8 @@ export class SearchTot {
      * @returns {SearchTot}
      */
     static createFrom($$source = {}) {
-        const $$createField0_0 = $$createType129;
-        const $$createField1_0 = $$createType131;
+        const $$createField0_0 = $$createType138;
+        const $$createField1_0 = $$createType140;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("hot_tab_list" in $$parsedSource) {
             $$parsedSource["hot_tab_list"] = $$createField0_0($$parsedSource["hot_tab_list"]);
@@ -12461,8 +12920,8 @@ export class SunflowerContent {
      * @returns {SunflowerContent}
      */
     static createFrom($$source = {}) {
-        const $$createField0_0 = $$createType133;
-        const $$createField2_0 = $$createType135;
+        const $$createField0_0 = $$createType142;
+        const $$createField2_0 = $$createType144;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("product_list" in $$parsedSource) {
             $$parsedSource["product_list"] = $$createField0_0($$parsedSource["product_list"]);
@@ -12497,7 +12956,7 @@ export class SunflowerLabelList {
      * @returns {SunflowerLabelList}
      */
     static createFrom($$source = {}) {
-        const $$createField0_0 = $$createType135;
+        const $$createField0_0 = $$createType144;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("list" in $$parsedSource) {
             $$parsedSource["list"] = $$createField0_0($$parsedSource["list"]);
@@ -12620,7 +13079,7 @@ export class SunflowerResourceList {
      * @returns {SunflowerResourceList}
      */
     static createFrom($$source = {}) {
-        const $$createField0_0 = $$createType137;
+        const $$createField0_0 = $$createType146;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("list" in $$parsedSource) {
             $$parsedSource["list"] = $$createField0_0($$parsedSource["list"]);
@@ -12690,7 +13149,7 @@ export class TopicAll {
      * @returns {TopicAll}
      */
     static createFrom($$source = {}) {
-        const $$createField1_0 = $$createType139;
+        const $$createField1_0 = $$createType148;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("list" in $$parsedSource) {
             $$parsedSource["list"] = $$createField1_0($$parsedSource["list"]);
@@ -12907,8 +13366,8 @@ export class TopicDetail {
      * @returns {TopicDetail}
      */
     static createFrom($$source = {}) {
-        const $$createField13_0 = $$createType141;
-        const $$createField14_0 = $$createType143;
+        const $$createField13_0 = $$createType150;
+        const $$createField14_0 = $$createType152;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("presenters" in $$parsedSource) {
             $$parsedSource["presenters"] = $$createField13_0($$parsedSource["presenters"]);
@@ -13385,7 +13844,7 @@ export class User {
      * @returns {User}
      */
     static createFrom($$source = {}) {
-        const $$createField5_0 = $$createType144;
+        const $$createField5_0 = $$createType153;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("vip_user" in $$parsedSource) {
             $$parsedSource["vip_user"] = $$createField5_0($$parsedSource["vip_user"]);
@@ -13651,7 +14110,7 @@ export class VideoTrack {
      * @returns {VideoTrack}
      */
     static createFrom($$source = {}) {
-        const $$createField4_0 = $$createType146;
+        const $$createField4_0 = $$createType155;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("formats" in $$parsedSource) {
             $$parsedSource["formats"] = $$createField4_0($$parsedSource["formats"]);
@@ -13991,9 +14450,9 @@ export class VodPlayInfoModel {
      * @returns {VodPlayInfoModel}
      */
     static createFrom($$source = {}) {
-        const $$createField8_0 = $$createType147;
-        const $$createField9_0 = $$createType149;
-        const $$createField10_0 = $$createType151;
+        const $$createField8_0 = $$createType156;
+        const $$createField9_0 = $$createType158;
+        const $$createField10_0 = $$createType160;
         const $$createField12_0 = $$createType1;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("AdaptiveInfo" in $$parsedSource) {
@@ -14046,8 +14505,8 @@ export class VodPlayInfoResp {
      * @returns {VodPlayInfoResp}
      */
     static createFrom($$source = {}) {
-        const $$createField0_0 = $$createType152;
-        const $$createField1_0 = $$createType153;
+        const $$createField0_0 = $$createType161;
+        const $$createField1_0 = $$createType162;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("ResponseMetadata" in $$parsedSource) {
             $$parsedSource["ResponseMetadata"] = $$createField0_0($$parsedSource["ResponseMetadata"]);
@@ -14407,31 +14866,40 @@ const $$createType122 = LiveInfoDetail.createFrom;
 const $$createType123 = OutsideSPUExtra.createFrom;
 const $$createType124 = QualityUser.createFrom;
 const $$createType125 = $Create.Array($$createType124);
-const $$createType126 = RTab.createFrom;
+const $$createType126 = RecentNameCount.createFrom;
 const $$createType127 = $Create.Array($$createType126);
-const $$createType128 = HotTab.createFrom;
-const $$createType129 = $Create.Array($$createType128);
-const $$createType130 = Recommend.createFrom;
-const $$createType131 = $Create.Array($$createType130);
-const $$createType132 = ProductSimple.createFrom;
-const $$createType133 = $Create.Array($$createType132);
-const $$createType134 = Navigation.createFrom;
-const $$createType135 = $Create.Array($$createType134);
-const $$createType136 = SunflowerResource.createFrom;
-const $$createType137 = $Create.Array($$createType136);
-const $$createType138 = TopicIntro.createFrom;
-const $$createType139 = $Create.Array($$createType138);
-const $$createType140 = TopicPresenter.createFrom;
-const $$createType141 = $Create.Array($$createType140);
-const $$createType142 = TopicTopArea.createFrom;
-const $$createType143 = $Create.Array($$createType142);
-const $$createType144 = VIPUser.createFrom;
-const $$createType145 = VolcFormat.createFrom;
+const $$createType128 = RecentProgress.createFrom;
+const $$createType129 = RecentItem.createFrom;
+const $$createType130 = $Create.Array($$createType129);
+const $$createType131 = RecentDayCount.createFrom;
+const $$createType132 = $Create.Array($$createType131);
+const $$createType133 = RecentHourCount.createFrom;
+const $$createType134 = $Create.Array($$createType133);
+const $$createType135 = RTab.createFrom;
+const $$createType136 = $Create.Array($$createType135);
+const $$createType137 = HotTab.createFrom;
+const $$createType138 = $Create.Array($$createType137);
+const $$createType139 = Recommend.createFrom;
+const $$createType140 = $Create.Array($$createType139);
+const $$createType141 = ProductSimple.createFrom;
+const $$createType142 = $Create.Array($$createType141);
+const $$createType143 = Navigation.createFrom;
+const $$createType144 = $Create.Array($$createType143);
+const $$createType145 = SunflowerResource.createFrom;
 const $$createType146 = $Create.Array($$createType145);
-const $$createType147 = VodAdaptiveInfo.createFrom;
-const $$createType148 = VodPlayInfo.createFrom;
-const $$createType149 = $Create.Array($$createType148);
-const $$createType150 = VodThumbInfo.createFrom;
-const $$createType151 = $Create.Array($$createType150);
-const $$createType152 = VodRespMetadata.createFrom;
-const $$createType153 = VodPlayInfoModel.createFrom;
+const $$createType147 = TopicIntro.createFrom;
+const $$createType148 = $Create.Array($$createType147);
+const $$createType149 = TopicPresenter.createFrom;
+const $$createType150 = $Create.Array($$createType149);
+const $$createType151 = TopicTopArea.createFrom;
+const $$createType152 = $Create.Array($$createType151);
+const $$createType153 = VIPUser.createFrom;
+const $$createType154 = VolcFormat.createFrom;
+const $$createType155 = $Create.Array($$createType154);
+const $$createType156 = VodAdaptiveInfo.createFrom;
+const $$createType157 = VodPlayInfo.createFrom;
+const $$createType158 = $Create.Array($$createType157);
+const $$createType159 = VodThumbInfo.createFrom;
+const $$createType160 = $Create.Array($$createType159);
+const $$createType161 = VodRespMetadata.createFrom;
+const $$createType162 = VodPlayInfoModel.createFrom;
