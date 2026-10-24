@@ -81,6 +81,21 @@ func (a *App) Logout() (err error) {
 	return
 }
 
+// RestoreLogin 用后端已存的 cookie 校验登录态并返回用户信息。
+// 后端无用户或 cookie 已失效时返回 nil（不算错误），前端据此决定是否显示登录页。
+func (a *App) RestoreLogin() (user *services.User, err error) {
+	u := config.Instance.ActiveUser()
+	if u.UIDHazy == "" || u.CookieStr == "" {
+		return nil, nil
+	}
+	user, err = Instance.User()
+	if err != nil {
+		// cookie 失效/网络异常都按未登录处理，让前端走登录页
+		return nil, nil
+	}
+	return user, nil
+}
+
 func (a *App) UserInfo() (user *services.User, err error) {
 	user, err = Instance.User()
 	return

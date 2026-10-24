@@ -212,7 +212,19 @@ func (c *ConfigsData) DeleteConfigFile() (err error) {
 	if c.configFilePath == "" {
 		return nil
 	}
+	// 先关闭并重置句柄：句柄残留时同进程内后续 Save() 会经 lazyOpenConfigFile
+	// 早退，把数据写进已删除文件的幽灵 inode，磁盘上不会重新出现
+	c.fileMu.Lock()
+	if c.configFile != nil {
+		_ = c.configFile.Close()
+		c.configFile = nil
+	}
+	c.fileMu.Unlock()
+
 	err = os.Remove(c.configFilePath)
+	if err != nil && os.IsNotExist(err) {
+		err = nil
+	}
 	return
 }
 

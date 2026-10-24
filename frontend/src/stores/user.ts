@@ -1,7 +1,7 @@
 import { ref, computed, reactive } from "vue";
 import { defineStore } from "pinia";
 import * as services from '@backend-bindings/services/models';
-import { Logout } from '@backend-bindings/app'
+import { Logout, RestoreLogin } from '@backend-bindings/app'
 import { Window } from '@wailsio/runtime'
 import { Local } from '../utils/storage'
 
@@ -32,6 +32,19 @@ export const userStore = defineStore("userStore",  {
         sessionExpired() {
             this.user = null
             this.loggedIn = false
+        },
+        // 启动时调用：本地无登录标志但后端有有效会话（换了 origin/容器启动）时恢复登录态
+        async restoreLogin() {
+            if (this.loggedIn) return
+            try {
+                const user = await RestoreLogin()
+                if (user && user.uid_hazy) {
+                    this.user = user
+                    this.loggedIn = true
+                }
+            } catch (error) {
+                console.error('restore login failed:', error)
+            }
         },
         loginSuccess(cookie: string, user: services.User) {
             this.loggedIn = true

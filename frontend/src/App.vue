@@ -9,6 +9,7 @@ import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { themeStore } from './stores/theme'
 import { settingStore } from './stores/setting'
 import { playerStore } from './stores/player'
+import { userStore } from './stores/user'
 import { AudioDetailAlias, SetDir } from '@backend-bindings/app'
 import { System } from '@wailsio/runtime'
 import { setFontFamily } from './utils/utils'
@@ -38,6 +39,9 @@ const applyPlatformClass = async () => {
 onMounted(() => {
   applyPlatformClass()
   store.initTheme()
+  // 启动时从后端恢复登录态：换了 origin/容器启动后 localStorage 是空的，
+  // 但后端 config 里的会话仍有效，校验通过就直接恢复，不用重新扫码
+  userStore().restoreLogin()
   setFontFamily(sStore.setting.fontFamily || 'default')
   // 启动时把持久化的路径同步到后端，让后台下载任务管理器（DownloadTaskPanel）
   // 在用户未进入 Course/Odob/Ebook 等页面时也能拿到 ffmpeg/wkhtmltopdf 路径。
