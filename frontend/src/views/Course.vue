@@ -115,7 +115,7 @@ import { settingStore } from '../stores/setting';
 import { useAppRouter } from '../composables/useRouter';
 import CourseInfo from '../components/CourseInfo.vue'
 import DownloadDialog from "../components/DownloadDialog.vue";
-import { Local } from '../utils/storage';
+import { isUnauthorized } from '../utils/errors';
 
 const store = userStore()
 const setStore = settingStore()
@@ -175,12 +175,10 @@ onMounted(() => {
             }
         })
     }).catch((error) => {
-        if (error == '401 Unauthorized') {
-            store.user = null
+        if (isUnauthorized(error)) {
+            store.sessionExpired()
             pushLogin()
         }
-        Local.remove("cookies")
-        Local.remove("userStore")
     })
 })
 

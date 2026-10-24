@@ -73,7 +73,7 @@ import * as services from '@backend-bindings/services/models';
 import { useRouter } from 'vue-router'
 import { userStore } from '../stores/user';
 import Pagination from '../components/Pagination.vue'
-import { Local } from '../utils/storage';
+import { isUnauthorized } from '../utils/errors';
 import { Download as DownloadIcon, User, Picture } from '@element-plus/icons-vue'
 
 const store = userStore()
@@ -103,12 +103,10 @@ onMounted(() => {
             }
         })
     }).catch((error) => {
-        if (error == '401 Unauthorized') {
-            store.user = null
+        if (isUnauthorized(error)) {
+            store.sessionExpired()
             router.push("/user/login")
         }
-        Local.remove("cookies")
-        Local.remove("userStore")
     })
 })
 

@@ -28,6 +28,11 @@ export const userStore = defineStore("userStore",  {
                 console.error('Logout failed:', error)
             }
         },
+        // 会话在服务端失效（401）时调用：只清前端状态，不能调 logout()，那会删掉后端 config
+        sessionExpired() {
+            this.user = null
+            this.loggedIn = false
+        },
         loginSuccess(cookie: string, user: services.User) {
             this.loggedIn = true
             Local.set("cookies", cookie)

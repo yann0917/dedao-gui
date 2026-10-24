@@ -51,6 +51,7 @@ func CheckLogin(token, qrCode string) (user *services.User, err error) {
 
 func Logout() (err error) {
 	err = config.Instance.DeleteConfigFile()
+	config.Instance.ResetActiveUser()
 	return
 }
 

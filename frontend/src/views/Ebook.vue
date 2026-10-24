@@ -167,7 +167,7 @@ import DownloadDialog from "../components/DownloadDialog.vue";
 import {useAppRouter} from '../composables/useRouter'
 import {userStore} from '../stores/user'
 import {settingStore} from "../stores/setting";
-import {Local} from '../utils/storage'
+import { isUnauthorized } from '../utils/errors'
 
 const store = userStore()
 const setStore = settingStore()
@@ -224,12 +224,10 @@ onMounted(() => {
         })
 
     }).catch((error) => {
-        if (error == '401 Unauthorized') {
-            store.user = null
+        if (isUnauthorized(error)) {
+            store.sessionExpired()
             pushLogin()
         }
-        Local.remove("cookies")
-        Local.remove("userStore")
     })
     
     // Initial load

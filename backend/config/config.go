@@ -269,6 +269,8 @@ func (c *ConfigsData) SetUser(u *Dedao) (*Dedao, *services.User, error) {
 	}
 	c.Users = append(c.Users, dedao)
 	c.setActiveUser(dedao)
+	// service 在进程启动时构建并缓存了当时的 cookie，登录后必须重建才能带上新 cookie
+	c.service = nil
 	return dedao, user, nil
 }
 
@@ -302,9 +304,18 @@ func (c *ConfigsData) SwitchUser(u *User) error {
 	for _, user := range c.Users {
 		if user.UIDHazy == u.UIDHazy {
 			c.setActiveUser(user)
+			c.service = nil // 重建 service，让后续请求带上新用户的 cookie
 			err := c.Save()
 			return err
 		}
 	}
 	return errors.New("用户不存在")
+}
+
+// ResetActiveUser 登出时清空内存中的账号与 service，避免后续请求仍携带旧 cookie
+func (c *ConfigsData) ResetActiveUser() {
+	c.AcitveUID = ""
+	c.Users = nil
+	c.activeUser = new(Dedao)
+	c.service = nil
 }

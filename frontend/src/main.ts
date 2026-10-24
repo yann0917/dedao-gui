@@ -11,6 +11,7 @@ import 'highlight.js/styles/atom-one-dark.css' //样式
 import 'element-plus/dist/index.css'
 import './assets/css/font.css' // 字体样式
 import './assets/css/global.css' // 全局自定义样式
+import { isUnauthorized } from './utils/errors'
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -32,11 +33,8 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 app.config.errorHandler = (err, vm, info) => {
   console.log('❌ 提示:', err);
-  if (err instanceof Error) {
-    console.log('❌ 提示:', err.message);
-    if (err.message == '401 Unauthorized') {
-      router.push("/user/login")
-    }
+  if (isUnauthorized(err)) {
+    router.push("/user/login")
   }
 }
 
