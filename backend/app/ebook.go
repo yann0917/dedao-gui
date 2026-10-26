@@ -62,7 +62,8 @@ func EbookPage(ctx context.Context, enID string, cb ProgressCallback) (info *ser
 	if err != nil {
 		return
 	}
-	wgp := utils.NewWaitGroupPool(5)
+	// get_pages 已触发封号：池大小限制为 1，同一时刻只有一个章节在请求
+	wgp := utils.NewWaitGroupPool(1)
 	total, curr := len(info.BookInfo.Orders), 0
 	var chapterMap sync.Map
 	var mu sync.Mutex
