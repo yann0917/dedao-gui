@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
-	"strconv"
 	"strings"
 
 	jsoniter "github.com/json-iterator/go"
@@ -294,82 +292,85 @@ func (d *OdobDownload) Download() error {
 }
 
 func (d *EBookDownload) Download() error {
-	if err := checkCanceled(d.Ctx); err != nil {
-		return err
-	}
-	detail, err := EbookDetail(d.EnID)
-	if err != nil {
-		return err
-	}
+	// 为保护账号已停用：get_pages 已触发风控，恢复时还原以下实现
+	// if err := checkCanceled(d.Ctx); err != nil {
+	// 	return err
+	// }
+	// detail, err := EbookDetail(d.EnID)
+	// if err != nil {
+	// 	return err
+	// }
+	//
+	// title := strconv.Itoa(d.ID) + "_"
+	// if detail.Title != "" {
+	// 	title += detail.Title
+	// } else if detail.OperatingTitle != "" {
+	// 	title += detail.OperatingTitle
+	// }
+	//
+	// title += "_" + detail.BookAuthor
+	// if err = checkCanceled(d.Ctx); err != nil {
+	// 	return err
+	// }
+	// info, svgContent, err := EbookPage(d.Ctx, detail.Enid, d.ProgressCB)
+	// if err != nil {
+	// 	return err
+	// }
+	// sort.Sort(svgContent)
+	//
+	// dType := map[int]string{
+	// 	1: "HTML",
+	// 	2: "PDF",
+	// 	3: "EPUB",
+	// }
+	// var progress Progress
+	// progress.Pct = 100
+	// progress.Value = "正在生成" + dType[d.DownloadType] + "文件"
+	// application.Get().Event.Emit("ebookDownload", progress)
+	// emitProgress(d.ProgressCB, progress)
+	// switch d.DownloadType {
+	// case 1:
+	// 	if err = checkCanceled(d.Ctx); err != nil {
+	// 		return err
+	// 	}
+	// 	if err = utils.Svg2Html(OutputDir, title, svgContent, info.BookInfo.Toc); err != nil {
+	// 		return err
+	// 	}
+	//
+	// case 2:
+	// 	if err = checkCanceled(d.Ctx); err != nil {
+	// 		return err
+	// 	}
+	// 	if err = utils.Svg2Pdf(OutputDir, title, svgContent, info.BookInfo.Toc); err != nil {
+	// 		return err
+	// 	}
+	//
+	// case 3:
+	// 	if err = checkCanceled(d.Ctx); err != nil {
+	// 		return err
+	// 	}
+	// 	var opts utils.EpubOptions
+	// 	opts.Title = title
+	// 	opts.Author = detail.BookAuthor
+	// 	opts.Description = detail.BookIntro
+	// 	opts.Toc = info.BookInfo.Toc
+	//
+	// 	if err = utils.Svg2Epub(OutputDir, title, svgContent, opts); err != nil {
+	// 		return err
+	// 	}
+	// }
+	//
+	// // 各格式成功生成后清掉本书的页面缓存：内容已写入输出文件，留着只占磁盘。
+	// // 失败路径在 switch 内已 return err，走到这里即成功
+	// if d.DownloadType >= 1 && d.DownloadType <= 3 {
+	// 	if clearErr := services.ClearBookCache(detail.Enid); clearErr != nil {
+	// 		fmt.Printf("Warning: Failed to clear book cache: %v\n", clearErr)
+	// 	}
+	// }
+	//
+	// return nil
 
-	title := strconv.Itoa(d.ID) + "_"
-	if detail.Title != "" {
-		title += detail.Title
-	} else if detail.OperatingTitle != "" {
-		title += detail.OperatingTitle
-	}
-
-	title += "_" + detail.BookAuthor
-	if err = checkCanceled(d.Ctx); err != nil {
-		return err
-	}
-	info, svgContent, err := EbookPage(d.Ctx, detail.Enid, d.ProgressCB)
-	if err != nil {
-		return err
-	}
-	sort.Sort(svgContent)
-
-	dType := map[int]string{
-		1: "HTML",
-		2: "PDF",
-		3: "EPUB",
-	}
-	var progress Progress
-	progress.Pct = 100
-	progress.Value = "正在生成" + dType[d.DownloadType] + "文件"
-	application.Get().Event.Emit("ebookDownload", progress)
-	emitProgress(d.ProgressCB, progress)
-	switch d.DownloadType {
-	case 1:
-		if err = checkCanceled(d.Ctx); err != nil {
-			return err
-		}
-		if err = utils.Svg2Html(OutputDir, title, svgContent, info.BookInfo.Toc); err != nil {
-			return err
-		}
-
-	case 2:
-		if err = checkCanceled(d.Ctx); err != nil {
-			return err
-		}
-		if err = utils.Svg2Pdf(OutputDir, title, svgContent, info.BookInfo.Toc); err != nil {
-			return err
-		}
-
-	case 3:
-		if err = checkCanceled(d.Ctx); err != nil {
-			return err
-		}
-		var opts utils.EpubOptions
-		opts.Title = title
-		opts.Author = detail.BookAuthor
-		opts.Description = detail.BookIntro
-		opts.Toc = info.BookInfo.Toc
-
-		if err = utils.Svg2Epub(OutputDir, title, svgContent, opts); err != nil {
-			return err
-		}
-	}
-
-	// 各格式成功生成后清掉本书的页面缓存：内容已写入输出文件，留着只占磁盘。
-	// 失败路径在 switch 内已 return err，走到这里即成功
-	if d.DownloadType >= 1 && d.DownloadType <= 3 {
-		if clearErr := services.ClearBookCache(detail.Enid); clearErr != nil {
-			fmt.Printf("Warning: Failed to clear book cache: %v\n", clearErr)
-		}
-	}
-
-	return nil
+	return fmt.Errorf("电子书下载已停用（账号风控保护），请在 dedao-dl Web 端使用在线阅读")
 }
 
 // 生成下载数据
