@@ -31,10 +31,11 @@ func emitProgress(cb ProgressCallback, p Progress) {
 
 type CourseDownload struct {
 	Ctx          context.Context
-	DownloadType int              // 1:mp3及元数据, 2:PDF文档, 3:markdown文档, 4:仅元数据
-	ID           int              // 课程 id
-	AID          int              // 文章 id
-	EnId         string           // 课程 enid
+	DownloadType int  // 1:mp3及元数据, 2:PDF文档, 3:markdown文档, 4:仅元数据
+	ID           int  // 课程 id
+	AID          int  // 文章 id
+	EnId         string // 课程 enid
+	Force        bool // 强制重新下载音频，忽略已有文件
 	ProgressCB   ProgressCallback // 可空；下载任务管理器注入以接收实时进度
 }
 
@@ -43,6 +44,7 @@ type OdobDownload struct {
 	DownloadType int // 1:mp3及元数据, 2:PDF文档, 3:markdown文档, 4:仅元数据
 	ID           int
 	Data         *services.Course
+	Force        bool // 强制重新下载音频，忽略已有文件
 	ProgressCB   ProgressCallback // 可空；下载任务管理器注入以接收实时进度
 }
 
@@ -102,7 +104,7 @@ func (d *CourseDownload) Download() error {
 
 	switch d.DownloadType {
 	case 1: // mp3
-		downloadData := extractDownloadData(course, articles, d.AID, 1)
+		downloadData := extractDownloadData(course, articles, d.AID)
 		errs := make([]error, 0)
 
 		path, err := utils.Mkdir(OutputDir, utils.FileName(course.ClassInfo.Name, ""), "MP3")
@@ -110,6 +112,21 @@ func (d *CourseDownload) Download() error {
 			return err
 		}
 
+		progressName := course.ClassInfo.Enid
+		if progressName == "" {
+			progressName = utils.FileName(course.ClassInfo.Name, "")
+		}
+		progress, err := downloader.NewProgressStore(filepath.Dir(path), progressName)
+		if err != nil {
+			return err
+		}
+		for i := range downloadData.Data {
+			downloadData.Data[i].Ctx = d.Ctx
+			downloadData.Data[i].Progress = progress
+			downloadData.Data[i].Force = d.Force
+		}
+
+		completed, skipped, failed := 0, 0, 0
 		total, curr := len(downloadData.Data), 0
 		for _, datum := range downloadData.Data {
 			if err := checkCanceled(d.Ctx); err != nil {
@@ -130,8 +147,16 @@ func (d *CourseDownload) Download() error {
 				continue
 			}
 			stream := datum.Enid
-			if err := downloader.Download(datum, stream, path); err != nil {
+			wasSkipped, err := downloader.Download(datum, stream, path)
+			if err != nil {
+				failed++
 				errs = append(errs, err)
+				continue
+			}
+			if wasSkipped {
+				skipped++
+			} else {
+				completed++
 			}
 		}
 		album, tracks := courseMetadata(course, articles, d.AID)
@@ -139,7 +164,7 @@ func (d *CourseDownload) Download() error {
 			errs = append(errs, err)
 		}
 		if len(errs) > 0 {
-			return errs[0]
+			return fmt.Errorf("有 %d 个内容下载失败（完成 %d，跳过 %d），首个错误: %w", failed, completed, skipped, errs[0])
 		}
 	case DownloadMetadata:
 		path, err := utils.Mkdir(OutputDir, utils.FileName(course.ClassInfo.Name, ""), "MP3")
@@ -153,7 +178,7 @@ func (d *CourseDownload) Download() error {
 			return err
 		}
 		// 下载 PDF
-		downloadData := extractDownloadData(course, articles, d.AID, 2)
+		downloadData := extractDownloadData(course, articles, d.AID)
 
 		path, err := utils.Mkdir(OutputDir, utils.FileName(course.ClassInfo.Name, ""), "PDF")
 		if err != nil {
@@ -200,6 +225,22 @@ func (d *OdobDownload) Download() error {
 		if err != nil {
 			return err
 		}
+
+		progressName := d.Data.Enid
+		if progressName == "" {
+			progressName = utils.FileName(d.Data.Title, "")
+		}
+		progressStore, err := downloader.NewProgressStore(filepath.Dir(path), progressName)
+		if err != nil {
+			return err
+		}
+		for i := range downloadData.Data {
+			downloadData.Data[i].Ctx = d.Ctx
+			downloadData.Data[i].Progress = progressStore
+			downloadData.Data[i].Force = d.Force
+		}
+
+		completed, skipped, failed := 0, 0, 0
 		total, curr := len(downloadData.Data), 0
 		for _, datum := range downloadData.Data {
 			if err := checkCanceled(d.Ctx); err != nil {
@@ -220,8 +261,16 @@ func (d *OdobDownload) Download() error {
 				continue
 			}
 			stream := datum.Enid
-			if err := downloader.Download(datum, stream, path); err != nil {
+			wasSkipped, err := downloader.Download(datum, stream, path)
+			if err != nil {
+				failed++
 				errors = append(errors, err)
+				continue
+			}
+			if wasSkipped {
+				skipped++
+			} else {
+				completed++
 			}
 		}
 		album, tracks := odobMetadata(d.Data)
@@ -229,7 +278,7 @@ func (d *OdobDownload) Download() error {
 			errors = append(errors, err)
 		}
 		if len(errors) > 0 {
-			return errors[0]
+			return fmt.Errorf("有 %d 个内容下载失败（完成 %d，跳过 %d），首个错误: %w", failed, completed, skipped, errors[0])
 		}
 	case DownloadMetadata:
 		path, err := odobAudioDir(OutputDir, d.Data)
@@ -374,7 +423,7 @@ func (d *EBookDownload) Download() error {
 }
 
 // 生成下载数据
-func extractDownloadData(course *services.CourseInfo, articles *services.ArticleList, aid int, flag int) downloader.Data {
+func extractDownloadData(course *services.CourseInfo, articles *services.ArticleList, aid int) downloader.Data {
 
 	downloadData := downloader.Data{
 		Title: course.ClassInfo.Name,
@@ -382,16 +431,15 @@ func extractDownloadData(course *services.CourseInfo, articles *services.Article
 
 	if course.HasAudio() {
 		downloadData.Type = "audio"
-		downloadData.Data = extractCourseDownloadData(articles, aid, flag)
+		downloadData.Data = extractCourseDownloadData(articles, aid)
 	}
 
 	return downloadData
 }
 
 // 生成课程下载数据
-func extractCourseDownloadData(articles *services.ArticleList, aid int, flag int) []downloader.Datum {
+func extractCourseDownloadData(articles *services.ArticleList, aid int) []downloader.Datum {
 	data := downloader.EmptyData
-	audioIds := map[int]string{}
 
 	audioData := make([]*downloader.Datum, 0)
 	for _, article := range articles.List {
@@ -403,8 +451,6 @@ func extractCourseDownloadData(articles *services.ArticleList, aid int, flag int
 		}
 
 		if article.Audio.Mp3PlayURL != "" && len(article.AudioAliasIds) > 0 {
-			audioIds[article.ID] = article.Audio.AliasID
-
 			var urls []downloader.URL
 			key := article.Enid
 			streams := map[string]downloader.Stream{
@@ -429,15 +475,12 @@ func extractCourseDownloadData(articles *services.ArticleList, aid int, flag int
 				OrderNum:  article.OrderNum,
 				Streams:   streams,
 				Type:      "audio",
+				Duration:  article.Audio.Duration,
 			}
 
 			audioData = append(audioData, datum)
 		}
 
-	}
-
-	if flag == 1 {
-		handleStreams(audioData, audioIds)
 	}
 
 	for _, d := range audioData {
@@ -449,12 +492,9 @@ func extractCourseDownloadData(articles *services.ArticleList, aid int, flag int
 // extOdobDownloadData 生成 AudioBook 下载数据
 func extOdobDownloadData(info *services.Course) ([]downloader.Datum, error) {
 	data := downloader.EmptyData
-	audioIds := map[int]string{}
 
 	audioData := make([]*downloader.Datum, 0)
 	aliasID := info.AudioDetail.AliasID
-
-	audioIds[info.ID] = aliasID
 
 	var urls []downloader.URL
 	key := info.Enid
@@ -473,55 +513,28 @@ func extOdobDownloadData(info *services.Course) ([]downloader.Datum, error) {
 	if err != nil {
 		return nil, err
 	}
+	audioDuration := info.AudioDetail.Duration
+	if audioDuration == 0 {
+		audioDuration = detail.Duration
+	}
 	datum := &downloader.Datum{
-		ID:      info.ID,
-		Enid:    info.Enid,
-		ClassID: info.ClassID,
-		Title:   info.Title,
-		IsCanDL: isCanDL,
-		M3U8URL: detail.Mp3PlayURL,
-		Streams: streams,
-		Type:    "audio",
+		ID:       info.ID,
+		Enid:     info.Enid,
+		ClassID:  info.ClassID,
+		Title:    info.Title,
+		IsCanDL:  isCanDL,
+		M3U8URL:  detail.Mp3PlayURL,
+		Streams:  streams,
+		Type:     "audio",
+		Duration: audioDuration,
 	}
 
 	audioData = append(audioData, datum)
-	handleStreams(audioData, audioIds)
 
 	for _, d := range audioData {
 		data = append(data, *d)
 	}
 	return data, nil
-}
-
-func handleStreams(audioData []*downloader.Datum, audioIds map[int]string) {
-	wgp := utils.NewWaitGroupPool(10)
-	for _, datum := range audioData {
-		wgp.Add()
-		go func(datum *downloader.Datum, streams map[int]string) {
-			defer func() {
-				wgp.Done()
-			}()
-			if datum.IsCanDL {
-				if urls, err := utils.M3u8URLs(datum.M3U8URL); err == nil {
-					key := datum.Enid
-					stream := datum.Streams[key]
-					for _, url := range urls {
-						stream.URLs = append(stream.URLs, downloader.URL{
-							URL: url,
-							Ext: "ts",
-						})
-					}
-					datum.Streams[key] = stream
-				}
-				for k, v := range datum.Streams {
-					if len(v.URLs) == 0 {
-						delete(datum.Streams, k)
-					}
-				}
-			}
-		}(datum, audioIds)
-	}
-	wgp.Wait()
 }
 
 func ContentsToMarkdown(contents []services.Content) (res string) {

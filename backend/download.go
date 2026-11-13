@@ -69,7 +69,7 @@ func (a *App) SetDir(dir []string) (err error) {
 	return nil
 }
 
-func (a *App) CourseDownload(id, aid, dType int, enid string) (err error) {
+func (a *App) CourseDownload(id, aid, dType int, enid string, force bool) (err error) {
 	title := "课程_" + strconv.Itoa(id)
 	if enid != "" {
 		if info, e := app.CourseInfoByEnid(enid); e == nil && info != nil && info.ClassInfo.Name != "" {
@@ -83,12 +83,13 @@ func (a *App) CourseDownload(id, aid, dType int, enid string) (err error) {
 		EnID:         enid,
 		ArticleID:    aid,
 		DownloadType: dType,
+		Force:        force,
 		SaveDir:      app.OutputDir,
 	})
 	return
 }
 
-func (a *App) OdobDownload(id, dType int, data *services.Course) (err error) {
+func (a *App) OdobDownload(id, dType int, data *services.Course, force bool) (err error) {
 	if data == nil {
 		return fmt.Errorf("缺少 odob 下载数据")
 	}
@@ -102,6 +103,7 @@ func (a *App) OdobDownload(id, dType int, data *services.Course) (err error) {
 		Title:        data.Title,
 		EnID:         data.Enid,
 		DownloadType: dType,
+		Force:        force,
 		SaveDir:      app.OutputDir,
 		PayloadJSON:  payload,
 	})

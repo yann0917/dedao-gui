@@ -31,6 +31,12 @@
                     : 'MP3 下载会同时保存 NFO、封面及内嵌音频标签，可导入 Jellyfin 音乐库或有声书库。' }}
             </p>
 
+            <el-checkbox
+                v-if="supportsResume"
+                v-model="forceRedownload"
+                class="force-option"
+            >强制重新下载（默认跳过已下载且完整的音频）</el-checkbox>
+
             <div class="download-status">
                 <div class="status-header">
                     <span class="status-text">{{ content }}</span>
@@ -60,6 +66,7 @@ const isDownloading = ref(false)
 
 const dialogVisible = ref(false)
 const downloadType = ref(1)
+const forceRedownload = ref(false)
 
 const props = defineProps({
     downloadId:{
@@ -97,6 +104,8 @@ const props = defineProps({
 const emits = defineEmits(["close"]);
 
 const supportsAudioMetadata = computed(() => props.prodType === 66 || props.prodType === 3)
+// 断点续传只作用于音频下载（类型 1）
+const supportsResume = computed(() => supportsAudioMetadata.value && downloadType.value === 1)
 const formatOptions = computed(() => supportsAudioMetadata.value
     ? [...props.downloadTypeOptions, { value: 4, label: '仅元数据' }]
     : props.downloadTypeOptions)
@@ -115,6 +124,7 @@ const openDialog = () => {
 
 const closeDialog = () => {
     content.value = '任务将提交到下载队列，可在“下载任务”中查看进度'
+    forceRedownload.value = false
     emits("close")
 }
 
@@ -128,10 +138,10 @@ const download = async () => {
                 await EbookDownload(props.downloadId, downloadType.value, props.enId)
                 break;
             case 66: // Course
-                await CourseDownload(props.downloadId, props.articleId, downloadType.value, props.enId)
+                await CourseDownload(props.downloadId, props.articleId, downloadType.value, props.enId, forceRedownload.value)
                 break;
             case 3: // Odob
-                await OdobDownload(props.downloadId, downloadType.value, props.downloadData as any)
+                await OdobDownload(props.downloadId, downloadType.value, props.downloadData as any, forceRedownload.value)
                 break;
         }
         ElMessage({
@@ -177,6 +187,10 @@ const download = async () => {
     color: var(--text-secondary, #606266);
     font-size: 12px;
     line-height: 1.6;
+}
+
+.force-option {
+    margin-top: 12px;
 }
 
 .format-option {

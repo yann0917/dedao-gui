@@ -75,7 +75,7 @@ func newPDFGenerator() (*wkhtmltopdf.PDFGenerator, error) {
 	if configured == "" && os.Getenv("WKHTMLTOPDF_PATH") != "" {
 		configured = filepath.Join(os.Getenv("WKHTMLTOPDF_PATH"), "wkhtmltopdf")
 	}
-	path, err := resolveExecutable(configured, "wkhtmltopdf")
+	path, err := ResolveExecutable(configured, "wkhtmltopdf")
 	if err != nil {
 		return nil, err
 	}

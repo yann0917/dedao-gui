@@ -54,6 +54,14 @@ export class CreateTaskRequest {
              */
             this["downloadType"] = 0;
         }
+        if (!("force" in $$source)) {
+            /**
+             * 音频强制重新下载，忽略断点续传
+             * @member
+             * @type {boolean}
+             */
+            this["force"] = false;
+        }
         if (!("saveDir" in $$source)) {
             /**
              * @member
@@ -151,6 +159,14 @@ export class DownloadTask {
              * @type {number}
              */
             this["downloadType"] = 0;
+        }
+        if (!("force" in $$source)) {
+            /**
+             * 音频强制重新下载，忽略断点续传
+             * @member
+             * @type {boolean}
+             */
+            this["force"] = false;
         }
         if (!("status" in $$source)) {
             /**

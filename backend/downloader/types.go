@@ -1,6 +1,7 @@
 package downloader
 
 import (
+	"context"
 	"sort"
 )
 
@@ -30,9 +31,16 @@ type Datum struct {
 	IsCanDL   bool   `json:"is_can_dl"`
 	M3U8URL   string `json:"m3u8_url"`
 	OrderNum  int    `json:"order_num"`
+	Duration  int    `json:"duration"` // 接口返回的音频时长（秒），用于校验已有文件
 
 	Streams       map[string]Stream `json:"streams"`
 	sortedStreams []Stream
+
+	// Ctx 取消下载任务时中断 ffmpeg；nil 时等同 context.Background()。
+	// Progress 为本次任务共享的进度清单；Force 为 true 时忽略已有文件重新下载。
+	Ctx      context.Context `json:"-"`
+	Progress *ProgressStore `json:"-"`
+	Force    bool           `json:"-"`
 }
 
 // Data 课程信息

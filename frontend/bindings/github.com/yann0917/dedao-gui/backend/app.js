@@ -177,10 +177,11 @@ export function CourseCategory() {
  * @param {number} aid
  * @param {number} dType
  * @param {string} enid
+ * @param {boolean} force
  * @returns {$CancellablePromise<void>}
  */
-export function CourseDownload(id, aid, dType, enid) {
-    return $Call.ByID(4237804328, id, aid, dType, enid);
+export function CourseDownload(id, aid, dType, enid, force) {
+    return $Call.ByID(4237804328, id, aid, dType, enid, force);
 }
 
 /**
@@ -394,10 +395,11 @@ export function NotesTimeline(maxID) {
  * @param {number} id
  * @param {number} dType
  * @param {services$0.Course | null} data
+ * @param {boolean} force
  * @returns {$CancellablePromise<void>}
  */
-export function OdobDownload(id, dType, data) {
-    return $Call.ByID(1556938807, id, dType, data);
+export function OdobDownload(id, dType, data, force) {
+    return $Call.ByID(1556938807, id, dType, data, force);
 }
 
 /**

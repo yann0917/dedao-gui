@@ -154,7 +154,7 @@ const closeDownloadDialog = () => {
 }
 
 const download = async (id: number, dType: number) => {
-    await CourseDownload(id, 0, dType,'').then((info) => {
+    await CourseDownload(id, 0, dType,'', false).then((info) => {
         console.log(info)
         ElMessage({
             message: '任务已添加到下载队列',

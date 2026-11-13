@@ -60,6 +60,7 @@ func (r *Repository) CreateTask(req CreateTaskRequest) (*DownloadTask, error) {
 		EnID:         req.EnID,
 		ArticleID:    req.ArticleID,
 		DownloadType: req.DownloadType,
+		Force:        req.Force,
 		Status:       StatusPending,
 		Priority:     req.Priority,
 		SaveDir:      req.SaveDir,

@@ -26,6 +26,7 @@ type DownloadTask struct {
 	EnID         string     `gorm:"type:varchar(255)" json:"enId"`
 	ArticleID    int        `json:"articleId"`
 	DownloadType int        `json:"downloadType"`
+	Force        bool       `gorm:"default:false" json:"force"` // 音频强制重新下载，忽略断点续传
 	Status       string     `gorm:"type:varchar(32);index:idx_tasks_status_priority_created,priority:2;index" json:"status"`
 	Priority     int        `gorm:"default:0;index:idx_tasks_status_priority_created,priority:3" json:"priority"`
 	Progress     int        `gorm:"default:0" json:"progress"`
@@ -60,6 +61,7 @@ type CreateTaskRequest struct {
 	EnID         string `json:"enId"`
 	ArticleID    int    `json:"articleId"`
 	DownloadType int    `json:"downloadType"`
+	Force        bool   `json:"force"` // 音频强制重新下载，忽略断点续传
 	SaveDir      string `json:"saveDir"`
 	Priority     int    `json:"priority"`
 	PayloadJSON  string `json:"payloadJson"`

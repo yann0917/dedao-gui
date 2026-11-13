@@ -9,7 +9,7 @@ import (
 )
 
 // Explicit settings override PATH; Finder does not normally inherit shell PATH.
-func resolveExecutable(configured, name string) (string, error) {
+func ResolveExecutable(configured, name string) (string, error) {
 	var fallbackDirs []string
 	if runtime.GOOS == "darwin" {
 		fallbackDirs = []string{"/opt/homebrew/bin", "/usr/local/bin"}

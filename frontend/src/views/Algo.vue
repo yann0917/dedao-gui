@@ -640,7 +640,7 @@ const closeOdobDownloadDialog = () => {
 const downloadOdob = async () => {
   odobDownloadContent.value = '正在提交任务...'
   try {
-    await OdobDownload(odobDownloadId.value, odobDownloadType.value, odobDownloadData as any)
+    await OdobDownload(odobDownloadId.value, odobDownloadType.value, odobDownloadData as any, false)
     ElMessage({
       message: '任务已加入下载队列',
       type: 'success'

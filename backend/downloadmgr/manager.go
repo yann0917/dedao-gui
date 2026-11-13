@@ -327,6 +327,7 @@ func (e *CourseExecutor) Execute(ctx context.Context, task *DownloadTask, report
 		AID:          task.ArticleID,
 		EnId:         task.EnID,
 		DownloadType: task.DownloadType,
+		Force:        task.Force,
 		ProgressCB: func(total, current, pct int, name string) {
 			reporter.Report(pct, current, total, name)
 		},
@@ -401,6 +402,7 @@ func (e *OdobExecutor) Execute(ctx context.Context, task *DownloadTask, reporter
 		Ctx:          ctx,
 		ID:           task.BizID,
 		DownloadType: task.DownloadType,
+		Force:        task.Force,
 		Data:         &payload.Data,
 		ProgressCB: func(total, current, pct int, name string) {
 			reporter.Report(pct, current, total, name)
